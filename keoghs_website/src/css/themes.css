@@ -1,4 +1,16 @@
 html
 {
+    /* test colors */
+    --t1: #00FF00;
+    --t2: #FFFF00;
+    --t3: #00FFFF;
+    --t4: #FF0000;
+    --t5: #0000FF;
+    --t6: #FF00FF;
+    --t7: #AAAAAA;
+    --t8: #FFAA00;
+
+    /* header colors */
     --header-background-color: rgb(250, 118, 118);
+    --header-sign-in-color: #ddd;
 }

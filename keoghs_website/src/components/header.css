@@ -2,19 +2,21 @@
 {
     background-color: var(--header-background-color);
     width: 100%;
-    /* grid template */
     display: grid;
-    grid-template-columns: 100px 1fr 100px;
-    /* grid-template-rows: 100px; */
+    grid-template-columns: 100px 1fr;
     grid-column-gap: 2px;
+}
+
+.rightSideOfHeader
+{
+ display: flex;  
+ position: relative; 
 }
 .headerTitle
 {
-    background-color: red;
     text-align: center;
+    width: fit-content;
     font-size: 45px;
-    /* margin: 10px auto; */
-    ; 
 }
 
 .keoghLogoContainer
@@ -33,4 +35,31 @@
     /* background-color: red; */
     margin: auto;
 
+}
+
+.signInContainer
+{
+    
+    position: relative;
+    height: fit-content;
+    margin: auto 0 auto auto;
+}
+
+.signInInput
+{
+    padding: 6px;
+    margin-top: 8px;
+    margin-right: 16px;
+    font-size: 20px;
+    cursor: pointer;
+}
+.signInButton
+{
+    padding: 10px;
+    margin-top: 8px;
+    margin-right: 16px;
+    background: var(--header-sign-in-color);
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
 }

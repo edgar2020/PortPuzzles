@@ -7,8 +7,6 @@ function homePage() {
     <div className="homePage">
         <SiteHeader/>
         <SiteFooter/>
-        <SiteFooter/>
-        <siteFooter/>
       <h1>Home Page</h1>
 
     </div>

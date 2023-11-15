@@ -9,10 +9,7 @@ function homePage() {
         <SiteHeader/>
         <HomeOptions/>
         <SiteFooter/>
-      <h1>Home Page</h1>
-
     </div>
   );
 }
-
 export default homePage;

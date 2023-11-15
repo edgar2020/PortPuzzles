@@ -1,12 +1,12 @@
 import './css/homePage.css';
-import loadUnload from "./loadingUnloading";
-import weight from "./weightBalancing";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import SiteHeader from './components/header'
 
 function homePage() {
   return (
-    <div className="App">
+    <div className="homePage">
+        <SiteHeader/>
       <h1>Home Page</h1>
+
     </div>
   );
 }

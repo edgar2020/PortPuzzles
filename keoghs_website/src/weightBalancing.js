@@ -2,7 +2,7 @@ import './css/loadingUnloading.css';
 
 function weightBalancing() {
   return (
-    <div className="App">
+    <div className="weightBalancingContainer">
       <h1>weight Balancing</h1>
     </div>
   );

@@ -9,8 +9,9 @@ class SiteHeader extends Component
     return (  
       <div className='homeOptions'>
         <h2>Options</h2>
-        <button id="load-unload">Load and Unload</button>
-        <button id="weight-balancing">Weight Balancing</button>
+        
+        <button id="load-unload"><a href="/LoadUnload">Load and Unload</a></button>
+        <button id="weight-balancing"><a href="/Weight">Weight Balancing</a></button>
         <button id="helpButton">Help</button>
       </div>
     )

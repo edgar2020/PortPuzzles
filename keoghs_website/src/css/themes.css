@@ -15,6 +15,10 @@ html
     --header-background-color: rgb(121, 114, 255);
     --header-sign-in-button-color: #ddd;
 
+    /* defaulr button color */
+    --button-def-color: #rgb(0, 0, 0);
+    --button-def-border: 2px solid red;
+
     /* Footer Colors */
     --footer-background-color: rgb(121, 114, 255);
     --heap-footer-text-color: rgb(255, 255, 255);

@@ -3,7 +3,7 @@ import './css/index.css';
 import SiteHeader from './components/header'
 import SiteFooter from './components/footer'
 
-import TASK1 from './components/task1Loading'
+import TASK1 from './components/task1Loading/task1Loading'
 
 function loadingUnloading() {
   return (

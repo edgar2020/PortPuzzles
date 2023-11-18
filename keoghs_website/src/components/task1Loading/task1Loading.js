@@ -1,5 +1,6 @@
 import React,{ Component } from 'react';
-import './tasks.css';
+import '../tasks.css';
+import FileUploader from './fileUploader';
 
 // Create States for State Machine Task1_States
 const Task1_States = {
@@ -13,9 +14,11 @@ const Task1_States = {
   class task1Loading extends Component {
     state = {
       // create starting state
-      current: Task1_States.INIT
-      
+      current: Task1_States.INIT,
+      selectedFile: null
+
     };
+
     transition(to) {
       this.setState({current: to});
     }
@@ -38,12 +41,10 @@ const Task1_States = {
       }
     }
     renderInit() {
-      // logic for the file upload
       return (
-        <button onClick={() => this.transition(Task1_States.CONFIRM_FILE)}>
-          Go to state 2
-        </button>
+        <FileUploader/>
       );
+      
     }
     // logic for the confirm file
     renderConfirmFile() {

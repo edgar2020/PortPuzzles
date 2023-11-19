@@ -3,7 +3,7 @@ import '../tasks.css';
 import FileUploader from './fileUploader';
 
 // Create States for State Machine Task1_States
-const Task1_States = {
+  const Task1_States = {
     INIT: 0,              //where form will be uploaded
     CONFIRM_FILE: 1,      //where form format will be checked and verifed
     GRAB_INPUTS: 2,       //where inputs from operator are given
@@ -15,9 +15,15 @@ const Task1_States = {
     state = {
       // create starting state
       current: Task1_States.INIT,
-      selectedFile: null
+      selectedFile: null,
+      gridData: "null"
 
     };
+
+    handleFileCallback = (fileData) => {
+      // Update the name in the component's state
+      this.setState({ gridData: fileData }) 
+    }
 
     transition(to) {
       this.setState({current: to});
@@ -42,7 +48,11 @@ const Task1_States = {
     }
     renderInit() {
       return (
-        <FileUploader/>
+      <div>
+
+        <FileUploader parentCallback={this.handleFileCallback}/>
+        {this.state.gridData}
+      </div>
       );
       
     }

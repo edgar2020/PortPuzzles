@@ -1,16 +1,23 @@
 import React, { Component } from 'react';
 import '../tasks.css' 
 
-class FileUploader extends Component {
+class FileUploader extends Component 
+{   
 
-    
-    
+    obj ={name: ""}
+
     state = {
         // Initially, no file is selected
         selectedFile: null,
-        errorMessage: 'No File Selected'
+        errorMessage: 'No File Selected',
     };
     
+    sendGridDataUp = (event) => {
+        // Call the parent callback function 
+        this.props.parentCallback(this.obj.name);
+        // event.preventDefault();
+    }
+
     // On file select
     onFileChange = event => {
         // no file is selected
@@ -39,6 +46,8 @@ class FileUploader extends Component {
                 document.getElementById('fileUploadButton').style.visibility='visible';
                 this.state.errorMessage = "File Is Permitted";
                 document.getElementById('dispalyValidationMessage').innerHTML = this.state.errorMessage;
+                this.obj.name = "sds "
+                this.sendGridDataUp();
             }
             // fails initial checks
             else

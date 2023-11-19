@@ -12,18 +12,13 @@ import FileUploader from '../fileUploader';
     FINISH_PROCEDURE: 3   //where new manifest is made, downloaded and reminder sent
   };
   class Container {
-
     constructor(name, weight) {
       this.name = name;
       this.weight = weight;
     }
   }
-  class task1Loading extends Component {
-    state = {
-      // create starting state
-      current: Task1_States.INIT,
-      textFromFile: "null",
-      grid: 
+
+  let grid =
       [
         [null, null, null, null, null, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null, null, null, null, null],
@@ -34,17 +29,21 @@ import FileUploader from '../fileUploader';
         [null, null, null, null, null, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null, null, null, null, null]//9th row
-      ]
-      // grid: null
+      ];
 
-
+  class task1Loading extends Component {
+    state = {
+      // create starting state
+      current: Task1_States.INIT,
+      textFromFile: "null",
+      loadedFileName: null
     };
 
     handleFileCallback = (fileData) => {
       // Update the name in the component's state
       try {
-        this.setState({ textFromFile: fileData });
-        var inputLines = fileData.split('\n');
+        this.setState({ textFromFile: fileData.text, loadedFileName: fileData.name });
+        var inputLines = fileData.text.split('\n');
         for (var i = 0; i < inputLines.length; i++)
         {
           
@@ -57,15 +56,15 @@ import FileUploader from '../fileUploader';
           {
             // alert(numbersFound);
             // alert(row_num + " " + col_num + " " + weight + " " + name);
-            this.state.grid[row_num][col_num] = new Container(name, weight);
+            grid[row_num][col_num] = new Container(name, weight);
           }
           if(name === 'NAN')
           {
-            this.state.grid[row_num][col_num] = 'NAN';
+            grid[row_num][col_num] = 'NAN';
           }
           else
           {
-            this.state.grid[row_num][col_num] = null;
+            grid[row_num][col_num] = null;
           }
         }
         // alert(inputLines.length);

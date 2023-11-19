@@ -6,6 +6,7 @@ import './tasks.css'
 class FileUploader extends Component 
 {   
     textFromFile = "none";
+    fileName = "none";
     state = {
         // Initially, no file is selected
         selectedFile: null,
@@ -15,16 +16,16 @@ class FileUploader extends Component
     
     sendDataUp = (event) => {
         // Call the parent callback function 
-        this.props.parentCallback(this.textFromFile);
+        this.props.parentCallback( {name: this.fileName, text: this.textFromFile});
         // event.preventDefault();
     }
 
     // On file select
     onFileChange = event => {
         // no file is selected
-        if(event.target.files.length == 0)
+        if(event.target.files.length === 0)
         {
-            this.state.errorMessage = "INVALID ACTION: No File is Selected";
+            this.setState( { errorMessage: "INVALID ACTION: No File is Selected"} );
             document.getElementById('fileUploadButton').style.visibility = 'hidden';
             document.getElementById('fileNameh2').style.visibility = 'hidden';
             document.getElementById('dispalyValidationMessage').style.color = 'red';
@@ -39,25 +40,25 @@ class FileUploader extends Component
             document.getElementById('showFileDataContainer').style.visibility='visible';
             
             // passes initial checks (type .txt and file is uploaded)
-            if( curFile.type == 'text/plain')
+            if( curFile.type === 'text/plain')
             {
                 document.getElementById('dispalyValidationMessage').style.color = 'limeGreen';
                 document.getElementById('fileNameh2').style.visibility = 'visible';
                 document.getElementById('fileNameEcho').innerHTML = curFile.name;
                 document.getElementById('fileUploadButton').style.visibility='visible';
-                this.state.errorMessage = "File Is Permitted";
+                this.setState ({errorMessage: "File Is Permitted"});
                 document.getElementById('dispalyValidationMessage').innerHTML = this.state.errorMessage;                          
             }
             // fails initial checks
             else
             {
                 // wrong file type
-                if (curFile.type != 'text/plain') 
+                if (curFile.type !== 'text/plain') 
                 {
                     document.getElementById('dispalyValidationMessage').style.color = 'red';
                     document.getElementById('fileNameh2').style.visibility = 'hidden';
                     document.getElementById('fileUploadButton').style.visibility = 'hidden';
-                    this.state.errorMessage = "INVALID FILE TYPE: please upload a .txt file";
+                    this.setState({errorMessage: "INVALID FILE TYPE: please upload a .txt file"});
                     document.getElementById('dispalyValidationMessage').innerHTML = this.state.errorMessage;
                 }
                 
@@ -83,6 +84,7 @@ class FileUploader extends Component
         
         fr.onload = () => {
             this.textFromFile = fr.result;
+            this.fileName = this.state.selectedFile.name;
             this.sendDataUp();
         }
         

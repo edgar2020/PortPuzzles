@@ -38,7 +38,7 @@ import FileUploader from '../fileUploader';
       // create starting state
       current: Task1_States.INIT,
       textFromFile: "null",
-      
+      loadedFileName: null,
       // grid: null
 
 
@@ -48,7 +48,7 @@ import FileUploader from '../fileUploader';
       // Update the name in the component's state
       try {
         let fileData = data.text;
-        this.setState({ textFromFile: fileData });
+        this.setState({ textFromFile: fileData, loadedFileName: data.name });
         var inputLines = fileData.split('\n');
         for (var i = 0; i < inputLines.length; i++)
         {
@@ -123,6 +123,7 @@ import FileUploader from '../fileUploader';
     // logic for the allowing inputs
     renderAllowInputs() {
       return (
+
         <button onClick={() => this.transition(Task1_States.INIT)}>
           In the grab input state
         </button>

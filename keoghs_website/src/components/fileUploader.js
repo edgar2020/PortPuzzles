@@ -1,20 +1,21 @@
 import React, { Component } from 'react';
-import '../tasks.css' 
+import './tasks.css' 
+
+
 
 class FileUploader extends Component 
 {   
-
-    obj ={name: ""}
-
+    textFromFile = "none";
     state = {
         // Initially, no file is selected
         selectedFile: null,
         errorMessage: 'No File Selected',
+        
     };
     
-    sendGridDataUp = (event) => {
+    sendDataUp = (event) => {
         // Call the parent callback function 
-        this.props.parentCallback(this.obj.name);
+        this.props.parentCallback(this.textFromFile);
         // event.preventDefault();
     }
 
@@ -45,9 +46,7 @@ class FileUploader extends Component
                 document.getElementById('fileNameEcho').innerHTML = curFile.name;
                 document.getElementById('fileUploadButton').style.visibility='visible';
                 this.state.errorMessage = "File Is Permitted";
-                document.getElementById('dispalyValidationMessage').innerHTML = this.state.errorMessage;
-                this.obj.name = "sds "
-                this.sendGridDataUp();
+                document.getElementById('dispalyValidationMessage').innerHTML = this.state.errorMessage;                          
             }
             // fails initial checks
             else
@@ -69,13 +68,27 @@ class FileUploader extends Component
     // On file upload (click the upload button)
     onFileUpload = () => {
         // Create an object of formData
-        const formData = new FormData();
-        // Update the formData object
-        formData.append(
-            //     "myFile",
-            this.state.selectedFile,
-            this.state.selectedFile.name
-            );
+        // const formData = new FormData();
+        // // Update the formData object
+        // formData.append(
+        //     //     "myFile",
+        //     this.state.selectedFile,
+        //     this.state.selectedFile.name
+        //     );
+
+        // sendDataUp);
+        let fr = new FileReader()
+        
+        fr.readAsText(this.state.selectedFile)
+        
+        fr.onload = () => {
+            this.textFromFile = fr.result;
+            this.sendDataUp();
+        }
+        
+        fr.onerror = () => {
+            alert(fr.error)
+        }
             
             
     };

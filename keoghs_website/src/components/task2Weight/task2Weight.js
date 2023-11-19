@@ -6,19 +6,24 @@ import FileUploader from '../fileUploader';
   const Task1_States = {
     INIT: 0,              //where form will be uploaded
     // CONFIRM_FILE: 1,      //where form format will be checked and verifed
-    GRAB_INPUTS: 1,       //where inputs from operator are given
-    COMPUTE_STEPS: 2,     //where the program begins calculating a sequence of moves
-    DISPLAY_STEPS: 3,     //where steps are displayed
-    FINISH_PROCEDURE: 4   //where new manifest is made, downloaded and reminder sent
+    // GRAB_INPUTS: 1,       //where inputs from operator are given
+    COMPUTE_STEPS: 1,     //where the program begins calculating a sequence of moves
+    DISPLAY_STEPS: 2,     //where steps are displayed
+    FINISH_PROCEDURE: 3   //where new manifest is made, downloaded and reminder sent
   };
   class Container {
+
     constructor(name, weight) {
       this.name = name;
       this.weight = weight;
     }
   }
-
-  let grid =
+  class task1Loading extends Component {
+    state = {
+      // create starting state
+      current: Task1_States.INIT,
+      textFromFile: "null",
+      grid: 
       [
         [null, null, null, null, null, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null, null, null, null, null],
@@ -29,25 +34,15 @@ import FileUploader from '../fileUploader';
         [null, null, null, null, null, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null, null, null, null, null],
         [null, null, null, null, null, null, null, null, null, null, null, null]//9th row
-      ];
-
-  
-
-  class task1Loading extends Component {
-    state = {
-      // create starting state
-      current: Task1_States.INIT,
-      textFromFile: "null",
-      
+      ]
       // grid: null
 
 
     };
 
-    handleFileCallback = (data) => {
+    handleFileCallback = (fileData) => {
       // Update the name in the component's state
       try {
-        let fileData = data.text;
         this.setState({ textFromFile: fileData });
         var inputLines = fileData.split('\n');
         for (var i = 0; i < inputLines.length; i++)
@@ -62,23 +57,23 @@ import FileUploader from '../fileUploader';
           {
             // alert(numbersFound);
             // alert(row_num + " " + col_num + " " + weight + " " + name);
-            grid[row_num][col_num] = new Container(name, weight);
+            this.state.grid[row_num][col_num] = new Container(name, weight);
           }
           if(name === 'NAN')
           {
-            grid[row_num][col_num] = new Container(name, weight);
+            this.state.grid[row_num][col_num] = 'NAN';
           }
           else
           {
-            grid[row_num][col_num] = new Container(name, weight);
+            this.state.grid[row_num][col_num] = null;
           }
         }
         // alert(inputLines.length);
         // alert(inputLines);
 
-        this.transition(Task1_States.GRAB_INPUTS)
+        this.transition(Task1_States.COMPUTE_STEPS)
       } catch (error) {
-        alert("ERROR: File not of correct format");
+        alert("ERROR: File not of correct format" + error);
         this.transition(Task1_States.INIT);
       }
     }
@@ -89,10 +84,6 @@ import FileUploader from '../fileUploader';
     // define what is shown at each state
     render() {
       switch(this.state.current) {
-        // case Task1_States.CONFIRM_FILE:
-        //   return this.renderConfirmFile();
-        case Task1_States.GRAB_INPUTS:
-          return this.renderAllowInputs();
         case Task1_States.COMPUTE_STEPS:
           return this.renderComputeSteps();
         case Task1_States.DISPLAY_STEPS:
@@ -112,22 +103,6 @@ import FileUploader from '../fileUploader';
       );
       
     }  
-    // logic for the confirm file
-    // renderConfirmFile() {
-    //   return (
-    //     <button onClick={() => this.transition(Task1_States.GRAB_INPUTS)}>
-    //       Go to state 3
-    //     </button>
-    //   );
-    // }
-    // logic for the allowing inputs
-    renderAllowInputs() {
-      return (
-        <button onClick={() => this.transition(Task1_States.INIT)}>
-          In the grab input state
-        </button>
-      );
-    }
     // #TODO: #3 logic for Computeing the steps (where our search function is going to go) 
     renderComputeSteps() {
       return (

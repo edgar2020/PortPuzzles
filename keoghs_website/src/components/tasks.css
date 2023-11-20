@@ -85,6 +85,10 @@
     display:inline-flex;
     /* background-color: red; */
 }
+#selectUnload
+{
+    transform: scale(90%);
+}
 #selectedButtonInfo
 {
     /* background-color: aqua; */
@@ -93,6 +97,27 @@
     overflow-y: hidden;
     border: 1px solid black;
     padding: 10px;
+}
+.label
+{
+    padding: 7px;
+}
+.columnNumbers
+{
+    /* padding: 10px; */
+    /* position: relative; */
+    /* background-color:gold; */
+    /* margin-left: 26px; */
+    display: inline-block;
+    text-align: left;
+    width: 36px;
+}
+#colNumbers
+{
+    /* background-color:rgb(139, 139, 6); */
+    margin-left: 20px;
+    width: 100%;
+    /* width: var(--button-dimension); */
 }
 @keyframes slide-left {
     0% {

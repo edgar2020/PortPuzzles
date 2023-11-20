@@ -71,13 +71,12 @@ class ToggleGrid extends Component
     render() {
  
         return (
-         <div>
-            
+         <div id="selectUnload">
             <h3 id="containersToUnloadInput_header">Select fgh to Unload</h3>
             <div id="containersToUnloadInput">
                 <div id="cargoGridDisplayContainer">
                     <div id='gridRow_8' className="gridRow">
-                        <span className='rowNumber'>8</span>
+                        <span className='label rowNumber'>8</span>
                         {this.determineTypeOfCell(8,1)}
                         {this.determineTypeOfCell(8,2)}
                         {this.determineTypeOfCell(8,3)}
@@ -92,7 +91,7 @@ class ToggleGrid extends Component
                         {this.determineTypeOfCell(8,12)}
                     </div>
                     <div id='gridRow_7' className="gridRow">
-                        <span className='rowNumber'>7</span>
+                        <span className='label rowNumber'>7</span>
                         {this.determineTypeOfCell(7,1)}
                         {this.determineTypeOfCell(7,2)}
                         {this.determineTypeOfCell(7,3)}
@@ -107,7 +106,7 @@ class ToggleGrid extends Component
                         {this.determineTypeOfCell(7,12)}
                     </div>
                     <div id='gridRow_6' className="gridRow">
-                        <span className='rowNumber'>6</span>
+                        <span className='label rowNumber'>6</span>
                         {this.determineTypeOfCell(6,1)}
                         {this.determineTypeOfCell(6,2)}
                         {this.determineTypeOfCell(6,3)}
@@ -123,7 +122,7 @@ class ToggleGrid extends Component
 
                     </div>
                     <div id='gridRow_5' className="gridRow">
-                        <span className='rowNumber'>5</span>
+                        <span className='label rowNumber'>5</span>
                         {this.determineTypeOfCell(5,1)}
                         {this.determineTypeOfCell(5,2)}
                         {this.determineTypeOfCell(5,3)}
@@ -138,7 +137,7 @@ class ToggleGrid extends Component
                         {this.determineTypeOfCell(5,12)}
                     </div>
                     <div id='gridRow_4' className="gridRow">
-                        <span className='rowNumber'>4</span>
+                        <span className='label rowNumber'>4</span>
                         {this.determineTypeOfCell(4,1)}
                         {this.determineTypeOfCell(4,2)}
                         {this.determineTypeOfCell(4,3)}
@@ -153,7 +152,7 @@ class ToggleGrid extends Component
                         {this.determineTypeOfCell(4,12)}
                     </div>
                     <div id='gridRow_3' className="gridRow">
-                        <span className='rowNumber'>3</span>
+                        <span className='label rowNumber'>3</span>
                         {this.determineTypeOfCell(3,1)}
                         {this.determineTypeOfCell(3,2)}
                         {this.determineTypeOfCell(3,3)}
@@ -168,7 +167,7 @@ class ToggleGrid extends Component
                         {this.determineTypeOfCell(3,12)}
                     </div>
                     <div id='gridRow_2' className="gridRow">
-                        <span className='rowNumber'>2</span>
+                        <span className='label rowNumber'>2</span>
                         {this.determineTypeOfCell(2,1)}
                         {this.determineTypeOfCell(2,2)}
                         {this.determineTypeOfCell(2,3)}
@@ -183,7 +182,7 @@ class ToggleGrid extends Component
                         {this.determineTypeOfCell(2,12)}
                     </div>
                     <div id='gridRow_1' className="gridRow">
-                        <span className='rowNumber'>1</span>
+                        <span className='rowNumber label'>1</span>
                         {/* <button id='[01,01]' className={this.determineTypeOfCell(1,1)}></button> */}
                         {this.determineTypeOfCell(1,1)}
                         {this.determineTypeOfCell(1,2)}
@@ -198,8 +197,21 @@ class ToggleGrid extends Component
                         {this.determineTypeOfCell(1,11)}
                         {this.determineTypeOfCell(1,12)}
                     </div>
-                    
 
+                    <div id="colNumbers">
+                        <div className='label columnNumbers'>1</div>
+                        <div className='label columnNumbers'>2</div>
+                        <div className='label columnNumbers'>3</div>
+                        <div className='label columnNumbers'>4</div>
+                        <div className='label columnNumbers'>5</div>
+                        <div className='label columnNumbers'>6</div>
+                        <div className='label columnNumbers'>7</div>
+                        <div className='label columnNumbers'>8</div>
+                        <div className='label columnNumbers'>9</div>
+                        <div className='label columnNumbers'>10</div>
+                        <div className='label columnNumbers'>11</div>
+                        <div className='label columnNumbers'>12</div>
+                    </div>
                 </div>
                 <div id='selectedButtonInfo'>
                     <h2>Cell Data</h2>

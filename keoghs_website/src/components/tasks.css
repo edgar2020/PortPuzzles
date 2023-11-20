@@ -1,0 +1,137 @@
+#fileUploadContainer
+{
+    /* background-color: var(--t1); */
+    width: 50%;
+    border: 2px solid black;
+    padding: 20px;
+    font-size: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 40px auto;
+    text-align: center;
+}
+#fileNameEcho
+{
+    text-decoration: none;
+    font-weight: normal;
+}
+#showFileDataContainer
+{
+    visibility: hidden;
+}
+#dispalyValidationMessage
+{
+    font-weight: bold;
+    color:var(--error-color);
+}
+#fileUploadButton
+{
+    visibility: hidden;
+}
+.no-interact
+{
+    background-color: rgb(235, 235, 235);
+}
+.gridCell
+{
+    width: var(--button-dimension);
+    height: var(--button-dimension);
+    display: inline-block;
+    /* margin:0px 0px 0 0; */
+    flex-grow: 0;
+    flex-shrink: 0;
+    font-size: 14px;
+    color: white;
+    text-align: center;
+    /* border: 2px solid black; */
+}
+
+.containerPresent 
+{
+    background-color: rgb(192, 89, 63);
+    align-items: center;
+    overflow-x: hidden;
+    white-space: nowrap;
+    vertical-align: top;   
+}
+.displayContainerName
+{
+    display: inline-flex;
+    text-overflow: clip;
+    animation: slide-left 50s linear infinite;
+}
+.containerPresent:hover .displayContainerName
+{
+    animation: none;
+    
+}
+.gridToggleButton.containerPresent:hover
+{
+    /* background-color: darkgoldenrod; */
+    border: 6px solid rgb(84, 64, 209)
+}
+.gridToggleButton.active
+{
+    background-color: green;
+}
+.unusable
+{
+    background-color: rgb(59, 59, 59);
+}
+
+.gridRow
+{
+    /* background-color: blue; */
+    width: fit-content;
+    /* height: var(--button-dimension); */
+}
+#containersToUnloadInput
+{
+    width: 800px;
+    display:inline-flex;
+    /* background-color: red; */
+}
+#selectUnload
+{
+    transform: scale(90%);
+}
+#selectedButtonInfo
+{
+    /* background-color: aqua; */
+    width: 150px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    border: 1px solid black;
+    padding: 10px;
+}
+.label
+{
+    padding: 7px;
+}
+.columnNumbers
+{
+    /* padding: 10px; */
+    /* position: relative; */
+    /* background-color:gold; */
+    /* margin-left: 26px; */
+    display: inline-block;
+    text-align: left;
+    width: 36px;
+}
+#colNumbers
+{
+    /* background-color:rgb(139, 139, 6); */
+    margin-left: 20px;
+    width: 100%;
+    /* width: var(--button-dimension); */
+}
+@keyframes slide-left {
+    0% {
+        transform: translate(0);
+      }
+      90% {
+        transform: translate(-100%);
+      }
+      91% {
+        transform: translate(0);
+      }
+  }

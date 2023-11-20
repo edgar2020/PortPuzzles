@@ -19,6 +19,12 @@ html
     --button-def-color: #rgb(0, 0, 0);
     --button-def-border: 2px solid red;
 
+    /* Default text colors */
+    --error-color: #F00;
+
+
+    --button-dimension: 50px;
+
     /* Footer Colors */
     --footer-background-color: rgb(121, 114, 255);
     --heap-footer-text-color: rgb(255, 255, 255);

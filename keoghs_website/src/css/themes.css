@@ -22,6 +22,9 @@ html
     /* Default text colors */
     --error-color: #F00;
 
+
+    --button-dimension: 50px;
+
     /* Footer Colors */
     --footer-background-color: rgb(121, 114, 255);
     --heap-footer-text-color: rgb(255, 255, 255);

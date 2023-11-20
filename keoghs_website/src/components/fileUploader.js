@@ -29,7 +29,7 @@ class FileUploader extends Component
             document.getElementById('fileUploadButton').style.visibility = 'hidden';
             document.getElementById('fileNameh2').style.visibility = 'hidden';
             document.getElementById('dispalyValidationMessage').style.color = 'red';
-            document.getElementById('dispalyValidationMessage').innerHTML = this.state.errorMessage;
+            document.getElementById('dispalyValidationMessage').innerHTML =  "INVALID ACTION: No File is Selected";
         }
         else
         {
@@ -42,12 +42,12 @@ class FileUploader extends Component
             // passes initial checks (type .txt and file is uploaded)
             if( curFile.type === 'text/plain')
             {
+                this.setState ({errorMessage: "File Is Permitted"});
                 document.getElementById('dispalyValidationMessage').style.color = 'limeGreen';
                 document.getElementById('fileNameh2').style.visibility = 'visible';
                 document.getElementById('fileNameEcho').innerHTML = curFile.name;
                 document.getElementById('fileUploadButton').style.visibility='visible';
-                this.setState ({errorMessage: "File Is Permitted"});
-                document.getElementById('dispalyValidationMessage').innerHTML = this.state.errorMessage;                          
+                document.getElementById('dispalyValidationMessage').innerHTML = "File Is Permitted";                          
             }
             // fails initial checks
             else
@@ -59,7 +59,7 @@ class FileUploader extends Component
                     document.getElementById('fileNameh2').style.visibility = 'hidden';
                     document.getElementById('fileUploadButton').style.visibility = 'hidden';
                     this.setState({errorMessage: "INVALID FILE TYPE: please upload a .txt file"});
-                    document.getElementById('dispalyValidationMessage').innerHTML = this.state.errorMessage;
+                    document.getElementById('dispalyValidationMessage').innerHTML = "INVALID FILE TYPE: please upload a .txt file";
                 }
                 
             }

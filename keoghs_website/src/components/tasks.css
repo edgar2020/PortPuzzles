@@ -35,6 +35,7 @@
 {
     width: var(--button-dimension);
     height: var(--button-dimension);
+    display: inline-block;
     margin:0px 0px 0 0;
     flex-grow: 0;
     flex-shrink: 0;
@@ -47,40 +48,60 @@
 .containerPresent 
 {
     background-color: rgb(192, 89, 63);
-
+    align-items: center;
+    overflow-x: hidden;
+    white-space: nowrap;
+    vertical-align: top;   
+}
+.displayContainerName
+{
+    display: inline-flex;
+    text-overflow: clip;
+    animation: slide-left 50s linear infinite;
+}
+.containerPresent:hover .displayContainerName
+{
+    animation: none;
+    
 }
 .gridToggleButton.containerPresent:hover
 {
-    /* border: 3px solid rgb(163, 0, 0); */
     background-color: darkgoldenrod;
 }
 .unusable
 {
     background-color: rgb(59, 59, 59);
 }
-.empty
-{
-    /* background-color: rgb(245, 240, 240); */
-}
 
-.gridRows
+.gridRow
 {
+    /* background-color: blue; */
     width: fit-content;
-    transform: rotate(180deg);
-    display: flex;
-    /* background-color: rgb(139, 139, 139);    */
+    /* height: var(--button-dimension); */
 }
-.cargoGridDisplayContainer
+#containersToUnloadInput
 {
-    width: fit-content; 
-    margin: auto;
-    padding:2px;
-    transform: rotate(180deg);
+    width: 800px;
+    display:inline-flex;
+    /* background-color: red; */
 }
-/* .rowNumbering
+#selectedButtonInfo
 {
-    font-size: 20px;
-    margin-right:5px;
-    vertical-align: ;
-    font-weight: bold;
-} */
+    /* background-color: aqua; */
+    width: 150px;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    border: 1px solid black;
+    padding: 10px;
+}
+@keyframes slide-left {
+    0% {
+        transform: translate(0);
+      }
+      90% {
+        transform: translate(-100%);
+      }
+      91% {
+        transform: translate(0);
+      }
+  }

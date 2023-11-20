@@ -3,7 +3,9 @@ import '../tasks.css';
 import FileUploader from '../fileUploader';
 // import GridButton from './gridButton';
 
-import Grid from './grid';
+// import Grid from './grid';
+import ToggleGrid from './toggleGrid';
+import RegularGrid from './regularGrid';
 
 // Create States for State Machine Task1_States
   const Task1_States = {
@@ -23,8 +25,8 @@ import Grid from './grid';
 
   let grid =
       [
-        [{container: new Container("amazon warehous", 2432), deadSpace: 0}, {container: null, deadSpace: 1}, {container: null, deadSpace: 1}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [{container: new Container("WWWW", 5442)}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
+        [{container: new Container("amazon warehous a b c d e f g h i j k l m n o p q r s t u v w x y z", 2432), deadSpace: 0}, {container: null, deadSpace: 1}, {container: null, deadSpace: 1}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
+        [{container: new Container("THIS STRING IS 256 CHARACTERS xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        ", 5442)}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
         [{container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
         [{container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
         [{container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
@@ -46,7 +48,9 @@ import Grid from './grid';
 
 
     };
-
+    handleButtonToggle = (row, col) => {
+      alert(row+" "+col+" toggled");
+    }
     handleFileCallback = (data) => {
       // Update the name in the component's state
       try {
@@ -106,14 +110,17 @@ import Grid from './grid';
         case Task1_States.INIT:
         default:
           return this.renderInit();
+        }
       }
-    }
     renderInit() {
           
 
       return (
-      <div>
-        <Grid toggle={1} grid={grid}/>
+        <div>
+        
+        {/* <RegularGrid grid={grid}/> */}
+        <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/>
+        {/* <Grid toggle={1} grid={grid}/> */}
         {/* <Grid toggle={1} grid={grid}/> */}
         <FileUploader parentCallback={this.handleFileCallback}/>
       </div>
@@ -136,7 +143,8 @@ import Grid from './grid';
         <div>
           <div id='selectContianersFromGrid'>
             {/* Floor 1 */}
-            <Grid toggle={1} grid={grid}/>
+            <ToggleGrid grid={grid}/>
+            {/* <Grid toggle={1} grid={grid}/> */}
           </div>
 
 

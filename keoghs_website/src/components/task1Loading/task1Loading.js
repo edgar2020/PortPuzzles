@@ -1,4 +1,4 @@
-import React,{ Component } from 'react';
+import React,{ Component, useState } from 'react';
 import '../tasks.css';
 import FileUploader from '../fileUploader';
 // import GridButton from './gridButton';
@@ -25,8 +25,8 @@ import RegularGrid from './regularGrid';
 
   let grid =
       [
-        [{container: new Container("amazon warehous a b c d e f g h i j k l m n o p q r s t u v w x y z", 2432), deadSpace: 0}, {container: null, deadSpace: 1}, {container: null, deadSpace: 1}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [{container: new Container("THIS STRING IS 256 CHARACTERS xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        ", 5442)}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
+        [{container: new Container("amazon warehous a b c d e f g h i j k l m n o p q r s t u v w x y z", 2432), deadSpace: 0, offload:false}, {container: null, deadSpace: 1}, {container: null, deadSpace: 1}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
+        [{container: new Container("THIS STRING IS 256 CHARACTERS xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        ", 5442), deadSpace: 0, offload: true}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
         [{container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
         [{container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
         [{container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
@@ -44,12 +44,14 @@ import RegularGrid from './regularGrid';
       current: Task1_States.INIT,
       textFromFile: "null",
       loadedFileName: null,
-      // grid: null
+      gridState: grid,
 
 
     };
-    handleButtonToggle = (row, col) => {
-      alert(row+" "+col+" toggled");
+    handleButtonToggle = (coord) => {
+      grid[coord.row-1][coord.col-1].offload = !(grid[coord.row-1][coord.col-1].offload); 
+      this.setState({gridState: grid});
+      // alert(coord.row+" "+coord.col+" toggled");
     }
     handleFileCallback = (data) => {
       // Update the name in the component's state
@@ -80,6 +82,7 @@ import RegularGrid from './regularGrid';
           {
             grid[row_num][col_num] = {container: new Container(name, weight), deadSpace: 0, offload: 0};
           }
+          this.setState({gridState: grid});
         }
         // alert(inputLines.length);
         // alert(inputLines);
@@ -119,7 +122,7 @@ import RegularGrid from './regularGrid';
         <div>
         
         {/* <RegularGrid grid={grid}/> */}
-        <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/>
+        {/* <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/> */}
         {/* <Grid toggle={1} grid={grid}/> */}
         {/* <Grid toggle={1} grid={grid}/> */}
         <FileUploader parentCallback={this.handleFileCallback}/>
@@ -138,12 +141,13 @@ import RegularGrid from './regularGrid';
     // logic for the allowing inputs
     renderAllowInputs() 
     {
-     
+      
       return (
         <div>
           <div id='selectContianersFromGrid'>
             {/* Floor 1 */}
-            <ToggleGrid grid={grid}/>
+          <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/>
+            {/* <ToggleGrid grid={grid}/> */}
             {/* <Grid toggle={1} grid={grid}/> */}
           </div>
 

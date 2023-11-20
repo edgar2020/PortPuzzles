@@ -6,17 +6,21 @@ import React, { Component, useState } from 'react';
 class ToggleGrid extends Component 
 {   
     
-    sendInputDataUp = (event) => {
-        this.props.parentToggleButton( {row: 1, col: 1});
+    sendInputDataUp = (row,col) => {
+        // alert(col);
+        this.props.parentToggleButton({row, col});
     }
-    
+    // toggleButton = (row, col) =>
+    // {
+    //     this.sendInputDataUp(col, row);
+
+    // }
     showCellData = (row, col) =>
     {
         // alert("df");
         try {
-            let gridCell = this.props.grid[row-1][col-1].container;
-            console.log(gridCell);
-            document.getElementById('selectedButtonInfo').innerHTML="<h2>Cell Data</h2><p>Location: ["+row+", "+col+"]</p><p>Name: "+gridCell.name+"]</p><p>Weight: "+gridCell.weight+"]</p>";
+            let gridCell = this.props.grid[row-1][col-1];
+            document.getElementById('selectedButtonInfo').innerHTML="<h2>Cell Data</h2><p>Location: ["+row+", "+col+"]</p><p>Name: "+gridCell.container.name+"</p><p>Weight: "+gridCell.container.weight+"kg</p><p>Offloading: "+gridCell.offload+"</p>";
             
         } catch (error) {
         }
@@ -58,8 +62,8 @@ class ToggleGrid extends Component
         {
             return (
                 <>
-                <button id={'toggleCell_['+row+','+col+']'} className='gridCell gridToggleButton containerPresent'
-                        onMouseOver={() => this.showCellData(row, col)} onMouseLeave={this.clearCellData}>
+                <button id={'toggleCell_['+row+','+col+']'} className={`gridCell gridToggleButton containerPresent ${gridCell.offload ? "active" : ""}`}
+                        onMouseOver={() => this.showCellData(row, col)} onMouseLeave={this.clearCellData} onClick={() => this.sendInputDataUp(row, col)}>
                     <span className='displayContainerName'>{gridCell.container.name}</span>
                 </button>
                 </>
@@ -72,7 +76,7 @@ class ToggleGrid extends Component
  
         return (
          <div id="selectUnload">
-            <h3 id="containersToUnloadInput_header">Select fgh to Unload</h3>
+            <h3 id="containersToUnloadInput_header">Select Containers to Unload</h3>
             <div id="containersToUnloadInput">
                 <div id="cargoGridDisplayContainer">
                     <div id='gridRow_8' className="gridRow">

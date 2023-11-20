@@ -69,6 +69,10 @@
     /* background-color: darkgoldenrod; */
     border: 6px solid rgb(84, 64, 209)
 }
+.gridToggleButton.active
+{
+    background-color: green;
+}
 .unusable
 {
     background-color: rgb(59, 59, 59);

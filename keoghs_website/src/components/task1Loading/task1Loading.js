@@ -1,16 +1,12 @@
 import React,{ Component, useState } from 'react';
 import '../tasks.css';
 import FileUploader from '../fileUploader';
-// import GridButton from './gridButton';
-
-// import Grid from './grid';
 import ToggleGrid from './toggleGrid';
-import RegularGrid from './regularGrid';
+import RegularGrid from '../regularGrid';
 
 // Create States for State Machine Task1_States
   const Task1_States = {
     INIT: 0,              //where form will be uploaded
-    // CONFIRM_FILE: 1,      //where form format will be checked and verifed
     GRAB_INPUTS: 1,       //where inputs from operator are given
     COMPUTE_STEPS: 2,     //where the program begins calculating a sequence of moves
     DISPLAY_STEPS: 3,     //where steps are displayed
@@ -25,15 +21,15 @@ import RegularGrid from './regularGrid';
 
   let grid =
       [
-        [{container: new Container("amazon warehous a b c d e f g h i j k l m n o p q r s t u v w x y z", 2432), deadSpace: 0, offload:false}, {container: null, deadSpace: 1}, {container: null, deadSpace: 1}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [{container: new Container("THIS STRING IS 256 CHARACTERS xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx        ", 5442), deadSpace: 0, offload: true}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [{container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [{container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [{container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [{container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [{container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [{container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [{container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],//9th row
+        [ {container: new Container("amazon warehous", 2432), deadSpace: 0, offload:false}, {container: null, deadSpace: 1}, {container: null, deadSpace: 1}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
+        [ {container: new Container("THIS STRING here", 5442), deadSpace: 0, offload: true}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
+        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
+        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
+        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
+        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
+        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
+        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
+        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],//9th row
       ];
 
   
@@ -45,13 +41,11 @@ import RegularGrid from './regularGrid';
       textFromFile: "null",
       loadedFileName: null,
       gridState: grid,
-
-
     };
+
     handleButtonToggle = (coord) => {
       grid[coord.row-1][coord.col-1].offload = !(grid[coord.row-1][coord.col-1].offload); 
       this.setState({gridState: grid});
-      // alert(coord.row+" "+coord.col+" toggled");
     }
     handleFileCallback = (data) => {
       // Update the name in the component's state
@@ -67,11 +61,8 @@ import RegularGrid from './regularGrid';
           var col_num = parseInt(numbersFound[1])-1;
           var weight = parseInt(numbersFound[2]);
           var name = inputLines[i].substring(19).trim();
-          // console.log('_'+name+'_');
-          if(name === 'UNUSED')
+          if(name === 'UNUSED')     
           {
-            // alert(numbersFound);
-            // alert(row_num + " " + col_num + " " + weight + " " + name);
             grid[row_num][col_num] = {container: null, deadSpace: 0};
           }
           else if(name === 'NAN')
@@ -84,12 +75,9 @@ import RegularGrid from './regularGrid';
           }
           this.setState({gridState: grid});
         }
-        // alert(inputLines.length);
-        // alert(inputLines);
 
         this.transition(Task1_States.GRAB_INPUTS)
       } catch (error) {
-        alert("ERROR: File not of correct format");
         this.transition(Task1_States.INIT);
       }
     }
@@ -100,8 +88,6 @@ import RegularGrid from './regularGrid';
     // define what is shown at each state
     render() {
       switch(this.state.current) {
-        // case Task1_States.CONFIRM_FILE:
-        //   return this.renderConfirmFile();
         case Task1_States.GRAB_INPUTS:
           return this.renderAllowInputs();
         case Task1_States.COMPUTE_STEPS:
@@ -115,29 +101,15 @@ import RegularGrid from './regularGrid';
           return this.renderInit();
         }
       }
-    renderInit() {
-          
-
+    renderInit() 
+    {
       return (
         <div>
-        
-        {/* <RegularGrid grid={grid}/> */}
-        {/* <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/> */}
-        {/* <Grid toggle={1} grid={grid}/> */}
-        {/* <Grid toggle={1} grid={grid}/> */}
-        <FileUploader parentCallback={this.handleFileCallback}/>
-      </div>
+          <FileUploader parentCallback={this.handleFileCallback}/>
+        </div>
       );
       
     }  
-    // logic for the confirm file
-    // renderConfirmFile() {
-    //   return (
-    //     <button onClick={() => this.transition(Task1_States.GRAB_INPUTS)}>
-    //       Go to state 3
-    //     </button>
-    //   );
-    // }
     // logic for the allowing inputs
     renderAllowInputs() 
     {
@@ -145,10 +117,7 @@ import RegularGrid from './regularGrid';
       return (
         <div>
           <div id='selectContianersFromGrid'>
-            {/* Floor 1 */}
-          <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/>
-            {/* <ToggleGrid grid={grid}/> */}
-            {/* <Grid toggle={1} grid={grid}/> */}
+            <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/>
           </div>
 
 

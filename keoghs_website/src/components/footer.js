@@ -10,7 +10,7 @@ class siteFooter extends Component
     return (
       <div className="footer">
         <footer>
-          <div class = "note">
+          <div className = "note">
           <form>
             <textarea
               id = "noteInput"
@@ -22,7 +22,7 @@ class siteFooter extends Component
             </textarea>
           </form>
           </div>
-          <div class = "heap">
+          <div className = "heap">
             Created and maintained by H.E.A.P.
           </div>
         </footer>

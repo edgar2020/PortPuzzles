@@ -2,7 +2,7 @@ import React,{ Component, useState } from 'react';
 import '../tasks.css';
 import FileUploader from '../fileUploader';
 import ToggleGrid from './toggleGrid';
-import RegularGrid from '../regularGrid';
+import AddContainers from './addContainers';
 
 // Create States for State Machine Task1_States
   const Task1_States = {
@@ -31,8 +31,7 @@ import RegularGrid from '../regularGrid';
         [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
         [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],//9th row
       ];
-
-  
+  let containersToLoad = [];
 
   class task1Loading extends Component {
     state = {
@@ -41,7 +40,14 @@ import RegularGrid from '../regularGrid';
       textFromFile: "null",
       loadedFileName: null,
       gridState: grid,
+      addContainersState: false,
     };
+
+    handleNewContainers = (containerArray) => {
+      containersToLoad = (containerArray);
+      this.setState({addContainersState: !this.state.addContainersState});
+      console.log(containerArray);
+    }
 
     handleButtonToggle = (coord) => {
       grid[coord.row-1][coord.col-1].offload = !(grid[coord.row-1][coord.col-1].offload); 
@@ -90,21 +96,22 @@ import RegularGrid from '../regularGrid';
       switch(this.state.current) {
         case Task1_States.GRAB_INPUTS:
           return this.renderAllowInputs();
-        case Task1_States.COMPUTE_STEPS:
-          return this.renderComputeSteps();
+          case Task1_States.COMPUTE_STEPS:
+            return this.renderComputeSteps();
         case Task1_States.DISPLAY_STEPS:
           return this.renderShowSteps();
-        case Task1_States.FINISH_PROCEDURE:
+          case Task1_States.FINISH_PROCEDURE:
           return this.renderFinishProcedure();
-        case Task1_States.INIT:
+          case Task1_States.INIT:
         default:
           return this.renderInit();
         }
       }
-    renderInit() 
-    {
-      return (
-        <div>
+      renderInit() 
+      {
+        return (
+          <div>
+          <AddContainers parentToggleButton={this.handleNewContainer} />
           <FileUploader parentCallback={this.handleFileCallback}/>
         </div>
       );
@@ -116,6 +123,7 @@ import RegularGrid from '../regularGrid';
       
       return (
         <div>
+            {/* <AddContainers parentToggleButton={this.handleNewContainer} /> */}
           <div id='selectContianersFromGrid'>
             <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/>
           </div>

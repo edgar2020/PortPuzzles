@@ -1,4 +1,4 @@
-import React,{ Component, useState } from 'react';
+import React,{ Component } from 'react';
 import '../tasks.css';
 import FileUploader from '../fileUploader';
 import ToggleGrid from './toggleGrid';
@@ -47,12 +47,12 @@ import AddContainers from './addContainers';
       containersToLoad = (containerArray);
       this.setState({addContainersState: !this.state.addContainersState});
       console.log(containerArray);
-    }
+    };
 
     handleButtonToggle = (coord) => {
       grid[coord.row-1][coord.col-1].offload = !(grid[coord.row-1][coord.col-1].offload); 
       this.setState({gridState: grid});
-    }
+    };
     handleFileCallback = (data) => {
       // Update the name in the component's state
       try {
@@ -111,7 +111,6 @@ import AddContainers from './addContainers';
       {
         return (
           <div>
-          <AddContainers parentToggleButton={this.handleNewContainer} />
           <FileUploader parentCallback={this.handleFileCallback}/>
         </div>
       );
@@ -125,12 +124,16 @@ import AddContainers from './addContainers';
         <div>
             {/* <AddContainers parentToggleButton={this.handleNewContainer} /> */}
           <div id='selectContianersFromGrid'>
-            <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/>
+            <div id="loadUnloadInputs">
+              <AddContainers parentAddContainers={this.handleNewContainers} />
+              <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/>
+            </div>
+            {/* <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/> */}
           </div>
 
 
-          <button onClick={() => this.transition(Task1_States.INIT)}>
-            In the grab input state
+          <button onClick={() => this.transition(Task1_States.COMPUTE_STEPS)}>
+            Ready to Compute Steps
           </button>
         </div>
       );
@@ -140,6 +143,8 @@ import AddContainers from './addContainers';
       return (
         <button onClick={() => this.transition(Task1_States.INIT)}>
           No Logic Yet
+          {console.log(grid)}
+          {console.log(containersToLoad)}
         </button>
       );
     }

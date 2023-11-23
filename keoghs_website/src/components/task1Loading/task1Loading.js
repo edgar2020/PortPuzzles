@@ -32,6 +32,7 @@ import AddContainers from './addContainers';
         [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],//9th row
       ];
   let containersToLoad = [];
+  let LocalNumberToOffload = 0;
 
   class task1Loading extends Component {
     state = {
@@ -40,6 +41,7 @@ import AddContainers from './addContainers';
       textFromFile: "null",
       loadedFileName: null,
       gridState: grid,
+      offloadStateCounter: LocalNumberToOffload,
       addContainersState: false,
     };
 
@@ -51,7 +53,11 @@ import AddContainers from './addContainers';
 
     handleButtonToggle = (coord) => {
       grid[coord.row-1][coord.col-1].offload = !(grid[coord.row-1][coord.col-1].offload); 
-      this.setState({gridState: grid});
+      if(grid[coord.row-1][coord.col-1].offload === true)
+        LocalNumberToOffload += 1;
+      else if(grid[coord.row-1][coord.col-1].offload === false)
+        LocalNumberToOffload -= 1;
+      this.setState({gridState: grid, offloadStateCounter: LocalNumberToOffload});
     };
     handleFileCallback = (data) => {
       // Update the name in the component's state
@@ -126,7 +132,7 @@ import AddContainers from './addContainers';
           <div id='selectContianersFromGrid'>
             <div id="loadUnloadInputs">
               <AddContainers parentAddContainers={this.handleNewContainers} />
-              <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/>
+              <ToggleGrid parentToggleButton={this.handleButtonToggle} numberToOffload={LocalNumberToOffload} grid={grid}/>
             </div>
             {/* <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/> */}
           </div>

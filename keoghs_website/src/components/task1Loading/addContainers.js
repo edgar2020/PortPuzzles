@@ -79,6 +79,7 @@ class AddContainers extends Component {
                 </div>
                 <div id="userContainerShowContainers">
                     {/* <ul className="listContainers"> */}
+                    <div id="containerCount">Adding {this.state.listitems.length} Containers</div>
                     {this.state.listitems.map((listitem, index) => 
                         <div key={index} className="individualContainers">
                             <div className="individualContainerName">{listitem.name}<button className="removeContainerButton" onClick={() => {this.removeContainerToAdd(index)}}>X</button></div>

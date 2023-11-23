@@ -152,7 +152,7 @@ import AddContainers from './addContainers';
     renderShowSteps() {
       return (
         <button onClick={() => this.transition(Task1_States.INIT)}>
-          No Logic Yet
+          Currently computing steps 
         </button>
       );
     }

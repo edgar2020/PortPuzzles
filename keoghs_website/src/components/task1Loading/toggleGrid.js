@@ -47,7 +47,7 @@ class ToggleGrid extends Component
         }
         else if(gridCell.container === null && gridCell.deadSpace === 0)
         {
-            console.log(1);
+            // console.log(1);
             return (
                 <>
                     <button

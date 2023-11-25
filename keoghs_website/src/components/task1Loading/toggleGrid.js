@@ -1,11 +1,15 @@
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 // import './tasks.css' 
 
 
 
+// var numberOfContainers= 0;
 class ToggleGrid extends Component 
 {   
     
+    state = {
+        numberOfContainersToOffload: 0,
+    }
     sendInputDataUp = (row,col) => {
         // alert(col);
         this.props.parentToggleButton({row, col});
@@ -47,7 +51,7 @@ class ToggleGrid extends Component
         }
         else if(gridCell.container === null && gridCell.deadSpace === 0)
         {
-            console.log(1);
+            // console.log(1);
             return (
                 <>
                     <button
@@ -60,10 +64,13 @@ class ToggleGrid extends Component
         }
         else if(gridCell.container !== null)
         {
+            // numberOfContainers+=1;
+            // this.state.numberOfContainers += 1;
+            // this.setState({numberOfContainers: this.state.numberOfContainers+1});
             return (
                 <>
                 <button id={'toggleCell_['+row+','+col+']'} className={`gridCell gridToggleButton containerPresent ${gridCell.offload ? "active" : ""}`}
-                        onMouseOver={() => this.showCellData(row, col)} onMouseLeave={this.clearCellData} onClick={() => this.sendInputDataUp(row, col)}>
+                        onMouseOver={() => this.showCellData(row, col)} onMouseLeave={()=>this.clearCellData} onClick={() => this.sendInputDataUp(row, col)}>
                     <span className='displayContainerName'>{gridCell.container.name}</span>
                 </button>
                 </>
@@ -77,6 +84,7 @@ class ToggleGrid extends Component
         return (
          <div id="selectUnload">
             <h3 id="containersToUnloadInput_header">Select Containers to Unload</h3>
+            <div id="OffloadCounter">Offloading {this.props.numberToOffload} containers</div>
             <div id="containersToUnloadInput">
                 <div id="cargoGridDisplayContainer">
                     <div id='gridRow_8' className="gridRow">

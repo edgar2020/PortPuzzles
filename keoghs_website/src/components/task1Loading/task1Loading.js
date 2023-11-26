@@ -90,6 +90,7 @@ import AddContainers from './addContainers';
 
         this.transition(Task1_States.GRAB_INPUTS)
       } catch (error) {
+        alert("File is of the incorrect manifest format and cannot be read");
         this.transition(Task1_States.INIT);
       }
     }
@@ -127,21 +128,23 @@ import AddContainers from './addContainers';
     {
       
       return (
-        <div>
-            {/* <AddContainers parentToggleButton={this.handleNewContainer} /> */}
-          <div id='selectContianersFromGrid'>
+        // <div>
+          <div id="selectContianersFromGrid">
             <div id="loadUnloadInputs">
               <AddContainers parentAddContainers={this.handleNewContainers} />
               <ToggleGrid parentToggleButton={this.handleButtonToggle} numberToOffload={LocalNumberToOffload} grid={grid}/>
+              <div id="submitInputsSection" className='inputSection'>
+                <h3 id="submitInputsHeader">Ready to Continue: </h3>
+                <button id="submitInputs" onClick={() => this.transition(Task1_States.COMPUTE_STEPS)}>
+                  Compute Steps
+                </button>
+              </div>
             </div>
             {/* <ToggleGrid parentToggleButton={this.handleButtonToggle} grid={grid}/> */}
           </div>
 
 
-          <button onClick={() => this.transition(Task1_States.COMPUTE_STEPS)}>
-            Ready to Compute Steps
-          </button>
-        </div>
+      //  </div> 
       );
     }
     // #TODO: #3 logic for Computeing the steps (where our search function is going to go) 

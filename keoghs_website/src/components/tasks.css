@@ -90,6 +90,7 @@
     display:inline-flex;
     /* background-color: red; */
 }
+
 #selectedButtonInfo
 {
     /* background-color: aqua; */
@@ -120,8 +121,7 @@
     width: 100%;
     /* width: var(--button-dimension); */
 }
-
-#inputContainerNamesContainer
+.inputSection
 {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 20px;
@@ -133,26 +133,18 @@
     width: fit-content;
     /* background-color: blue; */
 }
-#selectUnload
-{
-    border: 2px solid black;
-    margin: 5px;
-    padding: 5px;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 20px;
-    width: fit-content;
-}
+
 #loadUnloadInputs
 {
     display: inline-flex;
     width: fit-content;
     position: relative;
-    background-color: bisque;
+    /* background-color: bisque; */
     margin: 0 auto;
 }
 #userContainerShowContainers
 {
-    background-color: rgb(255, 208, 150);
+    /* background-color: rgb(255, 208, 150); */
     margin: 5px 0;
     overflow-y: scroll;
     height: 400px;
@@ -165,10 +157,7 @@
     background-color: gainsboro;
     padding: 5px 15px 5px 5px;
 }
-/* .individualContainers:hover
-{
-    background-color: pink;
-} */
+
 .removeContainerButton
 {
     border-radius: 100%;
@@ -180,7 +169,10 @@
     width: 100%;
     /* background-color: red; */
 }
-
+#submitInputs
+{
+    height: 30px;
+}
 @keyframes slide-left {
     0% {
         transform: translate(0);

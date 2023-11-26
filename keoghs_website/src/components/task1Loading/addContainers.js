@@ -69,7 +69,7 @@ class AddContainers extends Component {
     
     render() {
         return (
-            <div id="inputContainerNamesContainer">
+            <div id="inputContainerNamesContainer" className="inputSection">
                 <h3 id="containerToAddHeader">Add Containers</h3>
                 <div id="inputContainersUserInput">
                     <label id="textBoxLabel">Container's Label: 

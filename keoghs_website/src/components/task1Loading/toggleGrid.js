@@ -82,7 +82,7 @@ class ToggleGrid extends Component
     render() {
  
         return (
-         <div id="selectUnload">
+         <div id="selectUnload" className='inputSection'>
             <h3 id="containersToUnloadInput_header">Select Containers to Unload</h3>
             <div id="OffloadCounter">Offloading {this.props.numberToOffload} containers</div>
             <div id="containersToUnloadInput">

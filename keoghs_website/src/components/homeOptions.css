@@ -1,5 +1,5 @@
 
-.homeOptions {
+#homeOptions {
     margin: 20px auto;
     width: 500px;
     border: 1px solid var(--default-text-color);
@@ -8,16 +8,16 @@
     text-align: center;
 }
 
-.homeOptions h2 {
+#homeOptions h2 {
     margin-bottom: 20px;
     font-size: 40px;
 }
 
-.homeOptions button:not(:last-child) {
+#homeOptions button:not(:last-child) {
     width: 250px;
 }
 
-.homeOptions button {
+#homeOptions button {
     
     /* background-color: var(--button-bg-default); */
     margin: 10px auto;
@@ -29,17 +29,17 @@
     color: var(--button-def-color)
 }
 
-.homeOptions button:hover
+#homeOptions button:hover
 {
     text-decoration: underline;
     border: var(--button-def-border);
 }
 
-.homeOptions button a 
+#homeOptions button a 
 {
     text-decoration: none;
 }
-.homeOptions button a:visited 
+#homeOptions button a:visited 
 {
     color: var(--button-def-color)
 }

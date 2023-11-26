@@ -96,7 +96,7 @@ import FileUploader from '../fileUploader';
     }
     renderInit() {
       return (
-      <div>
+      <div className='page'>
         <FileUploader parentCallback={this.handleFileCallback}/>
       </div>
       );

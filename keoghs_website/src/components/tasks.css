@@ -126,29 +126,30 @@
     font-family: Arial, Helvetica, sans-serif;
     font-size: 20px;
     margin: 5px;
-    /* overflow-y: scroll; */
-    /* height: 100%; */
     padding: 5px;
     border: 2px solid black;
     width: fit-content;
-    /* background-color: blue; */
+    background-color: antiquewhite;
 }
 
 #loadUnloadInputs
 {
+    width: 100%;
     display: inline-flex;
-    width: fit-content;
-    position: relative;
-    /* background-color: bisque; */
-    margin: 0 auto;
+    /* margin: auto; */
+    /* border: 3px solid black; */
+    justify-content: center;
 }
 #userContainerShowContainers
 {
-    /* background-color: rgb(255, 208, 150); */
     margin: 5px 0;
     overflow-y: scroll;
     height: 400px;
 }
+/* #inputContainerNamesContainer
+{
+    width:290px;
+} */
 
 .individualContainers
 {
@@ -173,6 +174,26 @@
 {
     height: 30px;
 }
+
+@media (max-width: 1250px) {
+    .inputSection
+    {
+        width: 90%;
+    }
+    #loadUnloadInputs
+    {
+        display: inline-block;
+        margin: auto;
+        /* background-color: red; */
+        text-align: center;
+    }
+    #loadUnloadInputs,
+    #loadUnloadInputs > *
+    {
+        margin:auto
+    }
+}
+
 @keyframes slide-left {
     0% {
         transform: translate(0);

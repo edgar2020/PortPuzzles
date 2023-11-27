@@ -72,9 +72,9 @@ class AddContainers extends Component {
             <div id="inputContainerNamesContainer" className="inputSection">
                 <h3 id="containerToAddHeader">Add Containers</h3>
                 <div id="inputContainersUserInput">
-                    <label id="textBoxLabel">Container's Label: 
+                    {/* <label id="textBoxLabel">Container's Label:  */}
                         <input minLength={1} maxLength={255} id="inputContainerName" type="text" name="name" />
-                    </label>
+                    {/* </label> */}
                     <input type="submit" value="Submit" onClick={()=>{this.validateContainerName()}} />
                 </div>
                 <div id="userContainerShowContainers">

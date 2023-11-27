@@ -128,8 +128,7 @@ import AddContainers from './addContainers';
     {
       
       return (
-        // <div>
-          // <div id="selectContianersFromGrid">
+        <div>
             <div id="loadUnloadInputs" className='page'>
               <AddContainers parentAddContainers={this.handleNewContainers} />
               <ToggleGrid parentToggleButton={this.handleButtonToggle} numberToOffload={LocalNumberToOffload} grid={grid}/>
@@ -140,7 +139,7 @@ import AddContainers from './addContainers';
                 </button>
               </div>
             </div>
-          // </div>
+          </div>
 
 
       //  </div> 

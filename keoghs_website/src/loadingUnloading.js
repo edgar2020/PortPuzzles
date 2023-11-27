@@ -10,6 +10,9 @@ function loadingUnloading() {
     <div className="loadingUnloadingContainer">
       <SiteHeader/>
         <TASK1/>
+        <br></br>
+        <br></br>
+        <br></br>
       <SiteFooter/>
     </div>
   );

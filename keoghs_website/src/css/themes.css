@@ -11,6 +11,12 @@ html
     --t8: #FFAA00;
     --default-text-color: #000000;
 
+
+    --theme-color-1: #000;
+    --theme-color-2: #3D5A80;
+    --theme-color-3: #EE6C4D;
+    --theme-color-4: #FFAD05;
+    --theme-color-5: #FFf;
     /* header colors */
     --header-background-color: rgb(121, 114, 255);
     --header-sign-in-button-color: #ddd;

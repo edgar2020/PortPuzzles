@@ -95,17 +95,6 @@ class FileUploader extends Component
             
     };
  
-    // File content to be displayed after
-    // file upload is complete
-    // fileData = () => {
-    //     // if file is not empty
-    //     if (this.state.selectedFile ) {
-    //         return (
-                
-    //         );
-    //     } 
-    // };
- 
     render() {
  
         return (
@@ -113,8 +102,6 @@ class FileUploader extends Component
                 <div id='fileUploadInput'>
                     <input id='manifestFileInput' type="file" accept='.txt' onChange={this.onFileChange} />
                 </div>
-
-                {/* {this.fileData()} */}
                 <div id='fileInformationContainer'>
                     <div id='showFileDataContainer'>
                         <h2 id='fileNameh2'>File Name: <span id='fileNameEcho'></span></h2>

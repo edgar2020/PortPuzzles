@@ -12,7 +12,6 @@ function getCurrentLogFile()
 
 function getFormatedDate(date)
 {
-    var date = new Date();
         var year = date.getFullYear();
         var month = date.getMonth() + 1;
         var day = date.getDate();
@@ -64,7 +63,7 @@ const LogPage = () =>
     useEffect(() => {
         const getEntriesFromFirebase = [];
         const subscriber = db
-          .collection(getCurrentLogFile())
+          .collection(getCurrentLogFile()).orderBy("time_stamp")
           .onSnapshot((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 getEntriesFromFirebase.push({
@@ -75,7 +74,7 @@ const LogPage = () =>
             setEntries(getEntriesFromFirebase);
             setLoading(false);
           });
-          console.log(getEntriesFromFirebase);
+        //   console.log(getEntriesFromFirebase);
         // return cleanup function
         return () => subscriber();
       }, [loading]); // empty dependencies array => useEffect only called once
@@ -83,24 +82,28 @@ const LogPage = () =>
 
  
     return (
-        <div className="">
-           
-            <div className="">
-                <table>
-                    <tr>
-                        <th>Timestamp</th>
-                        <th>Message</th>
-                    </tr>
- 
-                    {entries.map((entry) => 
-                    <tr>
-                        {/* {entry.timestamp} */}
-                        {/* <td key={entry.id} className="tg-0lax">{entry.time_stamp}</td> */}
-                        <td key={entry.id} className="tg-0lax">{getFormatedDate(entry.time_stamp.toDate())}: </td>
-                        <td key={entry.id} className="tg-0lax">{entry.message}</td>
-                    </tr> )
-                }
-                </table>
+        <div id="logFilePage">
+            <div id="logFileContainer">
+                <h3 id = "logFileHeader">Log File for {new Date().getFullYear()}</h3>
+                <div id="logFileTableContainer">
+                    <table id="logFileTable">
+                        <thead>
+                            <tr>
+                                <th width="175px" id="timeStampTableHeader" className="logFileTableHeader timestamp">Timestamp</th>
+                                <th id="messageTableHeader" className="logFileTableHeader message">Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {entries.map((entry) => 
+                            <tr>
+                                <td key={entry.id} className="logInput timestamp">{getFormatedDate(entry.time_stamp.toDate())} </td>
+                                <td key={entry.id} className="logInput message">{entry.message}</td>
+                            </tr> )
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                {/* <button onClick={this.downloadTxtFile}>Download</button>  */}
             </div>
         </div>
     );

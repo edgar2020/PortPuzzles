@@ -32,7 +32,10 @@
     padding: 10px;
     font-size: 30px;
 }
-
+#downloadLogFile
+{
+    margin-left:15px;
+}
 #logFileTable
 {
     font-size: 20px;

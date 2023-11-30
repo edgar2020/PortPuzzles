@@ -79,12 +79,21 @@ const LogPage = () =>
         return () => subscriber();
       }, [loading]); // empty dependencies array => useEffect only called once
  
-
+      const downloadTxtFile = () => {
+        const element = document.createElement("a");
+        const file = new Blob([document.getElementById('logFileTableBody').innerText],    
+                    {type: 'text/plain;charset=utf-8'});
+        element.href = URL.createObjectURL(file);
+        element.download = getCurrentLogFile()+".txt";
+        document.body.appendChild(element);
+        element.click();
+      }
  
     return (
         <div id="logFilePage">
             <div id="logFileContainer">
-                <h3 id = "logFileHeader">Log File for {new Date().getFullYear()}</h3>
+                <h3 id = "logFileHeader">Log File for {new Date().getFullYear()}<button id="downloadLogFile" onClick={downloadTxtFile}>Download</button></h3>
+                
                 <div id="logFileTableContainer">
                     <table id="logFileTable">
                         <thead>
@@ -93,7 +102,7 @@ const LogPage = () =>
                                 <th id="messageTableHeader" className="logFileTableHeader message">Message</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="logFileTableBody">
                             {entries.map((entry) => 
                             <tr>
                                 <td key={entry.id} className="logInput timestamp">{getFormatedDate(entry.time_stamp.toDate())} </td>

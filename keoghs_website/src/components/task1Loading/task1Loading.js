@@ -76,7 +76,8 @@ import AddContainers from './addContainers';
           var row_num = parseInt(numbersFound[0])-1;
           var col_num = parseInt(numbersFound[1])-1;
           var weight = parseInt(numbersFound[2]);
-          var name = inputLines[i].substring(19).trim();
+          // var name = inputLines[i].substring(19).trim();
+          var name = inputLines[i].replace(/^(?:[^,]*,){2}[^,]*,/, ' ').trim();
           if(name === 'UNUSED')     
           {
             grid[row_num][col_num] = {container: null, deadSpace: 0};

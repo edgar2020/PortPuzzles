@@ -18,7 +18,7 @@ html
     --theme-color-4: #FFAD05;
     --theme-color-5: #FFf;
     /* header colors */
-    --header-background-color: rgb(121, 114, 255);
+    --header-background-color: #3d5a80;
     --header-sign-in-button-color: #ddd;
 
     /* defaulr button color */
@@ -32,7 +32,7 @@ html
     --button-dimension: 50px;
 
     /* Footer Colors */
-    --footer-background-color: rgb(121, 114, 255);
+    --footer-background-color: #3d5a80;
     --heap-footer-text-color: rgb(255, 255, 255);
 
 }

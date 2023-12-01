@@ -53,7 +53,8 @@ import { balance } from './balancingSearchAlgorithm';
           var row_num = parseInt(numbersFound[0]);
           var col_num = parseInt(numbersFound[1]);
           var weight = parseInt(numbersFound[2]);
-          var name = inputLines[i].substring(19);
+          // var name = inputLines[i].substring(19);
+          var name = inputLines[i].replace(/^(?:[^,]*,){2}[^,]*,/, ' ').trim();
           if(name !== 'UNUSED')
           {
             // alert(numbersFound);

@@ -2,6 +2,9 @@ import React,{ Component } from 'react';
 import '../tasks.css';
 import FileUploader from '../fileUploader';
 import ToggleGrid from './toggleGrid';
+
+import {saveEvent } from '../../logFile'
+
 import AddContainers from './addContainers';
 
 // Create States for State Machine Task1_States
@@ -62,6 +65,7 @@ import AddContainers from './addContainers';
     handleFileCallback = (data) => {
       // Update the name in the component's state
       try {
+        let count = 0;
         let fileData = data.text;
         this.setState({ textFromFile: fileData, loadedFileName: data.name });
         var inputLines = fileData.split('\n');
@@ -84,13 +88,15 @@ import AddContainers from './addContainers';
           else
           {
             grid[row_num][col_num] = {container: new Container(name, weight), deadSpace: 0, offload: 0};
+            count++;
           }
           this.setState({gridState: grid});
         }
-
+        saveEvent("Manifest " + data.name + " is opened. There are " + count + " container(s) on the ship");
         this.transition(Task1_States.GRAB_INPUTS)
       } catch (error) {
-        alert("File is of the incorrect manifest format and cannot be read");
+        // alert("File is of the incorrect manifest format and cannot be read");
+        alert(error);
         this.transition(Task1_States.INIT);
       }
     }

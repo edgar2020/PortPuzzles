@@ -19,7 +19,7 @@ class SiteHeader extends Component
         <div className='rightSideOfHeader'>
           <h1 className='headerTitle'>Keogh's Port</h1>
           <div className="signInContainer">
-            <form action="/action_page.php">
+            <form >
               <input className='signInInput' type="text" placeholder="Username" name="username"/>
               <button className='signInButton' type="submit">Sign-in</button>
             </form>

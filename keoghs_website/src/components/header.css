@@ -17,7 +17,9 @@
     text-align: center;
     width: fit-content;
     margin: 5px 0 0 0;
-    font-size: 50px;
+    font-size: 3.5rem;
+    color: aliceblue;
+    font-family: 'Caudex', serif;
     /* background-color: red; */
     
 }
@@ -40,7 +42,6 @@
 
 .signInContainer
 {
-    
     position: relative;
     height: fit-content;
     margin: auto 0 auto auto;
@@ -51,16 +52,21 @@
     padding: 6px;
     margin-top: 8px;
     margin-right: 16px;
-    font-size: 20px;
+    font-size: 1rem;
     cursor: pointer;
 }
 .signInButton
 {
-    padding: 10px;
-    margin-top: 8px;
-    margin-right: 16px;
-    background: var(--header-sign-in-button-color);
-    font-size: 20px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    margin-right: 2rem;
+    border-radius: 10%;
+    background: white;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #3d5a80;
     border: none;
     cursor: pointer;
 }

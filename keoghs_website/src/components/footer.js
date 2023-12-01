@@ -23,6 +23,7 @@ class siteFooter extends Component
           </form>
           </div>
           <div className = "heap">
+            <br />
             Created and maintained by H.E.A.P.
           </div>
         </footer>

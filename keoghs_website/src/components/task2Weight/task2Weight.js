@@ -1,6 +1,7 @@
 import React,{ Component } from 'react';
 import '../tasks.css';
 import FileUploader from '../fileUploader';
+import { balance } from './balancingSearchAlgorithm';
 
 // Create States for State Machine Task1_States
   const Task1_States = {
@@ -42,6 +43,7 @@ import FileUploader from '../fileUploader';
     handleFileCallback = (fileData) => {
       // Update the name in the component's state
       try {
+        console.log("LOADING"); 
         this.setState({ textFromFile: fileData.text, loadedFileName: fileData.name });
         var inputLines = fileData.text.split('\n');
         for (var i = 0; i < inputLines.length; i++)
@@ -104,6 +106,7 @@ import FileUploader from '../fileUploader';
     }  
     // #TODO: #3 logic for Computeing the steps (where our search function is going to go) 
     renderComputeSteps() {
+      balance(grid);
       return (
         <button onClick={() => this.transition(Task1_States.INIT)}>
           No Logic Yet

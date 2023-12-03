@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+
 class Node {
 	constructor(ship) {
 		this.state = ship;
@@ -9,17 +11,18 @@ class Node {
 	}
 }
 
-let x = 0;
+let x = 0; 
 export function balance(ship) {  // returns instructions to balance, already balanced returns empty instructions
 	console.log("START" + x++);
     console.log(ship);
-
+    return [];
+    
     if (isBalanced(ship))
-        return [];
+    return [];
     else if (balancePossible(ship)) 
         return balanceSearch(ship);
     else 
-        return performSIFT(ship);
+    return performSIFT(ship);
 }
 
 function isBalanced(state) { // returns true if balanced, false if isn't
@@ -132,3 +135,30 @@ function getInstructionsHelper(node, instructions) {
     instructions.push(node.lastMove);
     return instructions;
 }
+
+
+
+function GenerateBalanceSteps(props)
+{   
+    // useEffect(() => {
+    //     balance(props.input);
+    // }, []);
+    const callBalance = (inputGrid) => {
+        [] = balance(inputGrid);
+
+    }
+    //     // console.log(this.props.input);
+    //     // const steps = await balance(this.props.grid);
+    //     // this.setState({stillGenerating: false});
+    //     // alert(col);
+    //     // this.props.parentRecieveSteps(steps);
+    // // }
+ 
+    return (
+        <div id="generateBalancingStepsContainer" className='generatingSteps'>
+        <h3>Generating steps</h3>
+        {callBalance(props.input)}
+        </div>   
+    );
+}
+export default GenerateBalanceSteps;

@@ -50,25 +50,24 @@ import { balance } from './balancingSearchAlgorithm';
         {
           
           var numbersFound = inputLines[i].match(/(\d+)/g);
-          var row_num = parseInt(numbersFound[0]);
-          var col_num = parseInt(numbersFound[1]);
+          var row_num = parseInt(numbersFound[0])-1;
+          var col_num = parseInt(numbersFound[1])-1;
           var weight = parseInt(numbersFound[2]);
           // var name = inputLines[i].substring(19);
           var name = inputLines[i].replace(/^(?:[^,]*,){2}[^,]*,/, ' ').trim();
-          if(name !== 'UNUSED')
+          if(name === 'UNUSED')  
           {
-            // alert(numbersFound);
-            // alert(row_num + " " + col_num + " " + weight + " " + name);
-            grid[row_num][col_num] = new Container(name, weight);
+            grid[row_num][col_num] = {container: null, deadSpace: 0};
           }
-          if(name === 'NAN')
+          else if(name === 'NAN')
           {
-            grid[row_num][col_num] = 'NAN';
+            grid[row_num][col_num] = {container: null, deadSpace: 1};
           }
           else
           {
-            grid[row_num][col_num] = null;
+            grid[row_num][col_num] = {container: new Container(name, weight), deadSpace: 0, offload: 0};
           }
+          this.setState({gridState: grid});
         }
         // alert(inputLines.length);
         // alert(inputLines);

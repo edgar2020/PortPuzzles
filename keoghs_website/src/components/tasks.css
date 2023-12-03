@@ -50,14 +50,18 @@
 {
     background-color: rgb(192, 89, 63);
     align-items: center;
-    overflow-x: hidden;
+    overflow-x: auto;
     white-space: nowrap;
     vertical-align: top;  
     /* vertical-align: top;   
     width: var(--button-dimension);
     height: var(--button-dimension); */
+    /* position:relative;  */
+    /* top:50%;  */
+    /* left:50%;  */
+    /* transform:translate(-50%, -50%) */
 }
-/* .containerPresent {
+.containerPresent {
     &::-webkit-scrollbar {
         width: 0.5em;
         height: 0.5em;
@@ -72,16 +76,21 @@
             background: rgba(255,255,255,.2);
         }
     }
-} */
+}
 .displayContainerName
 {
+    /* position:absolute;  */
+    /* left:50%; top:50%;  */
+    transform-origin: center center; 
+    /* transform: translate(-50%, -50%);  */
+    /* transform: rotate(90deg); */
     /* background-color: rebeccapurple;
     display: inline-flex;
     transform: rotate(90deg);
     text-overflow: clip; */
     display: inline-flex;
     text-overflow: clip;
-    animation: slide-left 50s linear infinite;
+    /* animation: slide-left 50s linear infinite; */
 }
 .containerPresent:hover .displayContainerName
 {
@@ -91,7 +100,7 @@
 .gridToggleButton.containerPresent:hover
 {
     /* background-color: darkgoldenrod; */
-    border: 6px solid rgb(84, 64, 209)
+    border: 3px solid rgb(84, 64, 209)
 }
 .gridToggleButton.active
 {

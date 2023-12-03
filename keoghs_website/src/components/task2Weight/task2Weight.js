@@ -1,7 +1,7 @@
 import React,{ Component } from 'react';
 import '../tasks.css';
 import FileUploader from '../fileUploader';
-import { balance } from './balancingSearchAlgorithm';
+// import { balance } from './balancingSearchAlgorithm';
 
 // Create States for State Machine Task2_States
   const Task2_States = {
@@ -106,7 +106,7 @@ import { balance } from './balancingSearchAlgorithm';
     }  
     // #TODO: #3 logic for Computeing the steps (where our search function is going to go) 
     renderComputeSteps() {
-      balance(grid);
+      // balance(grid);
       return (
         <button onClick={() => this.transition(Task2_States.INIT)}>
           No Logic Yet

@@ -80,15 +80,15 @@ import AddContainers from './addContainers';
           var name = inputLines[i].replace(/^(?:[^,]*,){2}[^,]*,/, ' ').trim();
           if(name === 'UNUSED')     
           {
-            grid[row_num][col_num] = {container: null, deadSpace: 0};
+            grid[row_num][col_num] = {container: null, deadSpace: false};
           }
           else if(name === 'NAN')
           {
-            grid[row_num][col_num] = {container: null, deadSpace: 1};
+            grid[row_num][col_num] = {container: null, deadSpace: true};
           }
           else
           {
-            grid[row_num][col_num] = {container: new Container(name, weight), deadSpace: 0, offload: 0};
+            grid[row_num][col_num] = {container: new Container(name, weight), deadSpace: false, offload: false};
             count++;
           }
           this.setState({gridState: grid});

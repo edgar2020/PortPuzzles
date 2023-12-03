@@ -140,8 +140,11 @@ input
 {
     /* background-color: aqua; */
     width: 150px;
+    /* white-space: pre-wrap; */
+    /* text-wrap: ; */
+    overflow-wrap: break-word;
     overflow-x: hidden;
-    overflow-y: hidden;
+    /* overflow-y: hidden; */
     border: 1px solid black;
     padding: 10px;
 }

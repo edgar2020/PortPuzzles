@@ -52,10 +52,33 @@
     align-items: center;
     overflow-x: hidden;
     white-space: nowrap;
-    vertical-align: top;   
+    vertical-align: top;  
+    /* vertical-align: top;   
+    width: var(--button-dimension);
+    height: var(--button-dimension); */
 }
+/* .containerPresent {
+    &::-webkit-scrollbar {
+        width: 0.5em;
+        height: 0.5em;
+        background-color: rgba(255, 255, 255, 0.463);
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba(121, 0, 0, 0.875);
+        border-radius: 3px;
+        
+        &:hover {
+            background: rgba(255,255,255,.2);
+        }
+    }
+} */
 .displayContainerName
 {
+    /* background-color: rebeccapurple;
+    display: inline-flex;
+    transform: rotate(90deg);
+    text-overflow: clip; */
     display: inline-flex;
     text-overflow: clip;
     animation: slide-left 50s linear infinite;

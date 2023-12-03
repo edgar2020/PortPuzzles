@@ -68,12 +68,12 @@ class ToggleGrid extends Component
             // this.state.numberOfContainers += 1;
             // this.setState({numberOfContainers: this.state.numberOfContainers+1});
             return (
-                <>
-                <button id={'toggleCell_['+row+','+col+']'} className={`gridCell gridToggleButton containerPresent ${gridCell.offload ? "active" : ""}`}
-                        onMouseOver={() => this.showCellData(row, col)} onMouseLeave={()=>this.clearCellData} onClick={() => this.sendInputDataUp(row, col)}>
-                    <span className='displayContainerName'>{gridCell.container.name}</span>
-                </button>
-                </>
+                <div className='outerToggleButtonContaienr'>
+                    <button id={'toggleCell_['+row+','+col+']'} className={`gridCell gridToggleButton containerPresent ${gridCell.offload ? "active" : ""}`}
+                            onMouseOver={() => this.showCellData(row, col)} onMouseLeave={()=>this.clearCellData} onClick={() => this.sendInputDataUp(row, col)}>
+                        <span className='displayContainerName'>{gridCell.container.name}</span>
+                    </button>
+                </div>
             );
         }
 

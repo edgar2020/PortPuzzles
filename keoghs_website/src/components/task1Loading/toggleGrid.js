@@ -24,7 +24,8 @@ class ToggleGrid extends Component
         // alert("df");
         try {
             let gridCell = this.props.grid[row-1][col-1];
-            document.getElementById('selectedButtonInfo').innerHTML="<h2>Cell Data</h2><p>Location: ["+row+", "+col+"]</p><p>Name: "+gridCell.container.name+"</p><p>Weight: "+gridCell.container.weight+"kg</p><p>Offloading: "+gridCell.offload+"</p>";
+            // document.getElementById('selectedButtonInfo').innerHTML="<h2>Cell Data</h2><p>Location: ["+row+", "+col+"]</p><p>Name: "+gridCell.container.name+"</p><p>Weight: "+gridCell.container.weight+"kg</p><p>Offloading: "+gridCell.offload+"</p>";
+            document.getElementById('selectedButtonInfo').innerHTML="<h2>Cell Data</h2><p>Location: ["+row+", "+col+"]</p><p>Name: "+gridCell.container.name+"</p><p>Weight: "+gridCell.container.weight;
             
         } catch (error) {
         }
@@ -38,7 +39,7 @@ class ToggleGrid extends Component
     determineTypeOfCell = (row, col) =>
     {
         let gridCell = this.props.grid[row-1][col-1];
-        if(gridCell.container === null && gridCell.deadSpace === 1)
+        if(gridCell.container === null && gridCell.deadSpace === true)
         {
             return (
                 <>
@@ -49,7 +50,7 @@ class ToggleGrid extends Component
                 </>
             );
         }
-        else if(gridCell.container === null && gridCell.deadSpace === 0)
+        else if(gridCell.container === null && gridCell.deadSpace === false)
         {
             // console.log(1);
             return (

@@ -66,7 +66,6 @@ import { balance } from './balancingSearchAlgorithm';
           {
             grid[row_num][col_num] = {container: new Container(name, weight), deadSpace: 0};
           }
-        }
           for(var i = 0; i < 12; i++)
           {
             grid[8][i] = {container: null, deadSpace: 0};

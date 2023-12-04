@@ -1,3 +1,4 @@
+
 // This function is strictly for debugging
 function consolePrintState(state) {
     for (let row = 8; row >= 0; row--) {
@@ -100,7 +101,6 @@ function balancePossible(state) { // returns true if possible to balance, false 
 
 function balanceSearch(state) { // returns instructions for fastest balance
     let initialNode = new Node(state);
-   
 	// Create a data structure to store the paths that are being explored
 	let frontier = [initialNode];
 
@@ -122,6 +122,7 @@ function balanceSearch(state) { // returns instructions for fastest balance
         // If this node reaches the goal, return the node 
         if (isBalanced(node.state)) {
             console.log("SUCCESS! Balance Instructions:")
+
             return getInstructions(node);
         }
 

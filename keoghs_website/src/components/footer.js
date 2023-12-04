@@ -14,11 +14,12 @@ class siteFooter extends Component
           <form>
             <textarea
               id = "noteInput"
-              placeholder="Insert note..."
-              maxlength="1000"
-              minlength="1"
+              // placeholder="Insert note..."
+              maxLength="1000"
+              minLength="1"
+              placeholder="Insert note to log file here..."
             >
-              Insert note to log file here...
+              
             </textarea>
           </form>
           </div>

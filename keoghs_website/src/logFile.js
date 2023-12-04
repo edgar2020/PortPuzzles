@@ -52,6 +52,7 @@ export function saveEvent(m)
         time_stamp:  Timestamp.fromDate(new Date()),
         message: m,
     });
+    // alert(m);
 }
 
 

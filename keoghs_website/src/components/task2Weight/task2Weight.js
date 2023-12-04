@@ -54,7 +54,7 @@ import { balance } from './balancingSearchAlgorithm';
           var col_num = parseInt(numbersFound[1])-1;
           var weight = parseInt(numbersFound[2]);
           var name = inputLines[i].replace(/^(?:[^,]*,){2}[^,]*,/, ' ').trim();
-          console.log(row_num + ' ' + col_num + ' ' + weight + ' ' + name)
+     
           if(name === 'UNUSED')     
           {
             grid[row_num][col_num] = {container: null, deadSpace: 0};
@@ -110,8 +110,7 @@ import { balance } from './balancingSearchAlgorithm';
     }  
     // #TODO: #3 logic for Computeing the steps (where our search function is going to go) 
     renderComputeSteps() {
-        console.log(grid)
-      balance(grid);
+      console.log(balance(grid)); // Calling the balancing function for testing purposes
       return (
         <button onClick={() => this.transition(Task2_States.INIT)}>
           No Logic Yet

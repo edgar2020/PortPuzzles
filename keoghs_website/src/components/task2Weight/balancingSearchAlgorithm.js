@@ -1,6 +1,30 @@
+// This function is strictly for debugging
+function consolePrintState(state) {
+    for (let row = 8; row >= 0; row--) {
+        let a = []
+        a.push(row + 1)
+        for (let column = 0; column < 12; column++) {
+            if (state[row][column].container)
+                a.push(state[row][column].container.weight)
+            else if (state[row][column].deadSpace)
+                a.push("X")
+            else   
+                a.push('•')
+        }
+        console.log(a.join('\t'))
+    }
+
+    let a = []
+    a.push(' ')
+    for (let i = 1; i < 13; i++) {
+        a.push(i)
+    }
+    console.log(a.join('\t'))
+}
+
 class Node {
 	constructor(ship) {
-		this.state = [...ship]; // should make a copy of "ship" grid array
+		this.state = structuredClone(ship); // should make a copy of "ship" grid array
 		this.pathCost = 0; // total path cost (actual cost in minutes to get to current state)
 		this.heuristicCost = 0; // estimated cost in minutes left to reach balance
         // ((old row, old column), (new row, new column))
@@ -14,26 +38,27 @@ const NEW = 1;
 const ROW = 0;
 const COLUMN = 1;
 
-let x = 0;
-export function balance(ship) {  // returns instructions to balance, already balanced returns empty instructions
-	console.log("START" + x++);
-    console.log(ship);
+export function balance(ship) {  // returns instructions to balance, already balanced returns empty instructions  
+    console.log("Initial State:");
+    //console.log(ship);
+    consolePrintState(ship)
 
     if (isBalanced(ship)) {
         console.log("ALREADY BALANCED")
-        return [];
+        return {cost: 0, instruction: []}; // returns empty instructions if already balanced
     } 
     else if (balancePossible(ship)) {
-        console.log("BALANCING")
+        console.log("GOING TO BALANCE")
         return balanceSearch(ship);
     } 
     else {
-        console.log("SIFTING")
+        console.log("GOING TO SIFT")
         return performSIFT(ship);
     }
 }
 
-function isBalanced(state) { // returns true if balanced, false if isn't (MIGHT BE BETTER TO STORE LEFT AND RIGHT SUMS AS NODE VARIABLES)
+function isBalanced(state) { // returns true if balanced, false if isn't 
+    //MIGHT BE BETTER TO STORE LEFT AND RIGHT SUMS AS NODE VARIABLES TO SPEED IT UP (A LOT LESS LOOPS)
     let leftSum = 0
     for (let column = 0; column < 6; column++) {
         let row = 0
@@ -58,7 +83,15 @@ function isBalanced(state) { // returns true if balanced, false if isn't (MIGHT 
         }
     }
 
-    return (Math.min(leftSum, rightSum) / Math.max(leftSum, rightSum)) >= 0.9 // NEED TO TEST/CHECK
+    let isBalanced = (Math.min(leftSum, rightSum) / Math.max(leftSum, rightSum)) >= 0.9
+
+    if (isBalanced) {
+        console.log("Balanced State:")
+        consolePrintState(state)
+        //console.log(state)
+        return true
+    }
+    else return false
 }
 
 function balancePossible(state) { // returns true if possible to balance, false if impossible
@@ -67,10 +100,9 @@ function balancePossible(state) { // returns true if possible to balance, false 
 
 function balanceSearch(state) { // returns instructions for fastest balance
     let initialNode = new Node(state);
-    //console.log(initialNode.state)
+   
 	// Create a data structure to store the paths that are being explored
 	let frontier = [initialNode];
-    //console.log("INITIAL frontier: " + [...frontier])
 
 	// Create an empty data structure to store the explored paths
 	let explored = [];
@@ -89,6 +121,7 @@ function balanceSearch(state) { // returns instructions for fastest balance
         explored.push(node);
         // If this node reaches the goal, return the node 
         if (isBalanced(node.state)) {
+            console.log("SUCCESS! Balance Instructions:")
             return getInstructions(node);
         }
 
@@ -102,9 +135,7 @@ function balanceSearch(state) { // returns instructions for fastest balance
 
 function expand(frontier, explored, node) { // branching function, max 12x11 branches
     console.log("EXPANDING")
-    //console.log("frontier: " + frontier)
-    //console.log("explored: " + explored)
-   // console.log("node: " + node)
+
     // For every column, check every column
     // o: old column, n: new column
     for (let o = 0; o < 12; o++) {
@@ -134,6 +165,7 @@ function expand(frontier, explored, node) { // branching function, max 12x11 bra
                             tempNode.pathCost = node.pathCost + getPathCost(node, move);
                             tempNode.heuristicCost = getHeuristicCost(tempState);
                             tempNode.move = move;
+                            tempNode.parent = node
 
                             // Add the step to the frontier, using the cost and the heuristic function to estimate the total cost to reach the goal
                             frontier.push(tempNode);
@@ -146,34 +178,34 @@ function expand(frontier, explored, node) { // branching function, max 12x11 bra
     return frontier
 }
 
-function getMove(state, oldColumn, newColumn) {
+function getMove(state, oldColumn, newColumn) { // returns empty array if move is invalid
     let oldRow = 0;
     while (oldRow < 9 && state[oldRow][oldColumn].deadSpace == 1)
         oldRow++
 
     // ***NEED TO ADD CHECK THAT NO CONTAINERS ARE IN ROW 8 BETWEEN OLD AND NEW COLUMNS***
     
-    if (oldRow == 9 || state[oldRow][oldColumn].container === null) // returns empty move if no containers in oldColumn
+    if (oldRow == 9 || state[oldRow][oldColumn].container === null) // returns invalid if no containers in oldColumn
         return []
 
     while (oldRow < 8 && state[oldRow + 1][oldColumn].container !== null) // finds top container row in old column
         oldRow++; // increment if container on top of cell
 
     let newRow = 0;
-    while (newRow < 9 && state[newRow][newColumn].container !== null) // finds top empty cell in new column
+    while (newRow < 9 && (state[newRow][newColumn].container !== null || state[newRow][newColumn].deadSpace == 1)) // finds top empty cell in new column
         newRow++; // increment if cell has container
 
-    return [[oldRow, oldColumn], [newRow, newColumn]] // the move is returned                  **NOT SURE IF RETURN WORKS**
+    return [[oldRow, oldColumn], [newRow, newColumn]] // the move is returned               
 }
 
 function getNewState(oldState, move) {
-    var newState = [...oldState];
+    var newState = structuredClone(oldState);
     newState[move[OLD][ROW]][move[OLD][COLUMN]] = {container: null, deadSpace: 0}; // replace old location with empty cell
-    newState[move[NEW][ROW]][move[NEW][COLUMN]] = oldState[move[OLD][ROW]][move[OLD][COLUMN]]; // container is now in new cell      ***MIGHT NEED TO CHANGE TO COPY CONTAINER CORRECTLY***
+    newState[move[NEW][ROW]][move[NEW][COLUMN]] = oldState[move[OLD][ROW]][move[OLD][COLUMN]]; // container is now in new cell    
     return newState;
 }
 
-function getPathCost(node, move) { // NEED TO TEST
+function getPathCost(node, move) {
     let cost = 0;
     
     // First will add cost to move crane to old container location
@@ -237,11 +269,12 @@ function performSIFT(state) { // return instructions for SIFT
 function getInstructions(node) {
     var instructions = [];
 	instructions = getInstructionsHelper(node, instructions);
-    return instructions;
+    return {cost: node.pathCost, steps: instructions}
 }
 
-function getInstructionsHelper(node, instructions) { // NEED TO TEST
-    if (node.parent != null)
+function getInstructionsHelper(node, instructions) {
+    // Print steps in order but not the very first redundant one (used to store intial crane position)
+    if (node.parent != null && node.parent.parent != null)
         getInstructionsHelper(node.parent, instructions);
     
     instructions.push(node.move);

@@ -37,38 +37,40 @@ import { balance } from './balancingSearchAlgorithm';
       // create starting state
       current: Task2_States.INIT,
       textFromFile: "null",
-      loadedFileName: null
+      loadedFileName: null,
+        gridState: []
     };
 
     handleFileCallback = (fileData) => {
         // Update the name in the component's state
         try {
-          console.log("LOADING"); 
           this.setState({ textFromFile: fileData.text, loadedFileName: fileData.name });
           var inputLines = fileData.text.split('\n');
           for (var i = 0; i < inputLines.length; i++)
+        {
+          
+          var numbersFound = inputLines[i].match(/(\d+)/g);
+          var row_num = parseInt(numbersFound[0])-1;
+          var col_num = parseInt(numbersFound[1])-1;
+          var weight = parseInt(numbersFound[2]);
+          var name = inputLines[i].replace(/^(?:[^,]*,){2}[^,]*,/, ' ').trim();
+          if(name === 'UNUSED')
           {
-            
-            var numbersFound = inputLines[i].match(/(\d+)/g);
-            var row_num = parseInt(numbersFound[0])-1;
-            var col_num = parseInt(numbersFound[1])-1;
-            var weight = parseInt(numbersFound[2]);
-            // var name = inputLines[i].substring(19);
-            var name = inputLines[i].replace(/^(?:[^,]*,){2}[^,]*,/, ' ').trim();
-            if(name === 'UNUSED')  
-            {
-              grid[row_num][col_num] = {container: null, deadSpace: 0};
-            }
-            else if(name === 'NAN')
-            {
-              grid[row_num][col_num] = {container: null, deadSpace: 1};
-            }
-            else
-            {
-              grid[row_num][col_num] = {container: new Container(name, weight), deadSpace: 0, offload: 0};
-            }
-            this.setState({gridState: grid});
+            grid[row_num][col_num] = {container: null, deadSpace: 0};
           }
+          else if(name === 'NAN')
+          {
+            grid[row_num][col_num] = {container: null, deadSpace: 1};
+          }
+          else
+          {
+            grid[row_num][col_num] = {container: new Container(name, weight), deadSpace: 0};
+          }
+          for(var i = 0; i < 12; i++)
+          {
+            grid[8][i] = {container: null, deadSpace: 0};
+          }
+          this.setState({gridState: grid});
           // alert(inputLines.length);
           // alert(inputLines);
   
@@ -106,7 +108,7 @@ import { balance } from './balancingSearchAlgorithm';
     }  
     // #TODO: #3 logic for Computeing the steps (where our search function is going to go) 
     renderComputeSteps() {
-      balance(grid);
+      console.log(balance(grid)); // Calling the balancing function for testing purposes
       return (
         <button onClick={() => this.transition(Task2_States.INIT)}>
           No Logic Yet

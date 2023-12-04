@@ -2,6 +2,7 @@ import React,{ Component } from 'react';
 import '../tasks.css';
 import FileUploader from '../fileUploader';
 import { balance } from './balancingSearchAlgorithm';
+import {saveEvent } from '../../logFile'
 
 // Create States for State Machine Task2_States
 const Task2_States = {
@@ -44,6 +45,7 @@ class task2Loading extends Component {
   handleFileCallback = (fileData) => {
       // Update the name in the component's state
       try {
+        let count = 0;
         this.setState({ textFromFile: fileData.text, loadedFileName: fileData.name });
         var inputLines = fileData.text.split('\n');
         for (var i = 0; i < inputLines.length; i++)
@@ -64,6 +66,7 @@ class task2Loading extends Component {
           else
           {
             grid[row_num][col_num] = {container: new Container(name, weight), deadSpace: 0};
+            count++;
           }
         }
         for(var i = 0; i < 12; i++)
@@ -73,7 +76,7 @@ class task2Loading extends Component {
         this.setState({gridState: grid});
         // alert(inputLines.length);
         // alert(inputLines);
-
+        saveEvent("Manifest " + fileData.name + " is opened. There are " + count + " container(s) on the ship");
         this.transition(Task2_States.COMPUTE_STEPS)
       } catch (error) {
         alert("ERROR: File not of correct format" + error);

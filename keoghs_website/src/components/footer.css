@@ -1,17 +1,12 @@
 #noteInput {
     resize: none;
-    width: 33%;
+    width: 60%;
     height: 4rem;
     font-size: 1rem;
     padding-top: 1%;
     padding-left: 1%;
     bottom: 5px;
 }
-/*phantom {
-    display: 'block',
-    height: 6rem,
-    width: '100%',
-}*/
 
 .footer {
   position: fixed;
@@ -19,26 +14,47 @@
   height: 6rem;
   bottom: 0;
   width: 100%; 
-
   background-color: var(--footer-background-color);
   color: var(--heap-footer-text-color);
   text-align: center;
 }
 .note {
-    position: fixed;
-    left: 1rem;
-    bottom: 2rem;
-    height: 3.5rem;
-    width: 100%;
+    float: left;
+    margin: 5px 0 0 5px;
+    width: fit-content;
+    width: 67%;
     text-align: left;
     font-size: 20px;
     font-family: Arial, Helvetica, sans-serif;
 }
+
+#noteSubmitButton
+{
+    position: relative;
+    height: 4rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    bottom: 27px;
+    border-radius: 10%;
+    background: white;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #3d5a80;
+    border: none;
+    cursor: pointer;
+}
+
 .heap {
+    float: right;
+    width: 25%;
+    margin-right: 10px;
     text-align: right;
+    /* background-color: red; */
     font-size: 20px;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-style: italic;
     font-weight: 300;
-    padding-right: 2%;
+    /* padding-right: 2%; */
 }

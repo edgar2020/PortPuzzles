@@ -54,8 +54,7 @@ import { balance } from './balancingSearchAlgorithm';
           var col_num = parseInt(numbersFound[1])-1;
           var weight = parseInt(numbersFound[2]);
           var name = inputLines[i].replace(/^(?:[^,]*,){2}[^,]*,/, ' ').trim();
-     
-          if(name === 'UNUSED')     
+          if(name === 'UNUSED')
           {
             grid[row_num][col_num] = {container: null, deadSpace: 0};
           }

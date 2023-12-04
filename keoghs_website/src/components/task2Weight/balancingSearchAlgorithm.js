@@ -46,7 +46,7 @@ export function balance(ship) {  // returns instructions to balance, already bal
 
     if (isBalanced(ship)) {
         console.log("ALREADY BALANCED")
-        return {cost: 0, instruction: []} // returns empty instructions if already balanced
+        return {cost: 0, steps: []} // returns empty instructions if already balanced
     } 
     else if (balancePossible(ship)) {
         console.log("NOT BALANCED, BALANCING...")

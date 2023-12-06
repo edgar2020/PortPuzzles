@@ -1,6 +1,6 @@
 import React,{ Component } from 'react';
-import './homeOptions.css';
-import './tasks.css'
+import '../css/homeOptions.css';
+import '../css/tasks.css'
 
 class SiteHeader extends Component
 {

@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import '../tasks.css';
+import '../../css/tasks.css';
 import FileUploader from '../fileUploader';
 import { balance } from './balancingSearchAlgorithm';
 import {saveEvent } from '../../logFile'

@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import './footer.css';
+import '../css/footer.css';
 import keoghLogo from '../other/placeholder-logo.png'
 
 import {saveEvent } from '../logFile'

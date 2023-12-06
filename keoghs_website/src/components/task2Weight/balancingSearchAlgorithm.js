@@ -81,7 +81,7 @@ function isBalanced(state) { // returns true if balanced, false if isn't
 
     let isBalanced = (Math.min(leftSum, rightSum) / Math.max(leftSum, rightSum)) >= 0.9
 
-    if (isBalanced) {
+    if (isBalanced || leftSum + rightSum == 0) { // Balnced if lighter side / heavier side >= 0.9 OR ship is empty
         console.log("Balanced State:")
         consolePrintState(state)
         //console.log(state)
@@ -128,14 +128,14 @@ function balanceIsPossible(state) { // returns true if possible to balance, fals
 }
 
 function balanceIsPossibleHelper(lower, upper, sum, weights) { // recursivly checks all possible weight combinations
-    if (weights.length > 0) {
+    if (weights.length > 0 && sum < upper) {
         let weightsCopy = structuredClone(weights)
         let weight = weightsCopy.shift() // picks the heaviest weight and removes it
 
         sum += weight
-        if (sum > lower && sum < upper) { // checks if the current sum is within 10% of ideal sum
+        if (sum >= lower && sum <= upper) { // checks if the current sum is within 10% of ideal sum (NEED TO DOUBLE CHECK [> vs >=]/[< vs <=])
             //console.log("BALANCE FOUND! Possible sum: " + sum)
-            return true
+            return true // current sum balances the ship! Returns true and stops looking
         } else {
             return balanceIsPossibleHelper(lower, upper, sum, weightsCopy) || // keep weight and continue looking
                    balanceIsPossibleHelper(lower, upper, sum - weight, weightsCopy) // skip weight and continue looking
@@ -196,12 +196,30 @@ function expand(frontier, explored, node) { // branching function, max 12x11 bra
                         
                         // Check if this state has already been explored
                         let isExplored = (explored.find( e => {
-                            return e.state == tempState                     // ***NEED TO CHANGE FOR COMPARING ARRAYS TO WORK PROPERLY***
+                            return false // UNCOMMENT TO BYPASS
+
+                            let val = compareStates(e.state, tempState) // TAKES TOO LONG, NEED TO IMPLEMENT HASHING
+                            if (val) {
+                                //console.log("E - TRUE")
+                                return true
+                            } else {
+                                //console.log("E - FALSE")
+                                return false               // ***NEED TO CHANGE FOR COMPARING ARRAYS TO WORK PROPERLY***
+                            }
                         }))
                         
                         // avoid repeated nodes during the calculation of neighbors
                         let isFrontier = (frontier.find( e => {
-                            return e.state == tempState                     // ***NEED TO CHANGE FOR COMPARING ARRAYS TO WORK PROPERLY***      
+                            return false // UNCOMMENT TO BYPASS (NEED TO IMPLEMENT HASHING)
+
+                            let val = compareStates(e.state, tempState) // TAKES TOO LONG, NEED TO IMPLEMENT HASHING
+                            if (val) {
+                                //console.log("F - TRUE")
+                                return true
+                            } else {
+                                //console.log("F - FALSE")
+                                return false               // ***NEED TO CHANGE FOR COMPARING ARRAYS TO WORK PROPERLY***
+                            }
                         }))
                         
                         
@@ -215,6 +233,8 @@ function expand(frontier, explored, node) { // branching function, max 12x11 bra
 
                             // Add the step to the frontier, using the cost and the heuristic function to estimate the total cost to reach the goal
                             frontier.push(tempNode)
+                        } else {
+                            //console.log("DID NOT EXPAND NODE")
                         }
                     }
                 }
@@ -222,6 +242,35 @@ function expand(frontier, explored, node) { // branching function, max 12x11 bra
         }
     }
     return frontier
+}
+
+// BYPASSED, NEED TO CHANGE TO HASHING FUNCTION
+function compareStates(state1, state2) {// returns true if the states are the same, false otherwise
+    for (let column = 0; column < 12; column++) {
+        let row = 0
+        while (row < 9 && (state1[row][column].deadSpace == 1 || state2[row][column].deadSpace == 1)) {
+            if (state1[row][column].deadSpace != state2[row][column].deadSpace)
+                return false
+
+            row++
+        }
+        
+        while (row < 9 && (state1[row][column].container !== null || state2[row][column].container !== null)) {
+            if (state1[row][column].container == null || state2[row][column].container == null)
+                return false
+            
+            if (state1[row][column].container.weight != state2[row][column].container.weight)
+                return false
+
+            row++
+        }
+    }
+
+    // console.log("SAME STATES:")
+    // consolePrintState(state1)
+    // consolePrintState(state2)
+
+    return true
 }
 
 function getMove(state, oldColumn, newColumn) { // returns empty array if move is invalid
@@ -292,7 +341,6 @@ function getPathCost(node, move) {
     return cost
 }
 
-/*
 function getHeuristicCost(state) { // returns true if possible to balance, false if impossible
     let containers = []
 
@@ -309,7 +357,7 @@ function getHeuristicCost(state) { // returns true if possible to balance, false
             else 
                 rightSum += state[row][column].container.weight
 
-            containers.push({weight: state[row][column].container.weight, location: [row, column]})
+            containers.push(state[row][column].container)
             row++
         }
     }
@@ -321,58 +369,60 @@ function getHeuristicCost(state) { // returns true if possible to balance, false
     let idealSum = (leftSum + rightSum) / 2
     // let lowerDeficit = idealSum * (18 / 19) - Math.min(leftSum, rightSum) // 18/19 ≈ 0.95
     // let upperDeficit = idealSum * (20 / 19) - Math.min(leftSum, rightSum) // 20/19 ≈ 1.05
-    let lowerDeficit = idealSum * (18 / 19) // 18/19 ≈ 0.95
-    let upperDeficit = idealSum * (20 / 19)// 20/19 ≈ 1.05
+    let lowerBound = idealSum * (18 / 19) // 18/19 ≈ 0.95
+    let upperBound = idealSum * (20 / 19) // 20/19 ≈ 1.05
     
     console.log("Ideal sum: " + idealSum)
-    console.log("Lower deficit: " + lowerDeficit)
-    console.log("Upper defict: " + upperDeficit)
+    console.log("Lower bound: " + lowerBound)
+    console.log("Upper bound: " + upperBound)
     
     let sum = 0
     let combination = []
     let balancedCombinations = []
-    getHeuristicCostHelper(lowerDeficit, upperDeficit, sum, containers, combination, balancedCombinations)
-    console.log(balancedCombinations)
+    // NEED TO SEARCH DIAGONALLY DOWN FROM MIDDLE
+    // SORT BY MANHATTAN DISTANCE TO CLOSEST AVILABLE CELL ON OTHER SIDE
+    
+    let cost = getHeuristicCostHelper(lowerBound, upperBound, sum, containers, combination, balancedCombinations)
+    console.log(balancedCombinations.length)
+    return cost
+
+    // *old* WILL ADD CRANE COST TO MANHATTAN DISTANCE, AND *2 ALL EXCEPT BIGGEST
 
 
+    //balancedCombinations.forEach((e) => console.log(e))
 
 
-    balancedCombinations.forEach((e) => console.log(e))
-
-
-    let cost = 0
- 
+    
     // add Manhattan Distance to cost
-
+    
     // // Then will add actual cost of move
     // cost += Math.abs(move[NEW][ROW] - move[OLD][ROW]) // add vertical distance to cost
     // cost += Math.abs(move[NEW][COLUMN] - move[OLD][COLUMN]) // add horizontal distance to cost
-
+    
     // let maxMoveHeight = Math.max(move[NEW][ROW], move[OLD][ROW])
     // let left = Math.min(move[NEW][COLUMN], move[OLD][COLUMN])
     // let right = Math.max(move[NEW][COLUMN], move[OLD][COLUMN])
-
+    
     // // add any additional cost caused by containers blocking path
     // let maxObstacleHeight = maxMoveHeight    
     // for (let column = left + 1; column < right; column++) { // for all columns between old and new locations
     //     let row = 0
     //     while (row < 9 && node.state[row][column].deadSpace == 1)
     //         row++
-        
+    
     //     while (row < 9 && node.state[row][column].container !== null)
     //         row++
-        
+    
     //     if (row > maxObstacleHeight)
     //         maxObstacleHeight = row
     // }
     // cost += 2 * (maxObstacleHeight - maxMoveHeight) // what goes up must come down
-
-    return cost
+    
 }
-*/
 
+// fills "balancedCombinations" with all possible container combinations that balance the ship
 function getHeuristicCostHelper(lower, upper, sum, containers, combination, balancedCombinations) { // recursivly checks all possible weight combinations
-    if (containers.length > 0) {
+    if (containers.length > 0 && sum < upper) {
         let containersCopy = structuredClone(containers)
         let container = containersCopy.shift() // picks the heaviest container and removes it
         let weight = container.weight
@@ -382,17 +432,35 @@ function getHeuristicCostHelper(lower, upper, sum, containers, combination, bala
         let oldCombination = structuredClone(combination)
 
         sum += weight
-        if (sum > lower && sum < upper) { // checks if the current sum is within 10% of ideal sum
-            console.log("Checking: " + sum + " SUCCESS " + containersCopy.length)
+        if (sum > lower && sum < upper) { // checks if the current sum is within 10% of ideal sum (NEED TO DOUBLE CHECK [> vs >=]/[< vs <=])
+            //console.log("Checking: " + sum + " SUCCESS " + containersCopy.length)
             balancedCombinations.push(newCombination)
             //return true // ***REMOVE RETURN***
+            
+            //Uncomment line below to get all combinations,
+            //Leave commented to only get combinations in order of how they're sorted
+            //Needs to be commented if selecting going off manhattan distance
+            getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations) // skip weight and continue looking
         } else {
-            console.log("Checking: " + sum + " FAIL " + containersCopy.length)
+           // console.log("Checking: " + sum + " FAIL " + containersCopy.length)
+           getHeuristicCostHelper(lower, upper, sum, containersCopy, newCombination, balancedCombinations) // keep weight and continue looking
+           getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations) // skip weight and continue looking
         }
-        getHeuristicCostHelper(lower, upper, sum, containersCopy, newCombination, balancedCombinations) // keep weight and continue looking
-        getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations) // skip weight and continue looking
+
+        // NEED TO CHECK HEURISTIC COST SO FAR IS LOWER THAN LOWEST FOUND BEFORE CALLING RECURSIVE
+        // WILL BE INITIALLY 0, THEN BE UPDATED TO VALUE ONCE BALANCE IS FOUND
+        // UPDATED VALUE WILL BE SMALLEST COST OF MOVING COMBINATION LEFT TO RIGHT, OR RIGHT TO LEFT (CAN'T BE ZERO)
+        // HAS TO CONTAIN CRANE COST AS WELL
+        // EACH COMBINATION WILL HAVE A COST SO FAR
+        // ***old*** IF NONZERO AND SUM OF MANHATTAN DISTANCES TO CLOSEST CELL SO FAR GOES OVER OR EQUAL, IT WON'T CONTINUE WITH THAT BRANCH
+        // WON'T START NEW BRANCH IF SMALLEST MANHATTAN DISTANCE CONTAINER IN COMBINATION IS BIGGER OR EQUAL THAN VALUE
     }
     //return false
+}
+
+function heuristicCost(combination, move) {
+    let cost = 0
+    return cost
 }
 
 function performSIFT(state) { // return instructions for SIFT

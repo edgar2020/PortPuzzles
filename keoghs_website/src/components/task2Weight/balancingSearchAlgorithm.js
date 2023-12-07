@@ -64,6 +64,7 @@ function isBalanced(state) { // returns true if balanced, false if isn't
     //MIGHT BE BETTER TO STORE LEFT AND RIGHT SUMS AS NODE VARIABLES TO SPEED IT UP (A LOT LESS LOOPS)
     let leftSum = 0
     let rightSum = 0
+    let topRowEmpty = true
     for (let column = 0; column < 12; column++) {
         let row = 0
         while (row < 9 && state[row][column].deadSpace == 1)
@@ -74,14 +75,20 @@ function isBalanced(state) { // returns true if balanced, false if isn't
                 leftSum += state[row][column].container.weight
             else 
                 rightSum += state[row][column].container.weight
+            
+            if (row == 8) topRowEmpty = false
 
             row++
         }
     }
 
-    let isBalanced = (Math.min(leftSum, rightSum) / Math.max(leftSum, rightSum)) >= 0.9
+    // NEED TO CHECK THAT THERE ARE NO CONTAINERS IN 9TH ROW
 
-    if (isBalanced || leftSum + rightSum == 0) { // Balnced if lighter side / heavier side >= 0.9 OR ship is empty
+
+    let isBalanced = (Math.min(leftSum, rightSum) / Math.max(leftSum, rightSum)) >= 0.9
+    
+    // Balanced if ((lighter side / heavier side) >= 0.9 OR ship is empty) AND top row is empty
+    if ((isBalanced || leftSum + rightSum == 0) && topRowEmpty) {
         console.log("Balanced State:")
         consolePrintState(state)
         //console.log(state)
@@ -149,9 +156,16 @@ function balanceSearch(state) { // returns instructions for fastest balance
 	// Create a data structure to store the paths that are being explored
 	let frontier = [initialNode]
 
-	// Create an empty data structure to store the explored paths
-	let explored = []
-	
+	// Create an array to store all found states by a state ID
+    // A 1 at the index of state ID means the state has been found, a 0 means it hasn't
+    // This is to avoid exploring paths that have already been explored
+    var foundStates = new Array(9999999).fill(0) // ***TESTING STATE ID ARRAY*** 
+    //[need array size to be 350996490 to handle maximum ship weight (full of containers weighing 99999)]
+    // size greater than 9999999 takes too long to initialize to all 0's
+
+    // change this state to found so that it won't be explored anymore
+    //foundStates[getStateID(state)] = 1 // ***UNCOMMENT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST***
+
     // While there are paths being explored
     while (frontier.length > 0) {
         // Sort the paths in the frontier by total cost (path + heuristic cost), with the lowest-cost paths first
@@ -160,10 +174,10 @@ function balanceSearch(state) { // returns instructions for fastest balance
         })
 
         // Choose the lowest-cost path from the frontier
-        let node = frontier.shift()
+        let node = frontier.shift() // TAKES TOO LONG WHEN FRONTIER IS HUGE
 
-        // Add this nodeto the explored paths
-        explored.push(node)
+        foundStates[getStateID(node.state)] = 1 // ***COMMENT OUT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST***
+
         // If this node reaches the goal, return the node 
         if (isBalanced(node.state)) {
             console.log("SUCCESS! Balance Instructions:")
@@ -171,7 +185,7 @@ function balanceSearch(state) { // returns instructions for fastest balance
             return getInstructions(node)
         }
 
-        frontier = expand(frontier, explored, node)
+        frontier = expand(frontier, foundStates, node) // ***TESTING STATE ID***
     }
 
     // If there are no paths left to explore, return null to indicate that the goal cannot be reached
@@ -179,7 +193,8 @@ function balanceSearch(state) { // returns instructions for fastest balance
     return null //Should never reach here
 }
 
-function expand(frontier, explored, node) { // branching function, max 12x11 branches
+//function expand(frontier, explored, node) { // branching function, max 12x11 branches         foundStates[tempStateID] = 1
+function expand(frontier, foundStates, node) {
     console.log("EXPANDING NODE")
 
     // For every column, check every column
@@ -193,38 +208,10 @@ function expand(frontier, explored, node) { // branching function, max 12x11 bra
                     let move = getMove(node.state, o, n)
                     if (move.length > 0) { // if move is valid (old column must have at least 1 container)
                         let tempState = getNewState(node.state, move)
+                        let tempStateID = getStateID(tempState) // ***TESTING STATE ID***
                         
-                        // Check if this state has already been explored
-                        let isExplored = (explored.find( e => {
-                            return false // UNCOMMENT TO BYPASS
-
-                            let val = compareStates(e.state, tempState) // TAKES TOO LONG, NEED TO IMPLEMENT HASHING
-                            if (val) {
-                                //console.log("E - TRUE")
-                                return true
-                            } else {
-                                //console.log("E - FALSE")
-                                return false               // ***NEED TO CHANGE FOR COMPARING ARRAYS TO WORK PROPERLY***
-                            }
-                        }))
-                        
-                        // avoid repeated nodes during the calculation of neighbors
-                        let isFrontier = (frontier.find( e => {
-                            return false // UNCOMMENT TO BYPASS (NEED TO IMPLEMENT HASHING)
-
-                            let val = compareStates(e.state, tempState) // TAKES TOO LONG, NEED TO IMPLEMENT HASHING
-                            if (val) {
-                                //console.log("F - TRUE")
-                                return true
-                            } else {
-                                //console.log("F - FALSE")
-                                return false               // ***NEED TO CHANGE FOR COMPARING ARRAYS TO WORK PROPERLY***
-                            }
-                        }))
-                        
-                        
-                        // If this state has not been explored
-                        if (!isExplored && !isFrontier) {
+                        // If this state has not been explored/found
+                        if (foundStates[tempStateID] == 0) {
                             let tempNode = new Node(tempState)
                             tempNode.pathCost = node.pathCost + getPathCost(node, move)
                             //tempNode.heuristicCost = getHeuristicCost(tempState)              // *** REMOVE BEFORE FLIGHT ***
@@ -233,6 +220,8 @@ function expand(frontier, explored, node) { // branching function, max 12x11 bra
 
                             // Add the step to the frontier, using the cost and the heuristic function to estimate the total cost to reach the goal
                             frontier.push(tempNode)
+                            // Mark the state as found
+                            //foundStates[tempStateID] = 1 // ***UNCOMMENT FOR FASTER BUT LESS ACCURATE UNIFORM COST***
                         } else {
                             //console.log("DID NOT EXPAND NODE")
                         }
@@ -244,7 +233,36 @@ function expand(frontier, explored, node) { // branching function, max 12x11 bra
     return frontier
 }
 
-// BYPASSED, NEED TO CHANGE TO HASHING FUNCTION
+// Should use state ID as index instead
+function getStateID(state) { // returns (almost) unique ID for each state
+    //console.log("ENTERING")
+    //consolePrintState(state)
+    let id = 0
+    for (let column = 0; column < 12; column++) {
+        let row = 0
+        while (row < 9 && state[row][column].deadSpace == 1)
+            row++
+        
+        while (row < 9 && state[row][column].container !== null) {
+            // NEED TO FIND UNIQUE COMBINATION FOR EACH POSSIBLE STATE (test when all containers have weight 1)
+            //id += state[row][column].container.weight * (row + 1) * (column + 1) // fastest but least accurate
+
+            id += state[row][column].container.weight * Math.pow(10, row) * (row + 1) * (column + 1) // slower but accurate
+
+            //id += state[row][column].container.weight * Math.pow(10, row) * (row + 1) * (column + 1) // not accurate
+            //id += state[row][column].container.weight * ((row + 1) * (column + 1) + row + column) // not accurate
+            //id += (state[row][column].container.weight + (row * 10)) * ((row + 1) * (column + 1) + row + column) // even slower but accurate
+            //id += (state[row][column].container.weight + (row + 1) * (10 * (column + 1))) * ((row + 1) * (column + 1) + row + column) // // slowest but accurate
+            row++
+        }
+    }
+
+    //console.log("ID: " + id)
+    return id % 9999999
+}
+
+/*
+// REPLACED BY STATE IDs (USE TO HANDLE COLLISIONS)
 function compareStates(state1, state2) {// returns true if the states are the same, false otherwise
     for (let column = 0; column < 12; column++) {
         let row = 0
@@ -272,6 +290,7 @@ function compareStates(state1, state2) {// returns true if the states are the sa
 
     return true
 }
+*/
 
 function getMove(state, oldColumn, newColumn) { // returns empty array if move is invalid
     let oldRow = 0
@@ -467,18 +486,29 @@ function performSIFT(state) { // return instructions for SIFT
     return []
 }
 
+// Everything below is for returning the instructions only
+
 function getInstructions(node) { // Calls recurive function to return all steps
     var instructions = []
-	instructions = getInstructionsHelper(node, instructions)
-    return {cost: node.pathCost, steps: instructions}
+	instructions = getInstructionsHelper(node, 0, instructions)
+    //return {cost: node.pathCost, steps: instructions}
+    return instructions
 }
 
-function getInstructionsHelper(node, instructions) { // Recursively returns instructions in order
+function getInstructionsHelper(node, cost, instructions) { // Recursively returns instructions in order
+    cost += node.pathCost - node.parent.pathCost
+
     // Retruns steps in order but not the very first redundant one (used to store intial crane position)
     if (node.parent != null && node.parent.parent != null)
-        getInstructionsHelper(node.parent, instructions)
+        getInstructionsHelper(node.parent, cost, instructions)
     
     //instructions.push(node.move)
-    instructions.push({stepCost: (node.pathCost - node.parent.pathCost), stepState: node.state, step: node.move})
+    //instructions.push({stepCost: (node.pathCost - node.parent.pathCost), stepState: node.state, step: node.move})
+
+    let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: 0})) // 4x24 array of empty cells
+    let state = {ship: node.state, buffer: buffer, truck: 0}
+
+    instructions.push({cost: cost, state: state, initialPos: {pos: node.move[0], loc: 1}, finalPos: {pos: node.move[1], loc: 1}})
+
     return instructions
 }

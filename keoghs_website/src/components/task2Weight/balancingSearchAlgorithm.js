@@ -162,8 +162,8 @@ function balanceSearch(state) { // returns instructions for fastest balance
 	// Create an array to store all found states by a state ID
     // A 1 at the index of state ID means the state has been found, a 0 means it hasn't
     // This is to avoid exploring paths that have already been explored
-    var foundStates = new Array(9999999).fill(0) // ***TESTING STATE ID ARRAY*** 
-    //[need array size to be 350996490 to handle maximum ship weight (full of containers weighing 99999)]
+    var foundStates = new Array(9999999).fill(null) // ***TESTING STATE ID ARRAY*** 
+    // need array size to be 350996490 to handle maximum ship weight (full of containers weighing 99999)
     // size greater than 9999999 takes too long to initialize to all 0's
 
     // change this state to found so that it won't be explored anymore
@@ -179,7 +179,13 @@ function balanceSearch(state) { // returns instructions for fastest balance
         // Choose the lowest-cost path from the frontier
         let node = frontier.shift() // TAKES TOO LONG WHEN FRONTIER IS HUGE
 
-        foundStates[getStateID(node.state)] = 1 // ***COMMENT OUT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST***
+        //foundStates[getStateID(node.state)] = 1 // ***COMMENT OUT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST***
+
+        let stateID = getStateID(node.state)
+        if (foundStates[stateID] === null)
+            foundStates[stateID] = [node.state] // ***COMMENT OUT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST***
+        else 
+            foundStates[stateID].push(node.state)
 
         // If this node reaches the goal, return the node 
         if (isBalanced(node.state)) {
@@ -196,8 +202,7 @@ function balanceSearch(state) { // returns instructions for fastest balance
     return null //Should never reach here
 }
 
-//function expand(frontier, explored, node) { // branching function, max 12x11 branches         foundStates[tempStateID] = 1
-function expand(frontier, foundStates, node) {
+function expand(frontier, foundStates, node) { // branching function, max 12x11 branches
     console.log("EXPANDING NODE")
 
     // For every column, check every column
@@ -212,9 +217,18 @@ function expand(frontier, foundStates, node) {
                     if (move.length > 0) { // if move is valid (old column must have at least 1 container)
                         let tempState = getNewState(node.state, move)
                         let tempStateID = getStateID(tempState) // ***TESTING STATE ID***
+
+                        // let isNewState = true
+                        // if (foundStates[tempStateID] !== null) {
+                        //     //console.log("LOOKING")
+                        //     for (let i = 0; i < foundStates[tempStateID].size; i++)
+                        //         if (compareStates(tempState, foundStates[tempStateID][i]))
+                        //             isNewState = false
+                        // }
                         
                         // If this state has not been explored/found
-                        if (foundStates[tempStateID] == 0) {
+                        if (foundStates[tempStateID] === null) {
+                        //if (isNewState) {
                             let tempNode = new Node(tempState)
                             tempNode.pathCost = node.pathCost + getPathCost(node, move)
                             //tempNode.heuristicCost = getHeuristicCost(tempState)              // *** REMOVE BEFORE FLIGHT ***
@@ -264,7 +278,6 @@ function getStateID(state) { // returns (almost) unique ID for each state
     return id % 9999999
 }
 
-/*
 // REPLACED BY STATE IDs (USE TO HANDLE COLLISIONS)
 function compareStates(state1, state2) {// returns true if the states are the same, false otherwise
     for (let column = 0; column < 12; column++) {
@@ -293,7 +306,6 @@ function compareStates(state1, state2) {// returns true if the states are the sa
 
     return true
 }
-*/
 
 function getMove(state, oldColumn, newColumn) { // returns empty array if move is invalid
     let oldRow = 0
@@ -495,8 +507,11 @@ function getInstructions(node) { // Calls recurive function to return all steps
     var instructions = []
 	instructions = getInstructionsHelper(node, 0, instructions)
     let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
+ 
     let state = {ship: node.state, buffer: buffer, truck: 0}
+
     instructions.push({cost: 0, state: state, initialPos: {pos: node.move[0], loc: 1}, finalPos: {pos: node.move[1], loc: 1}})
+
     //return {cost: node.pathCost, steps: instructions}
     return instructions
 }
@@ -512,6 +527,7 @@ function getInstructionsHelper(node, cost, instructions) { // Recursively return
     //instructions.push({stepCost: (node.pathCost - node.parent.pathCost), stepState: node.state, step: node.move})
 
     let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
+
     let state = {ship: node.parent.state, buffer: buffer, truck: 0}
 
     instructions.push({cost: cost, state: state, initialPos: {pos: node.move[0], loc: 1}, finalPos: {pos: node.move[1], loc: 1}})

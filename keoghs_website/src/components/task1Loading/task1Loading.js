@@ -150,9 +150,6 @@ import AddContainers from './addContainers';
             <br/>
             <br/>
           </div>
-
-
-      //  </div> 
       );
     }
     // #TODO: #3 logic for Computeing the steps (where our search function is going to go) 

@@ -60,7 +60,6 @@ let grid =
       //   {cost: 14, state:{ship: grid, buffer: buffer},initialPos:{position: [2, 1], location: 1}, finalPos: {position: [1, 1], location: 3} }, 
       //   {cost: 4, state:{ship: grid2, buffer: buffer},initialPos:{position: [1, 1], location: 1}, finalPos: {position: [2, 2], location: 2} }, 
       //   {cost: 1, state:{ship: grid2, buffer: buffer},initialPos:{position: [1, 1], location: 1}, finalPos: {position: [2, 2], location: 1} }, 
-
       // ]
 
 let steps = null;
@@ -130,11 +129,13 @@ class task2Loading extends Component {
  */
     recieveSteps = (s) =>
     {
-      steps = s;
+      steps = s.steps;
       this.setState({steps: s});
-      console.log(s);
+      console.log(steps);
       this.transition(Task2_States.DISPLAY_STEPS);
     }
+
+    
     // stepsHaveFinished = () =>
     // {
     //   // this.setState({steps: s});
@@ -187,10 +188,10 @@ class task2Loading extends Component {
       <>
         {/* {console.log("fs")}
         {console.log(this.state.stepsFound)} */}
-        <DisplaySteps steps={steps}/>
-      <button onClick={() => this.transition(Task2_States.INIT)}>
+        <DisplaySteps steps={steps} />
+      {/* <button onClick={() => this.transition(Task2_States.INIT)}>
         No Logic Yetd
-      </button>
+      </button> */}
       </>
     );
   }

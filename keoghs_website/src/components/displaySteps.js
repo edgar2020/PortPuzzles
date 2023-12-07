@@ -41,7 +41,7 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length}) => 
         }
         else if(displayCell.container === null && displayCell.deadSpace === false)
         {   
-            let end = (row === finalPos.position[0] && col === finalPos.position[1] && loc === finalPos.location );
+            let end = (row-1 === finalPos.pos[0] && col-1 === finalPos.pos[1] && loc === finalPos.loc );
             return (
                 <>
                     <button
@@ -53,15 +53,12 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length}) => 
         }
         else if(displayCell.container !== null)
         {
-            let start = (row === initialPos.position[0] && col === initialPos.position[1] && loc === initialPos.location);
+            let start = ((row-1) === initialPos.pos[0] && (col-1) === initialPos.pos[1] && loc === initialPos.loc);
+            console.log( (row-1) + " " + initialPos.pos[0]);
             return (
                 <>
                 <button id={'toggleCell_['+row+','+col+']'} className={`displayCell gridToggleButton containerPresent ${start ? " start " : ""}`}>
-                    {/* {initialPos.position[0] + ' '+ initialPos.position[1]} */}
-                    {/* {row + ' '+ col} */}
-                    {/* {}
-                    {start} */}
-                    {/* <span className='displayContainerName'>{displayCell.container.name}</span> */}
+                    {displayCell.container.weight}
                 </button>
                 </>
             );
@@ -228,7 +225,6 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length}) => 
                     <div className='label displayColumnNumbers'>Truck</div>
 
                 </div>
-                {/* <div className='ship'> */}
                 <div className="ship">
                         <div id='shipRow_9' className="shipRow">
                             <span className='label rowNumber'>9</span>
@@ -383,28 +379,44 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length}) => 
                         </div>
                 </div>
                 
-                {/* </div> */}
             </div>
         </div>
         )
 
        }
+
+
  
 function DisplaySteps(props) 
 {
+    const [index, setIndex] = useState(0);
 
-  const [index, setIndex] = useState(0);
+
+    const createFinalSlide = (length) =>
+    {
+        let position = "nextSlide";
+        console.log(length);
+        if(length === index){
+            document.getElementById('nextStepButton').style.visibility  = 'hidden';
+            return(
+                <div>
+                    Task Completed: Do not forget to download the updated manifest ________ and send it to the captain
+                    <a href='/'>Return to Main Menu</a>
+                </div>
+            )
+        }
+    }
+
 
     let steps = props.steps
     return (
         <div id="displayStepsContainer">
-                {/* <h3>sdf</h3> */}
-                {/* {console.log(steps)} */}
                 
                     {steps.map((step, stepIndex) => {
                 return <Step key={stepIndex} {...step} stepIndex={stepIndex} index={index} length={steps.length} />
             })}
-            <button className="next" onClick={() => setIndex(index + 1)}>{index}{'>'}</button>
+            {createFinalSlide(steps.length)}
+            <button id="nextStepButton" className="next" onClick={() => setIndex(index + 1)}>{index}{'>'}</button>
         </div>
     )
   

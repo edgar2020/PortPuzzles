@@ -40,10 +40,8 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length}) => 
             );
         }
         else if(displayCell.container === null && displayCell.deadSpace === false)
-        {
-            // console.log(1);
-            
-            let end = (row === finalPos.position[0] && col === finalPos.position[1]) && loc === initialPos.location;
+        {   
+            let end = (row === finalPos.position[0] && col === finalPos.position[1] && loc === finalPos.location );
             return (
                 <>
                     <button

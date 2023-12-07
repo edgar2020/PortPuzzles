@@ -329,7 +329,7 @@ function getMove(state, oldColumn, newColumn) { // returns empty array if move i
 
 function getNewState(oldState, move) {
     var newState = structuredClone(oldState)
-    newState[move[OLD][ROW]][move[OLD][COLUMN]] = {container: null, deadSpace: 0} // replace old location with empty cell
+    newState[move[OLD][ROW]][move[OLD][COLUMN]] = {container: null, deadSpace: false} // replace old location with empty cell
     newState[move[NEW][ROW]][move[NEW][COLUMN]] = oldState[move[OLD][ROW]][move[OLD][COLUMN]] // container is now in new cell    
     return newState
 }
@@ -506,8 +506,8 @@ function performSIFT(state) { // return instructions for SIFT
 function getInstructions(node) { // Calls recurive function to return all steps
     var instructions = []
 	instructions = getInstructionsHelper(node, 0, instructions)
-
-    let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: 0})) // 4x24 array of empty cells
+    let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
+ 
     let state = {ship: node.state, buffer: buffer, truck: 0}
 
     instructions.push({cost: 0, state: state, initialPos: {pos: node.move[0], loc: 1}, finalPos: {pos: node.move[1], loc: 1}})
@@ -526,7 +526,8 @@ function getInstructionsHelper(node, cost, instructions) { // Recursively return
     //instructions.push(node.move)
     //instructions.push({stepCost: (node.pathCost - node.parent.pathCost), stepState: node.state, step: node.move})
 
-    let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: 0})) // 4x24 array of empty cells
+    let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
+
     let state = {ship: node.parent.state, buffer: buffer, truck: 0}
 
     instructions.push({cost: cost, state: state, initialPos: {pos: node.move[0], loc: 1}, finalPos: {pos: node.move[1], loc: 1}})

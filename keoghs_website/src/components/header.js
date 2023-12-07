@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import './header.css';
+import '../css/header.css';
 import keoghLogo from '../other/placeholder-logo.png'
   
 

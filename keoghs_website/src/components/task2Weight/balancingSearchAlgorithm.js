@@ -1,3 +1,6 @@
+import React, { useEffect, useState, Component } from 'react';
+import '../../css/tasks.css'
+
 // This function is strictly for debugging
 function consolePrintState(state) {
     for (let row = 8; row >= 0; row--) {
@@ -38,7 +41,7 @@ const NEW = 1
 const ROW = 0
 const COLUMN = 1
 
-export function balance(ship) {  // returns instructions to balance, already balanced returns empty instructions  
+async function balance(ship) {  // returns instructions to balance, already balanced returns empty instructions  
     console.log("Initial State:")
     //console.log(ship);
     consolePrintState(ship)
@@ -512,3 +515,44 @@ function getInstructionsHelper(node, cost, instructions) { // Recursively return
 
     return instructions
 }
+
+// creating a react component to show that we are currently computing the steps
+function ComputeSteps(props)
+{
+    const [isLoading, setIsLoading] = useState(true);
+    const [steps, setSteps] = useState(null);
+
+    useEffect(() => {
+        async function runAlgorithm() {
+           setIsLoading(true);
+           try {
+                setSteps(await balance(props.grid));
+           } catch (error) {
+              console.error(error);
+           } finally {
+              setIsLoading(false);
+           }
+        }
+        runAlgorithm();
+    }, []);
+    if (isLoading) {
+        return (
+            <div id="loadingBalanceSteps">
+                <h3 style={{ color: 'black' }}>Generating Steps...</h3>
+            </div>
+        )
+    }
+    if (steps) {
+        props.parentRecieveSteps({steps});
+        setSteps(null);
+        setIsLoading(false);
+        return;
+    }
+    return (
+        <div id="loadingBalanceSteps">
+            <h3 style={{ color: 'black' }}>Done!</h3>
+        </div>
+    )
+    //  return <div style={{ color: 'black' }}>No data</div>;
+}
+export default ComputeSteps;

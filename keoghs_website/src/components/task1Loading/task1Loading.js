@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import '../tasks.css';
+import '../../css/tasks.css';
 import FileUploader from '../fileUploader';
 import ToggleGrid from './toggleGrid';
 
@@ -146,10 +146,10 @@ import AddContainers from './addContainers';
                 </button>
               </div>
             </div>
+            <br/>
+            <br/>
+            <br/>
           </div>
-
-
-      //  </div> 
       );
     }
     // #TODO: #3 logic for Computeing the steps (where our search function is going to go) 

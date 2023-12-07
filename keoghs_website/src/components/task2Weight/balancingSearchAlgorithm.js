@@ -164,7 +164,8 @@ function balanceSearch(state) { // returns instructions for fastest balance
     // size greater than 9999999 takes too long to initialize to all 0's
 
     // change this state to found so that it won't be explored anymore
-    //foundStates[getStateID(state)] = 1 // ***UNCOMMENT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST***
+
+    //foundStates[getStateID(state)] = [state] // ***UNCOMMENT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST***
 
     // While there are paths being explored
     while (frontier.length > 0) {
@@ -176,13 +177,12 @@ function balanceSearch(state) { // returns instructions for fastest balance
         // Choose the lowest-cost path from the frontier
         let node = frontier.shift() // TAKES TOO LONG WHEN FRONTIER IS HUGE
 
-        //foundStates[getStateID(node.state)] = 1 // ***COMMENT OUT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST***
-
+        // ***COMMENT OUT BELOW TO RUN FASTER BUT LESS ACCURATE UNIFORM COST***
         let stateID = getStateID(node.state)
-        if (foundStates[stateID] === null)
-            foundStates[stateID] = [node.state] // ***COMMENT OUT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST***
+        if (foundStates[stateID] === null) 
+            foundStates[stateID] = [node.state] // create a new array if stateID is new
         else 
-            foundStates[stateID].push(node.state)
+            foundStates[stateID].push(node.state) // add to the existing array if stateID is old
 
         // If this node reaches the goal, return the node 
         if (isBalanced(node.state)) {
@@ -215,10 +215,12 @@ function expand(frontier, foundStates, node) { // branching function, max 12x11 
                         let tempState = getNewState(node.state, move)
                         let tempStateID = getStateID(tempState) // ***TESTING STATE ID***
 
+                        // *** COMMENTED OUT BECAUSE DIDN'T IMPROVE SEARCH TIME (FOR UNIFORM COST) ***
+                        // If the stateID has already been generated, checks if the state has actually been found
                         // let isNewState = true
                         // if (foundStates[tempStateID] !== null) {
-                        //     //console.log("LOOKING")
-                        //     for (let i = 0; i < foundStates[tempStateID].size; i++)
+                        //     //console.log(foundStates[tempStateID])
+                        //     for (let i = 0; i < foundStates[tempStateID].length; i++)
                         //         if (compareStates(tempState, foundStates[tempStateID][i]))
                         //             isNewState = false
                         // }
@@ -234,8 +236,14 @@ function expand(frontier, foundStates, node) { // branching function, max 12x11 
 
                             // Add the step to the frontier, using the cost and the heuristic function to estimate the total cost to reach the goal
                             frontier.push(tempNode)
+
                             // Mark the state as found
-                            //foundStates[tempStateID] = 1 // ***UNCOMMENT FOR FASTER BUT LESS ACCURATE UNIFORM COST***
+
+                            // ***UNCOMMENT BELOW FOR FASTER BUT LESS ACCURATE UNIFORM COST***
+                            // if (foundStates[tempStateID] === null)
+                            //     foundStates[tempStateID] = [tempState]
+                            // else 
+                            //     foundStates[tempStateID].push(tempState)
                         } else {
                             //console.log("DID NOT EXPAND NODE")
                         }
@@ -249,6 +257,7 @@ function expand(frontier, foundStates, node) { // branching function, max 12x11 
 
 // Should use state ID as index instead
 function getStateID(state) { // returns (almost) unique ID for each state
+    //return 1
     //console.log("ENTERING")
     //consolePrintState(state)
     let id = 0
@@ -276,7 +285,9 @@ function getStateID(state) { // returns (almost) unique ID for each state
 }
 
 // REPLACED BY STATE IDs (USE TO HANDLE COLLISIONS)
+/*
 function compareStates(state1, state2) {// returns true if the states are the same, false otherwise
+    //console.log("HELLO")
     for (let column = 0; column < 12; column++) {
         let row = 0
         while (row < 9 && (state1[row][column].deadSpace == 1 || state2[row][column].deadSpace == 1)) {
@@ -297,12 +308,13 @@ function compareStates(state1, state2) {// returns true if the states are the sa
         }
     }
 
-    // console.log("SAME STATES:")
+    //console.log("SAME STATES:")
     // consolePrintState(state1)
     // consolePrintState(state2)
 
     return true
 }
+*/
 
 function getMove(state, oldColumn, newColumn) { // returns empty array if move is invalid
     let oldRow = 0
@@ -500,14 +512,14 @@ function performSIFT(state) { // return instructions for SIFT
 
 // Everything below is for returning the instructions only
 
-function getInstructions(node) { // Calls recurive function to return all steps
+function getInstructions(node) { // Calls recursive function to return all steps
     var instructions = []
 	instructions = getInstructionsHelper(node, 0, instructions)
 
     let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: 0})) // 4x24 array of empty cells
     let state = {ship: node.state, buffer: buffer, truck: 0}
 
-    instructions.push({cost: 0, state: state, initialPos: {pos: node.move[0], loc: 1}, finalPos: {pos: node.move[1], loc: 1}})
+    instructions.push({cost: 0, state: state, initialPos: {pos: node.move[1], loc: 1}, finalPos: {pos: node.move[1], loc: 1}})
 
     //return {cost: node.pathCost, steps: instructions}
     return instructions

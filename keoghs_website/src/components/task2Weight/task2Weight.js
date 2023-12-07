@@ -102,6 +102,7 @@ class task2Loading extends Component {
     {
       this.setState({steps: s});
       console.log(s);
+      this.transition(Task2_States.DISPLAY_STEPS);
     }
  /** 
    * transition:
@@ -136,20 +137,8 @@ class task2Loading extends Component {
   }  
   // renders the state in which the states are computed
   renderComputeSteps() {
-    // try {
-      //   const computeHeader = document.getElementById("computingStepsHeader");
-    //   computeHeader.load = () => {
-    //     alert("loading");
-    //     console.log(balance(grid)); // Calling the balancing function for testing purposes
-    //   };
-      
-    // } catch (error) {
-    //   alert(error);
-    // }
     return (
       <>
-      {/* <button onClick={() => this.transition(Task2_States.INIT)}>No Logic Yet</button> */}
-        {/* <h3 id="computingStepsHeader" onload={() => this.generateSteps()}>Computing Steps For Weight Balancing: </h3> */}
         <ComputeSteps parentRecieveSteps={this.recieveSteps} grid={grid} />
       </>
     );

@@ -1,4 +1,5 @@
-// This function is strictly for debugging
+import React, { useEffect, useState, Component } from 'react';
+
 function consolePrintState(state) {
     for (let row = 8; row >= 0; row--) {
         let a = []
@@ -24,8 +25,8 @@ function consolePrintState(state) {
 
 const rows = 9
 const cols = 12
-finished_load = false;
-finished_unload = false;
+let finished_load = false;
+let finished_unload = false;
 
 let list_of_unloads = [] // assuming fileReader gives me this array/list
 let list_of_loads = [] //assuming fileReader gives me this number 
@@ -85,6 +86,7 @@ class Node {
 
 // GENERAL SEARCH ALGORITHM (searches for states, enqueues explored ones, checks if its final state )
 function finalStateSearch(state) {
+    console.log("Starting algo");
     
     if(list_of_unloads.length == 0)
     {
@@ -124,7 +126,7 @@ function finalStateSearch(state) {
         {
             console.log("FAILUREUnable to find load/unload operation list in time")
             console.log("Final manifest preview shown below:\n")
-            return getInstructions(min_f)
+            // return getInstructions(min_f)
         }
 
         // Sort the paths in the frontier by f(g+h), with the lowest-cost paths first

@@ -2,7 +2,9 @@ import React,{ Component } from 'react';
 import '../tasks.css';
 import FileUploader from '../fileUploader';
 import ToggleGrid from './toggleGrid';
+import ComputeSteps from './load_unload';
 
+// import DisplaySteps from '../displaySteps';
 // import { balance } from './balancingSearchAlgorithm';
 import {saveEvent } from '../../logFile'
 
@@ -35,6 +37,7 @@ import AddContainers from './addContainers';
         [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
         [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],//9th row
       ];
+    let steps = null;
   let containersToLoad = [];
   let LocalNumberToOffload = 0;
 
@@ -47,6 +50,7 @@ import AddContainers from './addContainers';
       gridState: grid,
       offloadStateCounter: LocalNumberToOffload,
       addContainersState: false,
+      stepsFound: null            // (array of obj) steps that have been found
     };
 
     handleNewContainers = (containerArray) => {
@@ -102,7 +106,16 @@ import AddContainers from './addContainers';
         this.transition(Task1_States.INIT);
       }
     }
-
+    /**
+     * recieveSteps:
+     */
+    recieveSteps = (s) =>
+    {
+      steps = s.steps;
+      this.setState({steps: s});
+      console.log(steps);
+      this.transition(Task1_States.DISPLAY_STEPS);
+    }
     transition(to) {
       this.setState({current: to});
     }
@@ -156,19 +169,15 @@ import AddContainers from './addContainers';
     // #TODO: #3 logic for Computeing the steps (where our search function is going to go) 
     renderComputeSteps() {
       return (
-        <button onClick={() => this.transition(Task1_States.INIT)}>
-          No Logic Yet
-          {console.log(grid)}
-          {console.log(containersToLoad)}
-        </button>
+        <ComputeSteps parentRecieveSteps={this.recieveSteps} grid={grid} />
       );
     }
     // logic for showing steps
     renderShowSteps() {
       return (
-        <button onClick={() => this.transition(Task1_States.INIT)}>
-          Currently computing steps 
-        </button>
+        <>
+          {/* <DisplaySteps fileName={this.state.loadedFileName} steps={steps} /> */}
+        </>
       );
     }
     // logic for the finish procedure

@@ -1,5 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import '../css/displaySteps.css'
+
+import {saveEvent } from '../logFile'
 // import '../css/tasks.css'
 
 const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, fileName}) => {
@@ -100,12 +102,14 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
         }
         const element = document.createElement("a");
         const file = new Blob([generatedText],    
-                    {type: 'text/plain;charset=utf-8'});
-        element.href = URL.createObjectURL(file);
-        // alert(generatedText);
-        element.download = fileName.replace(".txt", "")+"_OUTBOUND"+".txt";
-        document.body.appendChild(element);
-        element.click();
+            {type: 'text/plain;charset=utf-8'});
+            element.href = URL.createObjectURL(file);
+            let downloadFileName = fileName.replace(".txt", "")+"_OUTBOUND"+".txt";
+            element.download = downloadFileName;
+            document.body.appendChild(element);
+            element.click();
+            saveEvent("Finished a Cycle. Manifest "+downloadFileName+" was downloaded, and a reminder pop-up to operator to send the file was displayed.");
+        window.location.href="/";
       }
     
 

@@ -146,7 +146,6 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
                     <div className='statsContainer'>
                         <div className='statsContainerInner'>
                               {generateInfoBox()}
-
                         </div>
                     </div>
                     <div id='bufferRow_4' className="bufferRow">

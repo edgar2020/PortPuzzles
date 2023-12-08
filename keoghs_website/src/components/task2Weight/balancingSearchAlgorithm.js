@@ -49,7 +49,12 @@ async function balance(ship) {  // returns instructions to balance, already bala
 
     if (isBalanced(ship)) {
         console.log("ALREADY BALANCED")
-        return {cost: 0, steps: []} // returns empty instructions if already balanced
+
+        let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
+        let state = {ship: ship, buffer: buffer, truck: 0}
+
+        // returns empty instructions if already balanced
+        return [{cost: 0, state: state, initialPos: {pos: [8,0], loc: 1}, finalPos: {pos: [8,0], loc: 1}}]
     } 
     else if (balanceIsPossible(ship)) {
         console.log("UNBALANCED & BALANCE POSSIBLE, BALANCING...")

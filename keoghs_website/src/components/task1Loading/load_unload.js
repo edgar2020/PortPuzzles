@@ -31,6 +31,11 @@ let list_of_unloads = [] // assuming fileReader gives me this array/list
 let list_of_loads = [] //assuming fileReader gives me this number 
 // load_names -- do we need it?
 
+
+//try to limit the number of iterations so that the search doesn't go too big
+let max_iterations = 20000
+let num_iterations = 0 // start at 0, increment at each iteration
+
 class Node {
 	constructor(ship) {
 		this.state = structuredClone(ship) // should make a copy of "ship" grid array
@@ -114,6 +119,14 @@ function finalStateSearch(state) {
     // While there are paths being explored
     while (frontier.length > 0) 
     {
+        num_iterations++;
+        if(num_iterations > max_iterations)
+        {
+            console.log("FAILUREUnable to find load/unload operation list in time")
+            console.log("Final manifest preview shown below:\n")
+            return getInstructions(min_f)
+        }
+
         // Sort the paths in the frontier by f(g+h), with the lowest-cost paths first
         frontier.sort(
             function(a, b) {return (a.pathCost + a.heuristicCost) - (b.pathCost + b.heuristicCost)}

@@ -72,6 +72,30 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length}) => 
     if(stepIndex === index - 1 || (index === 0 && stepIndex === length - 1)){
        position = 'lastSlide'
       }
+
+      const generateInfoBox = () =>
+      {
+        if(length-1 === index){
+            document.getElementById('nextStepButton').style.visibility  = 'hidden';
+            return(
+                <div>
+                    Task Completed: Do not forget to download the updated manifest ________ and send it to the captain
+                    <a href='/'>Return to Main Menu</a>
+                </div>
+            )
+        }
+        else
+        {
+            return(
+                <>
+                    <h3>Information:</h3>
+                    <p>Time Remaining: {cost}</p>
+                    <p>Step: {index+1} of {length-1}</p>
+                </>
+            )
+        }
+          
+      }
      return(
         <div className={"individualStepContainerOuter " + position}>
             
@@ -80,8 +104,7 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length}) => 
                 <div className='buffer'>
                     <div className='statsContainer'>
                         <div className='statsContainerInner'>
-                            <h3>Information:</h3>
-                            <p>Time Remaining: {cost}</p>
+                              {generateInfoBox()}
 
                         </div>
                     </div>
@@ -391,23 +414,6 @@ function DisplaySteps(props)
 {
     const [index, setIndex] = useState(0);
 
-
-    const createFinalSlide = (length) =>
-    {
-        let position = "nextSlide";
-        console.log(length);
-        if(length === index){
-            document.getElementById('nextStepButton').style.visibility  = 'hidden';
-            return(
-                <div>
-                    Task Completed: Do not forget to download the updated manifest ________ and send it to the captain
-                    <a href='/'>Return to Main Menu</a>
-                </div>
-            )
-        }
-    }
-
-
     let steps = props.steps
     return (
         <div id="displayStepsContainer">
@@ -415,8 +421,7 @@ function DisplaySteps(props)
                     {steps.map((step, stepIndex) => {
                 return <Step key={stepIndex} {...step} stepIndex={stepIndex} index={index} length={steps.length} />
             })}
-            {createFinalSlide(steps.length)}
-            <button id="nextStepButton" className="next" onClick={() => setIndex(index + 1)}>{index}{'>'}</button>
+            <button id="nextStepButton" className="next" onClick={() => setIndex(index + 1)}>Next Step</button>
         </div>
     )
   

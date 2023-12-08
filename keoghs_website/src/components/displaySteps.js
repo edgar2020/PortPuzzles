@@ -82,6 +82,7 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length}) => 
                         <div className='statsContainerInner'>
                             <h3>Information:</h3>
                             <p>Time Remaining: {cost}</p>
+                            <p>Step: {index} of {length}</p>
 
                         </div>
                     </div>
@@ -416,7 +417,7 @@ function DisplaySteps(props)
                 return <Step key={stepIndex} {...step} stepIndex={stepIndex} index={index} length={steps.length} />
             })}
             {createFinalSlide(steps.length)}
-            <button id="nextStepButton" className="next" onClick={() => setIndex(index + 1)}>{index}{'>'}</button>
+            <button id="nextStepButton" className="next" onClick={() => setIndex(index + 1)}>Next Step</button>
         </div>
     )
   

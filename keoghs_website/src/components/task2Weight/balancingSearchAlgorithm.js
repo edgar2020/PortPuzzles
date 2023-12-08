@@ -800,8 +800,8 @@ function performSIFT(state) { // return instructions for SIFT
 function getInstructions(node) { // Calls recursive function to return all steps
     var instructions = []
 	instructions = getInstructionsHelper(node, 0, instructions)
+
     let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
- 
     let state = {ship: node.state, buffer: buffer, truck: 0}
 
     instructions.push({cost: 0, state: state, initialPos: {pos: node.move[NEW], loc: 1}, finalPos: {pos: node.move[NEW], loc: 1}})
@@ -821,7 +821,6 @@ function getInstructionsHelper(node, cost, instructions) { // Recursively return
     //instructions.push({stepCost: (node.pathCost - node.parent.pathCost), stepState: node.state, step: node.move})
 
     let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
-
     let state = {ship: node.parent.state, buffer: buffer, truck: 0}
 
     instructions.push({cost: cost, state: state, initialPos: {pos: node.move[OLD], loc: 1}, finalPos: {pos: node.move[NEW], loc: 1}})

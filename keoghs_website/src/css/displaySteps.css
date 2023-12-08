@@ -137,11 +137,11 @@ align-self: end;
     animation-duration: 0.1s;
     opacity: 1;
   }
-  .individualStepContainerOuter.lastSlide {
+  /* .individualStepContainerOuter.lastSlide {
     animation-duration: 0.1s;
-    opacity: 0;
-  }
-  .individualStepContainerOuter.nextSlide {
+    opacity: 1;
+  } */
+  .individualStepContainerOuter.nonActive {
     animation-duration: 0.1s;
     opacity: 0;
   }

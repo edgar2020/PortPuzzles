@@ -66,14 +66,11 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
         }
     }
 
-    let position = "nextSlide";
+    let position = "nonActive";
     if(stepIndex === index){
        position = 'activeSlide'
       }
-    if(stepIndex === index - 1 || (index === 0 && stepIndex === length - 1)){
-       position = 'lastSlide'
-      }
-
+      
       const downloadOutBoundManifest = () => {
         let generatedText = "";
         for(var rowNum = 0; rowNum < 8; rowNum++)
@@ -116,7 +113,7 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
       const generateInfoBox = () =>
       {
         if(length-1 === index){
-            document.getElementById('nextStepButton').style.visibility  = 'hidden';
+            // document.getElementById('nextStepButton').style.visibility  = 'hidden';
             return(
                 <div>
                     <h3>Task Completed:</h3>
@@ -452,17 +449,30 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
  
 function DisplaySteps(props) 
 {
+    const [steps, setSteps] = useState(props.steps);
+    const [showButton, setShowButton] = useState(false);
     const [index, setIndex] = useState(0);
 
-    let steps = props.steps
-    if(steps)
+    useEffect(() => {
+        if(index === steps.length-1)
+        {
+           setShowButton(false);
+        }
+        else
+        {
+            
+            setShowButton(true);
+        }
+      }, );
+        
     return (
         <div id="displayStepsContainer">
                 
                     {steps.map((step, stepIndex) => {
                 return <Step key={stepIndex} {...step} stepIndex={stepIndex} index={index} length={steps.length} fileName={props.fileName} />
             })}
-            <button id="nextStepButton" className="next" onClick={() => setIndex(index + 1)}>Next Step</button>
+            {showButton && <button id="nextStepButton" className="next" onClick={() => setIndex(index + 1)}>Next Step</button>}
+            
         </div>
     )
   

@@ -188,7 +188,7 @@ class task2Loading extends Component {
       <>
         {/* {console.log("fs")}
         {console.log(this.state.stepsFound)} */}
-        <DisplaySteps steps={steps} />
+        <DisplaySteps fileName={this.fileName} steps={steps} />
       {/* <button onClick={() => this.transition(Task2_States.INIT)}>
         No Logic Yetd
       </button> */}

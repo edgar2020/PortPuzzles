@@ -184,11 +184,12 @@ class task2Loading extends Component {
   }
   // renders the state that shows the steps
   renderShowSteps() {
+    // console.log(this.state.loadedFileName);
     return (
       <>
         {/* {console.log("fs")}
         {console.log(this.state.stepsFound)} */}
-        <DisplaySteps fileName={this.fileName} steps={steps} />
+        <DisplaySteps fileName={this.state.loadedFileName} steps={steps} />
       {/* <button onClick={() => this.transition(Task2_States.INIT)}>
         No Logic Yetd
       </button> */}

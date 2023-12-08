@@ -134,19 +134,16 @@ align-self: end;
     grid-row-gap: 0px;
   }
   .individualStepContainerOuter.activeSlide {
-    /* transform: translateX(0); */
     animation-duration: 0.1s;
     opacity: 1;
   }
   .individualStepContainerOuter.lastSlide {
     animation-duration: 0.1s;
     opacity: 0;
-    /* transform: translateX(-100%); */
   }
   .individualStepContainerOuter.nextSlide {
     animation-duration: 0.1s;
     opacity: 0;
-    /* transform: translateX(100%); */
   }
 
   @keyframes animateInitial{ 

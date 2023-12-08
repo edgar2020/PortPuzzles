@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import '../css/displaySteps.css'
 // import '../css/tasks.css'
 
-const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length}) => {
+const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, fileName}) => {
     {/* {cost: 14, state:{ship: grid, buffer: buffer},initialPos:{position: [1, 1], location: 1}, finalPos: {position: [1, 1], location: 12} },  */}
     function determineTypeOfCell (loc, row, col) 
     {
@@ -54,7 +54,6 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length}) => 
         else if(displayCell.container !== null)
         {
             let start = ((row-1) === initialPos.pos[0] && (col-1) === initialPos.pos[1] && loc === initialPos.loc);
-            console.log( (row-1) + " " + initialPos.pos[0]);
             return (
                 <>
                 <button id={'toggleCell_['+row+','+col+']'} className={`displayCell gridToggleButton containerPresent ${start ? " start " : ""}`}>
@@ -73,14 +72,52 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length}) => 
        position = 'lastSlide'
       }
 
+      const downloadOutBoundManifest = () => {
+        let generatedText = "";
+        for(var rowNum = 0; rowNum < 8; rowNum++)
+        {
+            for(var colNum = 0; colNum < 12; colNum++)
+            {
+                let disp_row = "0"+(rowNum+1); 
+                let disp_col = ((colNum+1 < 10) ? '0' : '')+(colNum+1); 
+                
+                let cell = state.ship[rowNum][colNum];
+                if(cell.container === null && cell.deadSpace===false)
+                {
+                    generatedText += ("["+disp_row+","+disp_col+"], {00000}, UNUSED\n");
+                }
+                else if(cell.container === null && cell.deadSpace===true)
+                {
+                    generatedText += ("["+disp_row+","+disp_col+"], {00000}, NAN\n");
+                }
+                else
+                {
+                    let weight = cell.container.weight.toString();
+                    while (weight.length < 5) weight = "0" + weight;
+                    generatedText += ("["+disp_row+","+disp_col+"], {"+weight+"}, "+cell.container.name+"\n");
+                }
+            }
+        }
+        const element = document.createElement("a");
+        const file = new Blob([generatedText],    
+                    {type: 'text/plain;charset=utf-8'});
+        element.href = URL.createObjectURL(file);
+        // alert(generatedText);
+        element.download = fileName.replace(".txt", "")+"_OUTBOUND"+".txt";
+        document.body.appendChild(element);
+        element.click();
+      }
+    
+
       const generateInfoBox = () =>
       {
         if(length-1 === index){
             document.getElementById('nextStepButton').style.visibility  = 'hidden';
             return(
                 <div>
-                    Task Completed: Do not forget to download the updated manifest ________ and send it to the captain
-                    <a href='/'>Return to Main Menu</a>
+                    <h3>Task Completed:</h3>
+                    Remember to download the OutBound Manifest and email it to the ship captain:
+                    <button onClick={downloadOutBoundManifest}>Download File</button>
                 </div>
             )
         }
@@ -420,7 +457,7 @@ function DisplaySteps(props)
         <div id="displayStepsContainer">
                 
                     {steps.map((step, stepIndex) => {
-                return <Step key={stepIndex} {...step} stepIndex={stepIndex} index={index} length={steps.length} />
+                return <Step key={stepIndex} {...step} stepIndex={stepIndex} index={index} length={steps.length} fileName={props.fileName} />
             })}
             <button id="nextStepButton" className="next" onClick={() => setIndex(index + 1)}>Next Step</button>
         </div>

@@ -3,6 +3,7 @@ import '../tasks.css';
 import FileUploader from '../fileUploader';
 import ToggleGrid from './toggleGrid';
 
+// import { balance } from './balancingSearchAlgorithm';
 import {saveEvent } from '../../logFile'
 
 import AddContainers from './addContainers';

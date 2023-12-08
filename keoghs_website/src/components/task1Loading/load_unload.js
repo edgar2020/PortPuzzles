@@ -181,3 +181,47 @@ function checkStatesEqual(state1, state2)
     }
     return true;
 }
+
+// Display the component on the screen
+
+// creating a react component to show that we are currently computing the steps
+function ComputeSteps(props)
+{
+    const [isLoading, setIsLoading] = useState(true);
+    const [steps, setSteps] = useState(null);
+
+    useEffect(() => {
+        async function runAlgorithm() {
+           setIsLoading(true);
+           try {
+            // call the algorithm incharge of the search
+                setSteps(await finalStateSearch(props.grid));
+           } catch (error) {
+              console.error(error);
+           } finally {
+              setIsLoading(false);
+           }
+        }
+        runAlgorithm();
+    }, []);
+    if (isLoading) {
+        return (
+            <div id="UbloadingSteps">
+                <h3 style={{ color: 'black' }}>Generating Steps...</h3>
+            </div>
+        )
+    }
+    if (steps) {
+        props.parentRecieveSteps({steps});
+        setSteps(null);
+        setIsLoading(false);
+        return;
+    }
+    return (
+        <div id="UnloadingSteps">
+            <h3 style={{ color: 'black' }}>Done!</h3>
+        </div>
+    )
+    //  return <div style={{ color: 'black' }}>No data</div>;
+}
+export default ComputeSteps;

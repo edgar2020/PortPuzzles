@@ -1,5 +1,7 @@
 import React, { useEffect, useState, Component } from 'react';
 
+
+// function to print a State or 2D array of ship
 function consolePrintState(state) {
     for (let row = 8; row >= 0; row--) {
         let a = []
@@ -21,6 +23,23 @@ function consolePrintState(state) {
         a.push(i)
     }
     console.log(a.join('\t'))
+}
+
+//function to print a Node
+function show_Node(node)
+{
+    let s= "";
+    s += "G: " + node.pathCost;
+    s += "\tH: " + node.heuristicCost;
+    s += "\tF: " + node.f;
+
+    consolePrintState(node.state)
+    console.log("----------------------------------")
+    console.log("\tUnloads left: "+ node.unloads_left.length)
+    console.log("\tLoads left: "+ node.loads_left)
+    console.log(s)
+    console.log("----------------------------------")
+
 }
 
 const rows = 9
@@ -56,7 +75,7 @@ class Node {
     //function to check if two nodes are equal
     isEqual(other) 
     {
-        return (this.checkStatesEqual(this.state, other.state) && this.unloads_left == other.unloads_left && this.loads_left == other.loads_left)
+        return (checkStatesEqual(this.state, other.state) && this.unloads_left == other.unloads_left && this.loads_left == other.loads_left)
         //Note for later: maybe also check equality for initial_loc and final_loc
     }
     // use as ``node1.isEqual(node2)''
@@ -101,8 +120,11 @@ function finalStateSearch(state) {
         // }
     }
     
-    // returns instructions for fastest balance
+    // returns instructions for fastest load/unload
     let initialNode = new Node(state)
+    console.log("---Printing initial nod--e")
+    show_Node(initialNode)
+    console.log("---Printing initial node done -- ")
     if(list_of_unloads.length!=0)
     {
         initialNode.unloads_left = list_of_unloads
@@ -124,7 +146,7 @@ function finalStateSearch(state) {
         num_iterations++;
         if(num_iterations > max_iterations)
         {
-            console.log("FAILUREUnable to find load/unload operation list in time")
+            console.log("FAILURE: Unable to find load/unload operation list in time")
             console.log("Final manifest preview shown below:\n")
             // return getInstructions(min_f)
         }
@@ -135,12 +157,12 @@ function finalStateSearch(state) {
         )
         
         // Choose the lowest-cost path from the frontier
-        let node = frontier.shift()
+        let curr_node = frontier.shift()
 
-        explored.push(node) // Add this node to the explored paths
+        explored.push(curr_node) // Add this node to the explored paths
         
         // If this node reaches the goal, return the node 
-        if (taskComplete(node.state)) 
+        if (taskComplete(curr_node.state)) 
         {
             console.log("SUCCESS! Instructions:")
             // return getInstructions(node)
@@ -150,7 +172,7 @@ function finalStateSearch(state) {
     }
 
     // If there are no paths left to explore, return null to indicate that the goal cannot be reached
-    console.log("ERROR: No Balance found!")
+    console.log("ERROR: No paths left to explore found!")
     return null //Should never reach here
 }
 
@@ -184,6 +206,28 @@ function checkStatesEqual(state1, state2)
     return true;
 }
 
+function main(state, load_list)
+{
+    // make unload list from state
+    console.log(state);
+    console.log("READING CONTAINERS LOADED")
+    list_of_loads = load_list
+    for(let i=0; i< rows-1; i++)
+    {
+        for(let j=0; j<cols; j++)
+        {
+            if(state[i][j].offload == true)
+            {
+                console.log("i: "+i,"j: "+j)
+                console.log(state[i][j].container)
+                list_of_unloads.push(state[i][j])
+            }
+        }
+    }
+
+    finalStateSearch(state)
+    
+}
 // Display the component on the screen
 
 // creating a react component to show that we are currently computing the steps
@@ -197,7 +241,7 @@ function ComputeSteps(props)
            setIsLoading(true);
            try {
             // call the algorithm incharge of the search
-                setSteps(await finalStateSearch(props.grid));
+                setSteps(await main(props.grid, props.load));
            } catch (error) {
               console.error(error);
            } finally {

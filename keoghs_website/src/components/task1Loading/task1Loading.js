@@ -169,7 +169,7 @@ import AddContainers from './addContainers';
     // #TODO: #3 logic for Computeing the steps (where our search function is going to go) 
     renderComputeSteps() {
       return (
-        <ComputeSteps parentRecieveSteps={this.recieveSteps} grid={grid} />
+        <ComputeSteps parentRecieveSteps={this.recieveSteps} load = {containersToLoad} grid={grid} />
       );
     }
     // logic for showing steps

@@ -46,7 +46,12 @@ export function balance(ship) {  // returns instructions to balance, already bal
 
     if (isBalanced(ship)) {
         console.log("ALREADY BALANCED")
-        return {cost: 0, steps: []} // returns empty instructions if already balanced
+        
+        let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
+        let state = {ship: ship, buffer: buffer, truck: 0}
+
+        // returns empty instructions if already balanced
+        return [{cost: 0, state: state, initialPos: {pos: [8,0], loc: 1}, finalPos: {pos: [8,0], loc: 1}}]
     } 
     else if (balanceIsPossible(ship)) {
         console.log("UNBALANCED & BALANCE POSSIBLE, BALANCING...")
@@ -500,19 +505,10 @@ function getHeuristicCostHelper(lower, upper, sum, containers, combination, bala
 
         sum += weight
         if (sum >= lower && sum <= upper) { // checks if the current sum is within 10% of ideal sum (NEED TO DOUBLE CHECK [> vs >=]/[< vs <=])
-            //console.log("Checking: " + sum + " SUCCESS " + containersCopy.length)
-            //return true // ***REMOVE RETURN***
-
-
-            
-            //Uncomment line below to get all combinations,
-            //Leave commented to only get combinations in order of how they're sorted
-            //Needs to be commented if selecting going off manhattan distance
-
             let nextCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombination, tempCost, originalContainers) // skip weight and continue looking
 
             //if (tempCost <= nextCost) console.log(newCombination)
-            if (tempCost <= nextCost) balancedCombination.push(newCombination)
+            //if (tempCost <= nextCost) balancedCombination.push(newCombination)
 
             return Math.min(tempCost, nextCost)
         } else {
@@ -522,21 +518,12 @@ function getHeuristicCostHelper(lower, upper, sum, containers, combination, bala
 
             return Math.min(keepCost, skipCost, cost)
         }
-
-        // NEED TO CHECK HEURISTIC COST SO FAR IS LOWER THAN LOWEST FOUND BEFORE CALLING RECURSIVE
-        // WILL BE INITIALLY 0, THEN BE UPDATED TO VALUE ONCE BALANCE IS FOUND
-        // UPDATED VALUE WILL BE SMALLEST COST OF MOVING COMBINATION LEFT TO RIGHT, OR RIGHT TO LEFT (CAN'T BE ZERO)
-        // HAS TO CONTAIN CRANE COST AS WELL
-        // EACH COMBINATION WILL HAVE A COST SO FAR
-        // ***old*** IF NONZERO AND SUM OF MANHATTAN DISTANCES TO CLOSEST CELL SO FAR GOES OVER OR EQUAL, IT WON'T CONTINUE WITH THAT BRANCH
-        // WON'T START NEW BRANCH IF SMALLEST MANHATTAN DISTANCE CONTAINER IN COMBINATION IS BIGGER OR EQUAL THAN VALUE
     }
     return cost
 }
 
 // returns the cost to move all the containers in the combination to the same side (other side if already on the same side)
 function totalMovingCost(combination, lower, upper, originalContainers) {
-    //console.log('GETTING TOTAL COST')
     let cost = Number.POSITIVE_INFINITY
 
     let leftContainers = []

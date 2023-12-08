@@ -57,7 +57,7 @@ export function balance(ship) {  // returns instructions to balance, already bal
         return performSIFT(ship)
     }
 
-    //getHeuristicCost(ship) // FOR TESTING PURPOSES *** COMMENT OUT WHEN RUNNING PROGRAM ***
+    //console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0])) // FOR TESTING PURPOSES *** COMMENT OUT WHEN RUNNING PROGRAM ***
 }
 
 function isBalanced(state) { // returns true if balanced, false if isn't 
@@ -82,15 +82,12 @@ function isBalanced(state) { // returns true if balanced, false if isn't
         }
     }
 
-    // NEED TO CHECK THAT THERE ARE NO CONTAINERS IN 9TH ROW
-
-
     let isBalanced = (Math.min(leftSum, rightSum) / Math.max(leftSum, rightSum)) >= 0.9
     
     // Balanced if ((lighter side / heavier side) >= 0.9 OR ship is empty) AND top row is empty
     if ((isBalanced || leftSum + rightSum == 0) && topRowEmpty) {
-        console.log("Balanced State:")
-        consolePrintState(state)
+        // console.log("Balanced State:")
+        // consolePrintState(state)
         //console.log(state)
         return true
     }
@@ -165,7 +162,7 @@ function balanceSearch(state) { // returns instructions for fastest balance
 
     // change this state to found so that it won't be explored anymore
 
-    //foundStates[getStateID(state)] = [state] // ***UNCOMMENT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST***
+    //foundStates[getStateID(state)] = [state] // ***UNCOMMENT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST*** (ship case 2 breaks for some reason)
 
     // While there are paths being explored
     while (frontier.length > 0) {
@@ -177,7 +174,7 @@ function balanceSearch(state) { // returns instructions for fastest balance
         // Choose the lowest-cost path from the frontier
         let node = frontier.shift() // TAKES TOO LONG WHEN FRONTIER IS HUGE
 
-        // ***COMMENT OUT BELOW TO RUN FASTER BUT LESS ACCURATE UNIFORM COST***
+        // ***COMMENT OUT BELOW TO RUN FASTER BUT LESS ACCURATE UNIFORM COST*** (ship case 2 breaks for some reason)
         let stateID = getStateID(node.state)
         if (foundStates[stateID] === null) 
             foundStates[stateID] = [node.state] // create a new array if stateID is new
@@ -186,7 +183,16 @@ function balanceSearch(state) { // returns instructions for fastest balance
 
         // If this node reaches the goal, return the node 
         if (isBalanced(node.state)) {
+        //if (node.heuristicCost == 0) {
+            console.log("Balanced State:")
+            consolePrintState(node.state)
+
             console.log("SUCCESS! Balance Instructions:")
+
+            // frontier.forEach(node => {
+            //     consolePrintState(node.state)
+            //     console.log("HEURISTIC COST: " + getHeuristicCost(node.state, [8,0]))
+            // })
 
             return getInstructions(node)
         }
@@ -230,7 +236,7 @@ function expand(frontier, foundStates, node) { // branching function, max 12x11 
                         //if (isNewState) {
                             let tempNode = new Node(tempState)
                             tempNode.pathCost = node.pathCost + getPathCost(node, move)
-                            //tempNode.heuristicCost = getHeuristicCost(tempState)              // *** REMOVE BEFORE FLIGHT ***
+                            tempNode.heuristicCost = getHeuristicCost(tempState, node.move[NEW])              // *** REMOVE BEFORE FLIGHT ***
                             tempNode.move = move
                             tempNode.parent = node
 
@@ -239,7 +245,7 @@ function expand(frontier, foundStates, node) { // branching function, max 12x11 
 
                             // Mark the state as found
 
-                            // ***UNCOMMENT BELOW FOR FASTER BUT LESS ACCURATE UNIFORM COST***
+                            // ***UNCOMMENT BELOW FOR FASTER BUT LESS ACCURATE UNIFORM COST*** (ship case 2 breaks for some reason)
                             // if (foundStates[tempStateID] === null)
                             //     foundStates[tempStateID] = [tempState]
                             // else 
@@ -384,87 +390,101 @@ function getPathCost(node, move) {
     return cost
 }
 
-function getHeuristicCost(state) { // returns true if possible to balance, false if impossible
+function getHeuristicCost(state, cranePos) { // returns true if possible to balance, false if impossible
+    if (isBalanced(state)) // heuristic cost is 0 if already balanced
+        return 0
+    
     let containers = []
+    let leftAvailableEmptyCells = []
+    let rightAvailableEmptyCells = []
 
-    let leftSum = 0
-    let rightSum = 0
-    for (let column = 0; column < 12; column++) {
-        let row = 0
-        while (row < 9 && state[row][column].deadSpace == 1)
-            row++
-        
-        while (row < 9 && state[row][column].container !== null) {
-            if (column < 6)
-                leftSum += state[row][column].container.weight
-            else 
-                rightSum += state[row][column].container.weight
+    for (let i = 0; i < 6; i++) {
+        let topLeftEmptyRow = 9 // initially out of bounds
+        let topRightEmptyRow = 9 // initially out of bounds
+        for (let row = 8; row >= 0; row--) {
+            // left side
+            let column = 5 - i
+            if (state[row][column].deadSpace == 0) {
+                if (state[row][column].container == null)
+                    topLeftEmptyRow--
+                else
+                    containers.push({weight: state[row][column].container.weight, pos: [row, column], moveCost: 0, craneCost: 0})
+            }// moveCost is min cost to move to other side, craneCost is min cost to move crane to it
 
-            containers.push(state[row][column].container)
-            row++
+
+            // right side
+            column = 6 + i
+            if (state[row][column].deadSpace == 0) {
+                if (state[row][column].container == null)
+                    topRightEmptyRow--
+                else
+                    containers.push({weight: state[row][column].container.weight, pos: [row, column], moveCost: 0, craneCost: 0})
+            }
         }
+        if (topLeftEmptyRow < 9)
+            leftAvailableEmptyCells.push([topLeftEmptyRow, 5 - i])
+
+        if (topRightEmptyRow < 9)
+            rightAvailableEmptyCells.push([topRightEmptyRow, 6 + i])
     }
 
-    containers.sort(function(a, b) { // sorts weights from largest to smallest
-        return b.weight - a.weight
-    })
+    let sum = 0
+    containers.forEach(container => { // update moveCost and craneCost to actual values
+        // craneCost is manhattan distance of crane position to container position
+        container.craneCost = Math.abs(cranePos[ROW] - container.pos[ROW]) // add vertical distance to cost
+        container.craneCost += Math.abs(cranePos[COLUMN] - container.pos[COLUMN]) // add horizontal distance to cost
 
-    let idealSum = (leftSum + rightSum) / 2
-    // let lowerDeficit = idealSum * (18 / 19) - Math.min(leftSum, rightSum) // 18/19 ≈ 0.95
-    // let upperDeficit = idealSum * (20 / 19) - Math.min(leftSum, rightSum) // 20/19 ≈ 1.05
+        // moveCost is manhattan distance of container position to closest empty position
+        let minMoveCost = Number.POSITIVE_INFINITY
+        if (container.pos[COLUMN] < 6) { // container on left side
+            rightAvailableEmptyCells.forEach(emptyPos => {
+                let moveCost = Math.abs(emptyPos[ROW] - container.pos[ROW]) // add vertical distance to cost
+                moveCost += Math.abs(emptyPos[COLUMN] - container.pos[COLUMN]) // add horizontal distance to cost
+                
+                if (moveCost < minMoveCost)
+                    minMoveCost = moveCost
+            });
+        } else { // container on right side
+            leftAvailableEmptyCells.forEach(emptyPos => {
+                let moveCost = Math.abs(emptyPos[ROW] - container.pos[ROW]) // add vertical distance to cost
+                moveCost += Math.abs(emptyPos[COLUMN] - container.pos[COLUMN]) // add horizontal distance to cost
+                
+                if (moveCost < minMoveCost)
+                    minMoveCost = moveCost
+            });
+        }
+        container.moveCost = minMoveCost
+
+        sum += container.weight
+    });
+
+    // console.log("containers:")
+    // console.log(containers)
+    // console.log("left empty:")
+    // console.log(leftAvailableEmptyCells)
+    // console.log("right empty:")
+    // console.log(rightAvailableEmptyCells)
+
+    let idealSum = sum / 2 //(leftSum + rightSum) / 2
     let lowerBound = idealSum * (18 / 19) // 18/19 ≈ 0.95
     let upperBound = idealSum * (20 / 19) // 20/19 ≈ 1.05
     
-    console.log("Ideal sum: " + idealSum)
-    console.log("Lower bound: " + lowerBound)
-    console.log("Upper bound: " + upperBound)
+    // console.log("Ideal sum: " + idealSum)
+    // console.log("Lower bound: " + lowerBound)
+    // console.log("Upper bound: " + upperBound)
     
-    let sum = 0
     let combination = []
-    let balancedCombinations = []
-    // NEED TO SEARCH DIAGONALLY DOWN FROM MIDDLE
-    // SORT BY MANHATTAN DISTANCE TO CLOSEST AVILABLE CELL ON OTHER SIDE
+    let balancedCombination = []
     
-    let cost = getHeuristicCostHelper(lowerBound, upperBound, sum, containers, combination, balancedCombinations)
-    console.log(balancedCombinations.length)
+    let cost = getHeuristicCostHelper(lowerBound, upperBound, 0, containers, combination, balancedCombination, Number.POSITIVE_INFINITY, containers)
+    //console.log(balancedCombination)
     return cost
-
-    // *old* WILL ADD CRANE COST TO MANHATTAN DISTANCE, AND *2 ALL EXCEPT BIGGEST
-
-
-    //balancedCombinations.forEach((e) => console.log(e))
-
-
-    
-    // add Manhattan Distance to cost
-    
-    // // Then will add actual cost of move
-    // cost += Math.abs(move[NEW][ROW] - move[OLD][ROW]) // add vertical distance to cost
-    // cost += Math.abs(move[NEW][COLUMN] - move[OLD][COLUMN]) // add horizontal distance to cost
-    
-    // let maxMoveHeight = Math.max(move[NEW][ROW], move[OLD][ROW])
-    // let left = Math.min(move[NEW][COLUMN], move[OLD][COLUMN])
-    // let right = Math.max(move[NEW][COLUMN], move[OLD][COLUMN])
-    
-    // // add any additional cost caused by containers blocking path
-    // let maxObstacleHeight = maxMoveHeight    
-    // for (let column = left + 1; column < right; column++) { // for all columns between old and new locations
-    //     let row = 0
-    //     while (row < 9 && node.state[row][column].deadSpace == 1)
-    //         row++
-    
-    //     while (row < 9 && node.state[row][column].container !== null)
-    //         row++
-    
-    //     if (row > maxObstacleHeight)
-    //         maxObstacleHeight = row
-    // }
-    // cost += 2 * (maxObstacleHeight - maxMoveHeight) // what goes up must come down
-    
 }
 
 // fills "balancedCombinations" with all possible container combinations that balance the ship
-function getHeuristicCostHelper(lower, upper, sum, containers, combination, balancedCombinations) { // recursivly checks all possible weight combinations
+// can remove sum variable by having it recomputed each time
+function getHeuristicCostHelper(lower, upper, sum, containers, combination, balancedCombination, cost, originalContainers) { // recursivly checks all possible weight combinations
+    //console.log("RECURSION")
     if (containers.length > 0 && sum < upper) {
         let containersCopy = structuredClone(containers)
         let container = containersCopy.shift() // picks the heaviest container and removes it
@@ -474,20 +494,33 @@ function getHeuristicCostHelper(lower, upper, sum, containers, combination, bala
         newCombination.push(container)
         let oldCombination = structuredClone(combination)
 
+        let tempCost = totalMovingCost(newCombination, lower, upper, originalContainers)
+        if (cost <= tempCost)
+            return cost // stop searching if combination already went over the lowest cost
+
         sum += weight
-        if (sum > lower && sum < upper) { // checks if the current sum is within 10% of ideal sum (NEED TO DOUBLE CHECK [> vs >=]/[< vs <=])
+        if (sum >= lower && sum <= upper) { // checks if the current sum is within 10% of ideal sum (NEED TO DOUBLE CHECK [> vs >=]/[< vs <=])
             //console.log("Checking: " + sum + " SUCCESS " + containersCopy.length)
-            balancedCombinations.push(newCombination)
             //return true // ***REMOVE RETURN***
+
+
             
             //Uncomment line below to get all combinations,
             //Leave commented to only get combinations in order of how they're sorted
             //Needs to be commented if selecting going off manhattan distance
-            getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations) // skip weight and continue looking
+
+            let nextCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombination, tempCost, originalContainers) // skip weight and continue looking
+
+            //if (tempCost <= nextCost) console.log(newCombination)
+            if (tempCost <= nextCost) balancedCombination.push(newCombination)
+
+            return Math.min(tempCost, nextCost)
         } else {
-           // console.log("Checking: " + sum + " FAIL " + containersCopy.length)
-           getHeuristicCostHelper(lower, upper, sum, containersCopy, newCombination, balancedCombinations) // keep weight and continue looking
-           getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations) // skip weight and continue looking
+            // console.log("Checking: " + sum + " FAIL " + containersCopy.length)
+            let keepCost = getHeuristicCostHelper(lower, upper, sum, containersCopy, newCombination, balancedCombination, cost, originalContainers) // keep weight and continue looking
+            let skipCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombination, cost, originalContainers) // skip weight and continue looking
+
+            return Math.min(keepCost, skipCost, cost)
         }
 
         // NEED TO CHECK HEURISTIC COST SO FAR IS LOWER THAN LOWEST FOUND BEFORE CALLING RECURSIVE
@@ -498,17 +531,294 @@ function getHeuristicCostHelper(lower, upper, sum, containers, combination, bala
         // ***old*** IF NONZERO AND SUM OF MANHATTAN DISTANCES TO CLOSEST CELL SO FAR GOES OVER OR EQUAL, IT WON'T CONTINUE WITH THAT BRANCH
         // WON'T START NEW BRANCH IF SMALLEST MANHATTAN DISTANCE CONTAINER IN COMBINATION IS BIGGER OR EQUAL THAN VALUE
     }
-    //return false
-}
-
-function heuristicCost(combination, move) {
-    let cost = 0
     return cost
 }
+
+// returns the cost to move all the containers in the combination to the same side (other side if already on the same side)
+function totalMovingCost(combination, lower, upper, originalContainers) {
+    //console.log('GETTING TOTAL COST')
+    let cost = Number.POSITIVE_INFINITY
+
+    let leftContainers = []
+    let rightContainers = []
+    let maxLeftMoveCost = 0
+    let maxRightMoveCost = 0
+
+    combination.forEach(container => {
+        if (container.craneCost < cost) {
+            cost = container.craneCost // first add min craneCost to cost
+        }
+
+        // separates each container in combination into left and right side
+        if (container.pos[COLUMN] < 6) {
+            if (container.moveCost > maxLeftMoveCost)
+                maxLeftMoveCost = container.moveCost
+
+            leftContainers.push(container)
+        } else {
+            if (container.moveCost > maxRightMoveCost)
+                maxRightMoveCost = container.moveCost
+
+            rightContainers.push(container)
+        }
+    });
+    
+    // if all containers are on one side, return cost to move all container to other side
+    if (leftContainers.length == 0 || rightContainers.length == 0) {
+        combination.forEach(container => { // return cost to move all containers to other side
+            if (container.moveCost == Math.max(maxLeftMoveCost, maxRightMoveCost)) {
+                cost += container.moveCost
+            } else {
+                cost += container.moveCost * 2
+            }
+        });
+
+        return cost
+    }  
+
+    // else return the min cost of moving all containers in comination to left or all containers in combination to right
+
+    // moving all containers in combination to right
+    let leftToRightCost = 0
+    leftContainers.forEach(container => {
+        if (container.moveCost == maxLeftMoveCost)
+            leftToRightCost += container.moveCost
+        else
+            leftToRightCost += container.moveCost * 2
+    });
+
+
+    // moving all containers in combination to left
+    let rightToLeftCost = 0
+    rightContainers.forEach(container => {
+        if (container.moveCost == maxRightMoveCost)
+            rightToLeftCost += container.moveCost
+        else
+            rightToLeftCost += container.moveCost * 2
+        //rightToLeftCost += container.moveCost
+    }); 
+
+    
+    cost = Math.min(leftToRightCost, rightToLeftCost)
+
+    return cost
+}
+
+/* //(This one breaks 6 one's case)
+// returns the cost to move all the containers in the combination to the same side (other side if already on the same side)
+function totalMovingCost(combination, lower, upper, originalContainers) {
+    //console.log('GETTING TOTAL COST')
+    let cost = 0
+    let minCraneCost = Number.POSITIVE_INFINITY
+
+    let leftContainers = []
+    let rightContainers = []
+    // let maxLeftMoveCost = 0
+    // let maxRightMoveCost = 0
+    let firstMovePos = []
+
+    let sum = 0
+
+    combination.forEach(container => {
+        if (container.craneCost < minCraneCost) {
+            minCraneCost = container.craneCost // first add min craneCost to cost
+            firstMovePos = container.pos // min craneCost is also the first move position
+        }
+
+        // separates each container in combination into left and right side
+        if (container.pos[COLUMN] < 6) {
+            // if (container.moveCost > maxLeftMoveCost)
+            //     maxLeftMoveCost = container.moveCost
+
+            leftContainers.push(container)
+        } else {
+            // if (container.moveCost > maxRightMoveCost)
+            //     maxRightMoveCost = container.moveCost
+
+            rightContainers.push(container)
+        }
+
+        sum += container.weight
+    });
+
+    let isBalanced = (sum >= lower && sum <= upper)
+    
+    // if all containers are on one side, return cost to move all container to other side
+    if (leftContainers.length == 0 || rightContainers.length == 0) {
+        // if balanced, first update cost to take into account moving all the containers not in combination
+        // if balanced, add cost of moving all containers not in combination to other side
+        if (isBalanced) {
+            let balancedOnlyMovingLeft = leftContainers.length == 0
+            let balancedOnlyMovingRight = rightContainers.length == 0
+
+            let i = 0
+            originalContainers.forEach(container => {
+                // check if container is part of combination
+                if (i < combination.length && (container.pos[ROW] == combination[i].pos[ROW]) && (container.pos[COLUMN] == combination[i].pos[COLUMN])) {
+                    i++
+                } else if ((balancedOnlyMovingLeft && container.pos[COLUMN] < 6) || (balancedOnlyMovingRight && container.pos[COLUMN] > 5)) {
+                    if (container.craneCost < minCraneCost) {
+                        minCraneCost = container.craneCost
+                        firstMovePos = container.pos // min craneCost is also the first move position
+                    }
+                }
+            })
+
+            i = 0
+            originalContainers.forEach(container => {
+                // check if container is part of combination
+                if (i < combination.length && (container.pos[ROW] == combination[i].pos[ROW]) && (container.pos[COLUMN] == combination[i].pos[COLUMN])) {
+                    i++
+                } else if ((balancedOnlyMovingLeft && container.pos[COLUMN] < 6) || (balancedOnlyMovingRight && container.pos[COLUMN] > 5)) {
+                    if ((container.pos[ROW] == firstMovePos[ROW]) && (container.pos[COLUMN] == firstMovePos[COLUMN]))
+                        cost += container.moveCost
+                    else
+                        cost += container.moveCost * 2
+                }
+            })
+        }
+
+        cost += minCraneCost
+
+        combination.forEach(container => { // return cost to move all containers to other side
+            //if (container.moveCost == Math.max(maxLeftMoveCost, maxRightMoveCost)) {
+            if ((container.pos[ROW] == firstMovePos[ROW]) && (container.pos[COLUMN] == firstMovePos[COLUMN])) {
+                cost += container.moveCost
+            } else {
+                cost += container.moveCost * 2
+            }
+        });
+
+        return cost
+    }  
+
+
+
+
+
+
+
+    // else return the min cost of moving all containers in comination to left or all containers in combination to right
+
+    // moving all containers in combination to right
+    let leftToRightCost = 0
+    leftContainers.forEach(container => {
+        //leftToRightCost += container.moveCost
+        //if (container.moveCost == maxLeftMoveCost) {
+        if ((container.pos[ROW] == firstMovePos[ROW]) && (container.pos[COLUMN] == firstMovePos[COLUMN])) {
+            leftToRightCost += container.moveCost
+        } else {
+            leftToRightCost += container.moveCost * 2
+        }
+    });
+
+    let oldMinCraneCost = minCraneCost
+    if (isBalanced) { // add cost of moving all containers not in combination to other side        
+        let i = 0
+        originalContainers.forEach(container => {
+            // check if container is part of combination
+            if (i < combination.length && (container.pos[ROW] == combination[i].pos[ROW]) && (container.pos[COLUMN] == combination[i].pos[COLUMN])) {
+                i++
+            } else if (container.pos[COLUMN] > 5) { // if container is not in combination
+                if (container.craneCost < minCraneCost) {
+                    minCraneCost = container.craneCost
+                    firstMovePos = container.pos // min craneCost is also the first move position
+                }
+            }
+        })
+        
+        i = 0
+        originalContainers.forEach(container => {
+            // check if container is part of combination
+            if (i < combination.length && (container.pos[ROW] == combination[i].pos[ROW]) && (container.pos[COLUMN] == combination[i].pos[COLUMN])) {
+                i++
+            } else if (container.pos[COLUMN] > 5) { // if container is not in combination
+                if ((container.pos[ROW] == firstMovePos[ROW]) && (container.pos[COLUMN] == firstMovePos[COLUMN]))
+                    leftToRightCost += container.moveCost
+                else
+                    leftToRightCost += container.moveCost * 2
+            }
+        })
+    }
+    minCraneCost = oldMinCraneCost
+
+
+
+
+    // moving all containers in combination to left
+    let rightToLeftCost = 0
+    rightContainers.forEach(container => {
+        //rightToLeftCost += container.moveCost
+        //if (container.moveCost == maxRightMoveCost) {
+        if ((container.pos[ROW] == firstMovePos[ROW]) && (container.pos[COLUMN] == firstMovePos[COLUMN])) {
+            rightToLeftCost += container.moveCost
+        } else {
+            rightToLeftCost += container.moveCost * 2
+        }
+    });
+    
+    
+    if (isBalanced) { // add cost of moving all containers not in combination to other side        
+        let i = 0
+        originalContainers.forEach(container => {
+            // check if container is part of combination
+            if (i < combination.length && (container.pos[ROW] == combination[i].pos[ROW]) && (container.pos[COLUMN] == combination[i].pos[COLUMN])) {
+                i++
+            } else if (container.pos[COLUMN] < 6) { // if container is not in combination
+                if (container.craneCost < minCraneCost) {
+                    minCraneCost = container.craneCost
+                    firstMovePos = container.pos // min craneCost is also the first move position
+                }
+            }
+        })
+        
+        i = 0
+        originalContainers.forEach(container => {
+            // check if container is part of combination
+            if (i < combination.length && (container.pos[ROW] == combination[i].pos[ROW]) && (container.pos[COLUMN] == combination[i].pos[COLUMN])) {
+                i++
+            } else if (container.pos[COLUMN] < 6) { // if container is not in combination
+                if ((container.pos[ROW] == firstMovePos[ROW]) && (container.pos[COLUMN] == firstMovePos[COLUMN]))
+                    rightToLeftCost += container.moveCost
+                else
+                    rightToLeftCost += container.moveCost * 2
+            }
+        })
+    }
+    
+    cost += Math.min(leftToRightCost, rightToLeftCost)
+    cost += minCraneCost
+
+    return cost
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function performSIFT(state) { // return instructions for SIFT
     return []
 }
+
+
+
+
+
+
+
+
 
 // Everything below is for returning the instructions only
 
@@ -519,7 +829,7 @@ function getInstructions(node) { // Calls recursive function to return all steps
     let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: 0})) // 4x24 array of empty cells
     let state = {ship: node.state, buffer: buffer, truck: 0}
 
-    instructions.push({cost: 0, state: state, initialPos: {pos: node.move[1], loc: 1}, finalPos: {pos: node.move[1], loc: 1}})
+    instructions.push({cost: 0, state: state, initialPos: {pos: node.move[NEW], loc: 1}, finalPos: {pos: node.move[NEW], loc: 1}})
 
     //return {cost: node.pathCost, steps: instructions}
     return instructions
@@ -538,7 +848,7 @@ function getInstructionsHelper(node, cost, instructions) { // Recursively return
     let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: 0})) // 4x24 array of empty cells
     let state = {ship: node.parent.state, buffer: buffer, truck: 0}
 
-    instructions.push({cost: cost, state: state, initialPos: {pos: node.move[0], loc: 1}, finalPos: {pos: node.move[1], loc: 1}})
+    instructions.push({cost: cost, state: state, initialPos: {pos: node.move[OLD], loc: 1}, finalPos: {pos: node.move[NEW], loc: 1}})
 
     return instructions
 }

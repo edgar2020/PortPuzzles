@@ -11,25 +11,16 @@ class ToggleGrid extends Component
         numberOfContainersToOffload: 0,
     }
     sendInputDataUp = (row,col) => {
-        // alert(col);
         this.props.parentToggleButton({row, col});
     }
-    // toggleButton = (row, col) =>
-    // {
-    //     this.sendInputDataUp(col, row);
-
-    // }
     showCellData = (row, col) =>
     {
-        // alert("df");
         try {
             let gridCell = this.props.grid[row-1][col-1];
-            // document.getElementById('selectedButtonInfo').innerHTML="<h2>Cell Data</h2><p>Location: ["+row+", "+col+"]</p><p>Name: "+gridCell.container.name+"</p><p>Weight: "+gridCell.container.weight+"kg</p><p>Offloading: "+gridCell.offload+"</p>";
             document.getElementById('selectedButtonInfo').innerHTML="<h2>Cell Data</h2><p>Location: ["+row+", "+col+"]</p><p>Name: "+gridCell.container.name+"</p><p>Weight: "+gridCell.container.weight;
             
         } catch (error) {
         }
-        
     }
     clearCellData = () =>
     {
@@ -65,9 +56,6 @@ class ToggleGrid extends Component
         }
         else if(gridCell.container !== null)
         {
-            // numberOfContainers+=1;
-            // this.state.numberOfContainers += 1;
-            // this.setState({numberOfContainers: this.state.numberOfContainers+1});
             return (
                 <>
                 <button id={'toggleCell_['+row+','+col+']'} className={`gridCell gridToggleButton containerPresent ${gridCell.offload ? "active" : ""}`}
@@ -77,7 +65,6 @@ class ToggleGrid extends Component
                 </>
             );
         }
-
     }
  
     render() {

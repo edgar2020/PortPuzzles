@@ -1,27 +1,53 @@
 import React,{ Component } from 'react';
-import './footer.css';
+import '../css/footer.css';
 import keoghLogo from '../other/placeholder-logo.png'
+
+import {saveEvent } from '../logFile'
   
 
-class siteFooter extends Component
+export default function siteFooter ()
 {
-  render () 
-  {
+//   saveNote = () => {
+//     // alert("asdf");
+//     try {
+//         let note = document.getElementById('noteInput').value.trim();
+//         // let message = "Note:" + note;
+//         saveEvent("Note by Operator: "+note);
+
+//       } catch (error) {
+  //         alert( error);
+  //       }
+  //       // document.getElementById('noteInput').value="";
+  // }
+  // document.getElementById("noteInput");
+  function handleSubmit(e) {
+    e.preventDefault();
+    try {
+      let note = document.getElementById('noteInput').value.trim();
+      saveEvent("Note by Operator: "+note);
+    } catch (error) {
+      alert( error);
+    }
+    document.getElementById('noteInput').value="";
+}
+document.getElementById("noteInput");        
+
+  // render () 
+  // {
     return (
       <div className="footer">
         <footer>
           <div className = "note">
-          <form>
-            <textarea
-              id = "noteInput"
-              // placeholder="Insert note..."
-              maxLength="1000"
-              minLength="1"
-              placeholder="Insert note to log file here..."
-            >
-              
-            </textarea>
-          </form>
+            <form id="noteForm" onSubmit={handleSubmit}>
+              <textarea
+                id = "noteInput"
+                maxLength="1000"
+                minLength="1"
+                placeholder="Insert note to log file here..."
+              />
+              {/* <input id="noteSubmitButton" type="submit" value="Submit" onClick={() => {this.saveNote()}}/> */}
+              <input id="noteSubmitButton" type="submit" value="Submit"/>
+            </form>
           </div>
           <div className = "heap">
             <br />
@@ -30,6 +56,6 @@ class siteFooter extends Component
         </footer>
       </div>
     );
-  }
+  // }
 }
-export default siteFooter;
+// export default siteFooter;

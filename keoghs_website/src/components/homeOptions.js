@@ -1,6 +1,6 @@
 import React,{ Component } from 'react';
-import './homeOptions.css';
-import './tasks.css'
+import '../css/homeOptions.css';
+import '../css/tasks.css'
 
 class SiteHeader extends Component
 {
@@ -10,8 +10,8 @@ class SiteHeader extends Component
       <div id='homeOptions' className='page'>
         <h2>Options</h2>
         
-        <button id="load-unload"><a href="/LoadUnload">Load and Unload</a></button>
-        <button id="weight-balancing"><a href="/Weight">Weight Balancing</a></button>
+        <a href="/LoadUnload"><button id="load-unload">Load and Unload</button></a>
+        <a href="/Weight"><button id="weight-balancing">Weight Balancing</button></a>
         <button id="helpButton">Help</button>
       </div>
     )

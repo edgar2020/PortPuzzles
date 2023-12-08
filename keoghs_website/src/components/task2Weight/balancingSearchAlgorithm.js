@@ -45,6 +45,8 @@ async function balance(ship) {  // returns instructions to balance, already bala
     console.log("Initial State:")
     //console.log(ship);
     consolePrintState(ship)
+    console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0]))
+
     console.log("CHECKING BALANCE...")
 
     if (isBalanced(ship)) {
@@ -54,7 +56,7 @@ async function balance(ship) {  // returns instructions to balance, already bala
         let state = {ship: ship, buffer: buffer, truck: 0}
 
         // returns empty instructions if already balanced
-        return [{cost: 0, state: state, initialPos: {pos: [8,0], loc: 1}, finalPos: {pos: [8,0], loc: 1}}]
+        return [{cost: 0, state: state, initialPos: {pos: [-1, -1], loc: 1}, finalPos: {pos: [-1, -1], loc: 1}}]
     } 
     else if (balanceIsPossible(ship)) {
         console.log("UNBALANCED & BALANCE POSSIBLE, BALANCING...")
@@ -192,10 +194,9 @@ function balanceSearch(state) { // returns instructions for fastest balance
         // If this node reaches the goal, return the node 
         if (isBalanced(node.state)) {
         //if (node.heuristicCost == 0) {
+            console.log("SUCCESS!")
             console.log("Balanced State:")
             consolePrintState(node.state)
-
-            console.log("SUCCESS! Balance Instructions:")
 
             // frontier.forEach(node => {
             //     consolePrintState(node.state)
@@ -804,7 +805,9 @@ function getInstructions(node) { // Calls recursive function to return all steps
     let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
     let state = {ship: node.state, buffer: buffer, truck: 0}
 
-    instructions.push({cost: 0, state: state, initialPos: {pos: node.move[NEW], loc: 1}, finalPos: {pos: node.move[NEW], loc: 1}})
+    instructions.push({cost: 0, state: state, initialPos: {pos: [-1, -1], loc: 1}, finalPos: {pos: [-1 , -1], loc: 1}})
+
+    console.log("ACTUAL COST: " + instructions[0].cost)
 
     //return {cost: node.pathCost, steps: instructions}
     return instructions
@@ -827,6 +830,14 @@ function getInstructionsHelper(node, cost, instructions) { // Recursively return
 
     return instructions
 }
+
+
+
+
+
+
+
+// EDGAR'S CODE BELOW
 
 // creating a react component to show that we are currently computing the steps
 function ComputeSteps(props)

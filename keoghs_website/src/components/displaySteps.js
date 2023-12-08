@@ -415,6 +415,7 @@ function DisplaySteps(props)
     const [index, setIndex] = useState(0);
 
     let steps = props.steps
+    if(steps)
     return (
         <div id="displayStepsContainer">
                 

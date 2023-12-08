@@ -2,15 +2,15 @@
 *{
     --transition: all 0.3s linear;
     --displayButtonDimension: 35px;
-    --initial-color: #00ca14;
-    --final-color: #ca0000;
+    --initial-color: rgb(255, 164, 60);
+    --final-color: #00ca14;
 }
     
 
 .start
 {
-    background-color: rgb(152, 251, 152);
-    animation: animateInitial 3.5s ease 0s infinite normal forwards;
+  /* background-color: rgb(152, 251, 152); */
+  animation: animateInitial 3.5s ease 0s infinite normal forwards;
 }
 .end
 {
@@ -84,32 +84,33 @@
     margin-left: 20px;
     width: 100%;
 }
+.statsContainer
+{
+  margin:  0 auto;
+  width: 90%;
+  height: 150px;
+  margin-bottom: 10px;
+  border:3px double;
 
+}
 .statsContainerInner
 {
-    /* padding: 0px 20px; */
-    /* background-color: red; */
-    width: 300px;
+  padding: 10px;
 }
 
 .buffer
 {
 grid-area: "buffer";
-/* width: 800px; */
-/* background-color: red; */
 align-self: end;
 }
 .truck
 {
-    /* background-color: #00ff00; */
     grid-area: "truck";
     align-self: end;
     
 }
 .ship
 {
-    /* width: 630px; */
-    /* background-color: rgb(255, 0, 238); */
     grid-area:  "ship";
 }
 .individualStepContainerOuter {
@@ -123,11 +124,7 @@ align-self: end;
   }
   .individualStepContainerInner
   {
-      /* position: absolute; */
-      /* bottom: 0px; */
-    /* background-color: red; */
     padding: 10px;
-
     display: grid;
     grid-template-columns: 870px 40px 460px;
     grid-template-rows: 1fr;
@@ -137,14 +134,16 @@ align-self: end;
     grid-row-gap: 0px;
   }
   .individualStepContainerOuter.activeSlide {
+    animation-duration: 0.1s;
     opacity: 1;
-    transform: translateX(0);
   }
   .individualStepContainerOuter.lastSlide {
-    transform: translateX(-100%);
+    animation-duration: 0.1s;
+    opacity: 0;
   }
   .individualStepContainerOuter.nextSlide {
-    transform: translateX(100%);
+    animation-duration: 0.1s;
+    opacity: 0;
   }
 
   @keyframes animateInitial{ 

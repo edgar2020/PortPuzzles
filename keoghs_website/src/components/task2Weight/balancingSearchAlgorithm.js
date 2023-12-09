@@ -49,25 +49,26 @@ async function balance(ship) {  // returns instructions to balance, already bala
 
     console.log("CHECKING BALANCE...")
 
-    if (isBalanced(ship)) {
-        console.log("ALREADY BALANCED")
+    // if (isBalanced(ship)) {
+    //     console.log("ALREADY BALANCED")
 
-        let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
-        let state = {ship: ship, buffer: buffer, truck: 0}
+    //     let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
+    //     let state = {ship: ship, buffer: buffer, truck: 0}
 
-        // returns empty instructions if already balanced
-        return [{cost: 0, state: state, initialPos: {pos: [-1, -1], loc: 1}, finalPos: {pos: [-1, -1], loc: 1}}]
-    } 
-    else if (balanceIsPossible(ship)) {
-        console.log("UNBALANCED & BALANCE POSSIBLE, BALANCING...")
-        return balanceSearch(ship) 
-    } 
-    else {
-        console.log("UNBALANCED & IMPOSSIBLE TO BALANCE, SIFTING...")
-        return performSIFT(ship)
-    }
+    //     // returns empty instructions if already balanced
+    //     return [{cost: 0, state: state, initialPos: {pos: [-1, -1], loc: 1}, finalPos: {pos: [-1, -1], loc: 1}}]
+    // } 
+    // else if (balanceIsPossible(ship)) {
+    //     console.log("UNBALANCED & BALANCE POSSIBLE, BALANCING...")
+    //     return balanceSearch(ship) 
+    // } 
+    // else {
+    //     console.log("UNBALANCED & IMPOSSIBLE TO BALANCE, SIFTING...")
+    //     return performSIFT(ship)
+    // }
 
-    //console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0])) // FOR TESTING PURPOSES *** COMMENT OUT WHEN RUNNING PROGRAM ***
+    if (performSIFT(ship)) console.log("SIFTed")
+    else console.log("NOT SIFTED")
 }
 
 function isBalanced(state) { // returns true if balanced, false if isn't 
@@ -485,45 +486,92 @@ function getHeuristicCost(state, cranePos) { // returns true if possible to bala
     // console.log("Upper bound: " + upperBound)
     
     let combination = []
-    let balancedCombination = []
+    let balancedCombinations = []
     
-    let cost = getHeuristicCostHelper(lowerBound, upperBound, 0, containers, combination, balancedCombination, Number.POSITIVE_INFINITY, containers)
-    //console.log(balancedCombination)
+    let cost = getHeuristicCostHelper(lowerBound, upperBound, 0, containers, combination, balancedCombinations, Number.POSITIVE_INFINITY, containers)
+    
+    /*
+
+    // need combinations to only have the minimum number of containers needed to balance
+    // NEED TO TEST IF MINIMUM MATTERS
+    let balancedCombinationsCopy = structuredClone(balancedCombinations)
+    console.log(balancedCombinationsCopy)
+
+    for (let small = 0; small < balancedCombinations.length; small++) {
+        for (let big = 0; big < balancedCombinations.length; big++) {
+            if (balancedCombinations[big].length > balancedCombinations[small].length) {
+                let shareAllContainers = true
+                let s = 0
+                while (shareAllContainers && s < balancedCombinations[small].length) {
+                    let b = 0
+                    // look to see if bigger combination has the smaller combination's container at index s
+                    while (b < balancedCombinations[big].length && (balancedCombinations[small][s].pos[ROW] != balancedCombinations[big][b].pos[ROW] || balancedCombinations[small][s].pos[COLUMN] != balancedCombinations[big][b].pos[COLUMN])) {
+                        b++
+                    }
+                    if (b == balancedCombinations[big].length) 
+                        shareAllContainers = false // if the bigger combination did not have the smaller combination's container at index s, they do not share all the containers (in smaller combination)
+                    s++
+                }
+
+                if (shareAllContainers) { // If they share all the containers (in smaller combination), then the bigger combination is the exact same comination as the smaller with just added containers
+                    //balancedCombinations.splice(big, 1) // remove the bigger combination from balanced combinations
+                    //console.log(balancedCombinations[big])
+                    balancedCombinations[big] = []
+                }
+            }
+        }
+    }
+
+    let newBalancedCombinations = []
+    balancedCombinations.forEach(combination => {
+        if (combination.length > 0)
+            newBalancedCombinations.push(combination)
+    }) 
+    console.log(newBalancedCombinations)
+    */
+
+
+
+
     return cost
 }
 
 // fills "balancedCombinations" with all possible container combinations that balance the ship
 // can remove sum variable by having it recomputed each time
-function getHeuristicCostHelper(lower, upper, sum, containers, combination, balancedCombination, cost, originalContainers) { // recursivly checks all possible weight combinations
+function getHeuristicCostHelper(lower, upper, sum, containers, combination, balancedCombinations, cost, originalContainers) { // recursivly checks all possible weight combinations
     //console.log("RECURSION")
     if (containers.length > 0 && sum < upper) {
         let containersCopy = structuredClone(containers)
         let container = containersCopy.shift() // picks the heaviest container and removes it
         let weight = container.weight
 
+        let oldCombination = structuredClone(combination)
+
+        sum += weight
+        if (sum > upper) // skip weight and continue looking if weight is too heavy too balance
+            return getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations, cost, originalContainers)
+        
         let newCombination = structuredClone(combination)
         newCombination.push(container)
-        let oldCombination = structuredClone(combination)
 
         let tempCost = totalMovingCost(newCombination, lower, upper, originalContainers)
 
-        sum += weight
 
-        if (cost <= tempCost || sum > upper) // ADDED EXTRA COMPARISON HERE TO STOP RECURSION EARLIER
-            return cost // stop searching if combination already went over the lowest cost
+        // if (tempCost >= cost) // ADDED EXTRA COMPARISON HERE TO STOP RECURSION EARLIER            ** NOT SURE IF I SHOULD INCLUDE BALANCED COMBINATIONS THAT HAVE HIGH COST IN HEURISTIC ** EDIT: I DO NEED THEM ALL
+        //      return cost // stop searching if combination already went over the lowest cost
 
         if (sum >= lower && sum <= upper) { // checks if the current sum is within 10% of ideal sum (NEED TO DOUBLE CHECK [> vs >=]/[< vs <=])
-            let nextCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombination, tempCost, originalContainers) // skip weight and continue looking
+            let nextCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations, tempCost, originalContainers) // skip weight and continue looking
 
             //if (tempCost <= nextCost) console.log(newCombination)
-            //if (tempCost <= nextCost) balancedCombination.push(newCombination)
+            balancedCombinations.push(newCombination)
 
             //return tempCost // NOT ACCURATE
             return Math.min(tempCost, nextCost)
-        } else {
+        } else if (sum < lower) {
             // console.log("Checking: " + sum + " FAIL " + containersCopy.length)
-            let keepCost = getHeuristicCostHelper(lower, upper, sum, containersCopy, newCombination, balancedCombination, cost, originalContainers) // keep weight and continue looking
-            let skipCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombination, cost, originalContainers) // skip weight and continue looking
+            let keepCost = getHeuristicCostHelper(lower, upper, sum, containersCopy, newCombination, balancedCombinations, cost, originalContainers) // keep weight and continue looking
+            let skipCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations, cost, originalContainers) // skip weight and continue looking
 
             return Math.min(keepCost, skipCost, cost)
         }
@@ -531,7 +579,7 @@ function getHeuristicCostHelper(lower, upper, sum, containers, combination, bala
     return cost
 }
 
-/* // OLD VERSION (works for 6 one's)
+/* // OLD VERSION 
 // returns the cost to move all the containers in the combination to the same side (other side if already on the same side)
 function totalMovingCost(combination, lower, upper, originalContainers) {
     let cost = Number.POSITIVE_INFINITY
@@ -789,9 +837,60 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
 
 
 function performSIFT(state) { // return instructions for SIFT
-    return []
+    return isSIFTed(state)
 }
 
+function isSIFTed(state) { // returns true if SIFTed, false if not
+    let weights = []
+
+    for (let column = 0; column < 12; column++) {
+        let row = 0
+        while (row < 9 && state[row][column].deadSpace == 1)
+            row++
+        
+        while (row < 9 && state[row][column].container !== null) {
+            if (state[row][column].container.weight > 0) // only care about non-empty containers
+                weights.push(state[row][column].container.weight)
+
+            row++
+        }
+    }
+
+    weights.sort(function(a, b) { // sorts weights from largest to smallest
+        return b - a
+    })
+
+
+    let SIFTrow = 0 // what row of SIFTing we're on
+    while (weights.length > 0) {
+        for (let i = 0; i < 6; i++) {
+            let row = 0
+            let column = 5 - i
+            while (row < 9 && state[row][column].deadSpace == 1) // go to lowest container in column
+                row++
+            
+            row += SIFTrow // go to current SIFT row
+
+            if (weights.length > 0) { // checks left contaienr in SIFT row
+                let weight = weights.shift()
+                if (state[row][column].container == null || state[row][column].container.weight != weight)
+                    return false
+            }
+            else return true
+
+
+            column = 6 + i          // ship is symmetric so container is on other side
+            if (weights.length > 0) { // checks right container in SIFT row
+                let weight = weights.shift()
+                if (state[row][column].container == null || state[row][column].container.weight != weight)
+                    return false
+            }
+            else return true
+        } 
+        SIFTrow++
+    }
+    return true
+}
 
 
 

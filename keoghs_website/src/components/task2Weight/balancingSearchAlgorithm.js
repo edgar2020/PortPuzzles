@@ -172,7 +172,7 @@ function balanceSearch(state) { // returns instructions for fastest balance
 
     // change this state to found so that it won't be explored anymore
 
-    foundStates[getStateID(state)] = [state] // ***UNCOMMENT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST*** (ship case 2 breaks for some reason)
+    foundStates[getStateID(state)] = [state] // ***UNCOMMENT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST*** 
 
     // While there are paths being explored
     while (frontier.length > 0) {
@@ -184,7 +184,7 @@ function balanceSearch(state) { // returns instructions for fastest balance
         // Choose the lowest-cost path from the frontier
         let node = frontier.shift() // TAKES TOO LONG WHEN FRONTIER IS HUGE
 
-        // ***COMMENT OUT BELOW TO RUN FASTER BUT LESS ACCURATE UNIFORM COST*** (ship case 2 breaks for some reason)
+        // ***COMMENT OUT BELOW TO RUN FASTER BUT LESS ACCURATE UNIFORM COST*** 
         // let stateID = getStateID(node.state)
         // if (foundStates[stateID] === null) 
         //     foundStates[stateID] = [node.state] // create a new array if stateID is new
@@ -255,7 +255,7 @@ function expand(frontier, foundStates, node) { // branching function, max 12x11 
 
                             // Mark the state as found
 
-                            // ***UNCOMMENT BELOW FOR FASTER BUT LESS ACCURATE UNIFORM COST*** (ship case 2 breaks for some reason)
+                            // ***UNCOMMENT BELOW FOR FASTER BUT LESS ACCURATE UNIFORM COST*** 
                             if (foundStates[tempStateID] === null)
                                 foundStates[tempStateID] = [tempState]
                             else 
@@ -284,14 +284,15 @@ function getStateID(state) { // returns (almost) unique ID for each state
         
         while (row < 9 && state[row][column].container !== null) {
             // NEED TO FIND UNIQUE COMBINATION FOR EACH POSSIBLE STATE (test when all containers have weight 1)
-            //id += state[row][column].container.weight * (row + 1) * (column + 1) // fastest but least accurate
+            //id += state[row][column].container.weight * (row + 1) * (column + 1) // fastest but not accurate
 
-            id += state[row][column].container.weight * Math.pow(10, row) * (row + 1) * (column + 1) // slower but accurate
+            //id += state[row][column].container.weight * Math.pow(10, row) * (row + 1) * (column + 1) // slower but (almost) accurate
 
             //id += state[row][column].container.weight * Math.pow(10, row) * (row + 1) * (column + 1) // not accurate
             //id += state[row][column].container.weight * ((row + 1) * (column + 1) + row + column) // not accurate
-            //id += (state[row][column].container.weight + (row * 10)) * ((row + 1) * (column + 1) + row + column) // even slower but accurate
-            //id += (state[row][column].container.weight + (row + 1) * (10 * (column + 1))) * ((row + 1) * (column + 1) + row + column) // // slowest but accurate
+            //id += (state[row][column].container.weight + (row * 10)) * ((row + 1) * (column + 1) + row + column) // even slower but not accurate
+
+            id += (state[row][column].container.weight + (row + 1) * (10 * (column + 1))) * ((row + 1) * (column + 1) + row + column) // // slowest but accurate
             row++
         }
     }
@@ -505,16 +506,19 @@ function getHeuristicCostHelper(lower, upper, sum, containers, combination, bala
         let oldCombination = structuredClone(combination)
 
         let tempCost = totalMovingCost(newCombination, lower, upper, originalContainers)
-        if (cost <= tempCost)
-            return cost // stop searching if combination already went over the lowest cost
 
         sum += weight
+
+        if (cost <= tempCost || sum > upper) // ADDED EXTRA COMPARISON HERE TO STOP RECURSION EARLIER
+            return cost // stop searching if combination already went over the lowest cost
+
         if (sum >= lower && sum <= upper) { // checks if the current sum is within 10% of ideal sum (NEED TO DOUBLE CHECK [> vs >=]/[< vs <=])
             let nextCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombination, tempCost, originalContainers) // skip weight and continue looking
 
             //if (tempCost <= nextCost) console.log(newCombination)
             //if (tempCost <= nextCost) balancedCombination.push(newCombination)
 
+            //return tempCost // NOT ACCURATE
             return Math.min(tempCost, nextCost)
         } else {
             // console.log("Checking: " + sum + " FAIL " + containersCopy.length)
@@ -769,7 +773,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
 }
 
 
-
+// GOD SPEED HEURISTIC
 
 
 

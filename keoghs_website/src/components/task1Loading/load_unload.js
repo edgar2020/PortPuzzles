@@ -122,9 +122,7 @@ function finalStateSearch(state) {
     
     // returns instructions for fastest load/unload
     let initialNode = new Node(state)
-    console.log("---Printing initial nod--e")
-    show_Node(initialNode)
-    console.log("---Printing initial node done -- ")
+    
     if(list_of_unloads.length!=0)
     {
         initialNode.unloads_left = list_of_unloads
@@ -134,6 +132,9 @@ function finalStateSearch(state) {
         initialNode.loads_left = list_of_loads
     }
 
+    console.log("---Printing initial nod--e")
+    show_Node(initialNode)
+    console.log("---Printing initial node done -- ")
 	// Create a data structure to store the paths that are being explored
 	let frontier = [initialNode]
 
@@ -211,7 +212,7 @@ function main(state, load_list)
     // make unload list from state
     console.log(state);
     console.log("READING CONTAINERS LOADED")
-    list_of_loads = load_list
+    list_of_loads = load_list.length
     for(let i=0; i< rows-1; i++)
     {
         for(let j=0; j<cols; j++)

@@ -136,6 +136,8 @@ import AddContainers from './addContainers';
       
       return (
         <div>
+          
+            <div className='loadedFileName'>Current File: {this.state.loadedFileName}</div>
             <div id="loadUnloadInputs" className='page'>
               <AddContainers parentAddContainers={this.handleNewContainers} />
               <ToggleGrid parentToggleButton={this.handleButtonToggle} numberToOffload={LocalNumberToOffload} grid={grid}/>
@@ -157,17 +159,18 @@ import AddContainers from './addContainers';
       return (
         <button onClick={() => this.transition(Task1_States.INIT)}>
           No Logic Yet
-          {console.log(grid)}
-          {console.log(containersToLoad)}
         </button>
       );
     }
     // logic for showing steps
     renderShowSteps() {
       return (
+        <>
+        <div className='loadedFileName'>Current File: {this.state.loadedFileName}</div>
         <button onClick={() => this.transition(Task1_States.INIT)}>
           Currently computing steps 
         </button>
+        </>
       );
     }
     // logic for the finish procedure

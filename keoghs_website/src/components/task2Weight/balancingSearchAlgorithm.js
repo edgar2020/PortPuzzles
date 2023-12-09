@@ -865,7 +865,7 @@ function ComputeSteps(props)
             </div>
         )
     }
-    if (steps) {
+    else if (steps) {
         props.parentRecieveSteps({steps});
         setSteps(null);
         setIsLoading(false);

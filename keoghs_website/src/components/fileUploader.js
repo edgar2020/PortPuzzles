@@ -16,7 +16,7 @@ class FileUploader extends Component
     
     sendDataUp = (event) => {
         // Call the parent callback function 
-        this.props.parentCallback( {name: this.fileName, text: this.textFromFile});
+        this.props.parentCallback( {name: this.fileName, text: this.textFromFile.trim()});
         // event.preventDefault();
     }
 

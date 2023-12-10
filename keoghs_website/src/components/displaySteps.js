@@ -166,7 +166,7 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
                         <p>Time Remaining: {cost} minutes</p>
                         <p>Step: {index+1} of {length-1}</p>
                     </>
-                    )
+                )
             }
         }
           

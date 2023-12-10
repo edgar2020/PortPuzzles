@@ -39,6 +39,7 @@ import AddContainers from './addContainers';
       ];
     let steps = null;
   let containersToLoad = [new Container("AA", null), new Container("BB", null), new Container("CC", null)];
+  // let containersToLoad = [];
   let LocalNumberToOffload = 0;
 
   class task1Loading extends Component {

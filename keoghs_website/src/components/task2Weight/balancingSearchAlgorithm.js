@@ -67,7 +67,7 @@ async function balance(ship) {  // returns instructions to balance, already bala
         return performSIFT(ship)
     }
 
-    //return performSIFT(ship) // FOR TESTING ONLY
+    return performSIFT(ship) // FOR TESTING ONLY
 }
 
 function isBalanced(state) { // returns true if balanced, false if isn't 
@@ -973,6 +973,10 @@ function expandSIFT(frontier, foundStates, node) { // branching function, max 12
 function isSIFTed(state) { // returns true if SIFTed, false if not
     let weights = getWeightsSortedHeaviestToLightest(state)
 
+    // NEED TO ALSO CHECK NO CONTAINERS ON 9TH ROW
+
+    // SIFTing layer by layer
+    /*
     let SIFTrow = 0 // what row of SIFTing we're on
     while (weights.length > 0) {
         for (let i = 0; i < 6; i++) {
@@ -1003,6 +1007,34 @@ function isSIFTed(state) { // returns true if SIFTed, false if not
         } 
         SIFTrow++
     }
+    //*/
+
+    // SIFTing row by row
+    let row = 0
+    while (weights.length > 0 && row < 8) {
+        for (let i = 0; i < 6; i++) {
+            let column = 5 - i // checks left container in SIFT row
+            if (state[row][column].deadSpace == 0) {// if not a NAN
+                if (weights.length > 0) {
+                    let weight = weights.shift()
+                    if (state[row][column].container == null || state[row][column].container.weight != weight)
+                        return false
+                }
+                else return true
+
+                // ship is symmetric so SIFT container is on other side
+                column = 6 + i          // checks right container in SIFT row
+                if (weights.length > 0) {
+                    let weight = weights.shift()
+                    if (state[row][column].container == null || state[row][column].container.weight != weight)
+                        return false
+                }
+                else return true
+            }
+        } 
+        row++
+    }
+
     return true
 }
 
@@ -1011,8 +1043,9 @@ function getSIFTHeuristicCost(state) { // returns true if SIFTed, false if not
 
     let cost = 0
 
+    // SIFTing layer by layer
+    /*
     let SIFTrow = 0 // what row of SIFTing we're on
-    let maxSIFTrow = Math.floor(weights.length / 12) // NEED TO CHECK IF THIS IS ALWAYS TRUE
     while (weights.length > 0) {
         for (let i = 0; i < 6; i++) {
             let row = 0
@@ -1052,6 +1085,47 @@ function getSIFTHeuristicCost(state) { // returns true if SIFTed, false if not
         } 
         SIFTrow++
     }
+    //*/
+
+    // SIFTing row by row
+    let row = 0
+    while (weights.length > 0 && row < 8) {
+        for (let i = 0; i < 6; i++) {
+            let currentRow = row // save current row to go back to it after
+
+            let column = 5 - i // checks left container in SIFT row
+            if (state[row][column].deadSpace == 0) { // if not a NAN
+                if (weights.length > 0) {
+                    let weight = weights.shift()
+                    if (state[row][column].container == null || state[row][column].container.weight != weight) { // if the SIFT container is not there   
+                        while (row < 9 && state[row][column].container !== null) { // adds cost of moving all containers out of that spot
+                            cost += 100000 // need to clear the SIFT cells of all other containers (top priority)
+                            row++
+                        }
+                    }
+                    else cost -= 100000 // subtract from cost any SIFT cells that already have their proper containers
+                }
+
+                row = currentRow // go back to current row
+
+                // ship is symmetric so SIFT container is on other side
+                column = 6 + i          // checks right container in SIFT row
+                if (weights.length > 0) {
+                    let weight = weights.shift()
+                    if (state[row][column].container == null || state[row][column].container.weight != weight) { // if the SIFT container is not there
+                        while (row < 9 && state[row][column].container !== null) { // adds cost of moving all containers out of that spot
+                            cost += 100000 // need to clear the SIFT cells of all other containers (top priority)
+                            row++
+                        }
+                    }
+                    else cost -= 100000 // subtract from cost any SIFT cells that already have their proper containers
+                }
+            }
+            row = currentRow // go back to current row
+        } 
+        row++
+    }
+
     return cost
 }
 

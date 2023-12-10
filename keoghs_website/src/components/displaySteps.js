@@ -123,15 +123,51 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
                 </div>
             )
         }
+        else if (cost > 60)
+        {
+            if (cost - 60 * Math.floor(cost/60) == 1)
+            {
+                return(
+                    <>
+                        <h3>Information:</h3>
+                        <p>Time Remaining: {Math.floor(cost/60)} hours {cost - 60 * Math.floor(cost/60)} minute ({cost} minutes total)</p>
+                        <p>Step: {index+1} of {length-1}</p>
+                    </>
+                )
+            }
+            else
+            {
+                return(
+                    <>
+                        <h3>Information:</h3>
+                        <p>Time Remaining: {Math.floor(cost/60)} hours {cost - 60 * Math.floor(cost/60)} minutes ({cost} minutes total)</p>
+                        <p>Step: {index+1} of {length-1}</p>
+                    </>
+                )
+            }
+        }
         else
         {
-            return(
+            if (cost == 1)
+            {
+                return(
                 <>
                     <h3>Information:</h3>
-                    <p>Time Remaining: {cost}</p>
+                    <p>Time Remaining: {cost} minute</p>
                     <p>Step: {index+1} of {length-1}</p>
                 </>
-            )
+                )
+            }
+            else
+            {
+                return(
+                    <>
+                        <h3>Information:</h3>
+                        <p>Time Remaining: {cost} minutes</p>
+                        <p>Step: {index+1} of {length-1}</p>
+                    </>
+                    )
+            }
         }
           
       }

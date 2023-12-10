@@ -891,6 +891,7 @@ function performSIFT(state) { // returns instructions for SIFT
             //     console.log("HEURISTIC COST: " + getHeuristicCost(node.state, [8,0]))
             // })
 
+            // return []
             return getInstructions(node)
         }
 
@@ -1156,9 +1157,11 @@ function getWeightsSortedHeaviestToLightest(state) {
 
 
 function getInstructions(node) { // Calls recursive function to return all steps
+    // console.log(1);
     var instructions = []
+    // console.log(2);
 	instructions = getInstructionsHelper(node, 0, instructions)
-
+    
     let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
     let state = {ship: node.state, buffer: buffer, truck: 0}
 
@@ -1171,6 +1174,11 @@ function getInstructions(node) { // Calls recursive function to return all steps
 }
 
 function getInstructionsHelper(node, cost, instructions) { // Recursively returns instructions in order
+    if(node.parent === null)
+    {
+        return instructions
+    }
+
     cost += node.pathCost - node.parent.pathCost
 
     // Retruns steps in order but not the very first redundant one (used to store intial crane position)

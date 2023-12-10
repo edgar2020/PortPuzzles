@@ -117,6 +117,7 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
             return(
                 <div>
                     <h3>Task Completed:</h3>
+                    <h4>{length === 1 ? "Paremeters for task completion already met" : ""}</h4>
                     Remember to download the OutBound Manifest and email it to the ship captain:
                     <button onClick={downloadOutBoundManifest}>Download File</button>
                 </div>

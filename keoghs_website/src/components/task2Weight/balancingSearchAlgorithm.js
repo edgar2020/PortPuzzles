@@ -46,26 +46,26 @@ async function balance(ship) {  // returns instructions to balance, already bala
     //console.log(ship);
     consolePrintState(ship)
 
-    console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0]))
-    console.log("CHECKING BALANCE...")
+    // console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0]))
+    // console.log("CHECKING BALANCE...")
 
-    if (isBalanced(ship)) {
-        console.log("ALREADY BALANCED")
+    // if (isBalanced(ship)) {
+    //     console.log("ALREADY BALANCED")
 
-        let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
-        let state = {ship: ship, buffer: buffer, truck: 0}
+    //     let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
+    //     let state = {ship: ship, buffer: buffer, truck: 0}
 
-        // returns empty instructions if already balanced
-        return [{cost: 0, state: state, initialPos: {pos: [-1, -1], loc: 1}, finalPos: {pos: [-1, -1], loc: 1}}]
-    } 
-    else if (balanceIsPossible(ship)) {
-        console.log("UNBALANCED & BALANCE POSSIBLE, BALANCING...")
-        return balanceSearch(ship) 
-    } 
-    else {
-        console.log("UNBALANCED & IMPOSSIBLE TO BALANCE, SIFTING...")
-        return performSIFT(ship)
-    }
+    //     // returns empty instructions if already balanced
+    //     return [{cost: 0, state: state, initialPos: {pos: [-1, -1], loc: 1}, finalPos: {pos: [-1, -1], loc: 1}}]
+    // } 
+    // else if (balanceIsPossible(ship)) {
+    //     console.log("UNBALANCED & BALANCE POSSIBLE, BALANCING...")
+    //     return balanceSearch(ship) 
+    // } 
+    // else {
+    //     console.log("UNBALANCED & IMPOSSIBLE TO BALANCE, SIFTING...")
+    //     return performSIFT(ship)
+    // }
 
     return performSIFT(ship) // FOR TESTING ONLY
 }
@@ -351,12 +351,19 @@ function compareStates(state1, state2) {// returns true if the states are the sa
 //*/
 
 function getMove(state, oldColumn, newColumn) { // returns empty array if move is invalid
+    // first check if it possible to move from oldCoumn to newColumn
+    let column = oldColumn + 1
+    while (column < newColumn) {
+        if (state[8][column].deadSpace == 1 || state[8][column].container !== null) // returns invalid if impossible to move from oldColumn to newColumn
+            return []
+            
+        column++
+    }
+
+    // next check if there is a container in oldColumn
     let oldRow = 0
     while (oldRow < 9 && state[oldRow][oldColumn].deadSpace == 1)
         oldRow++
-
-    // ***NEED TO ADD CHECK THAT NO CONTAINERS ARE IN ROW 8 BETWEEN OLD AND NEW COLUMNS***
-    
     if (oldRow == 9 || state[oldRow][oldColumn].container === null) // returns invalid if no containers in oldColumn
         return []
 

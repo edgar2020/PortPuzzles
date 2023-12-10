@@ -46,7 +46,7 @@ async function balance(ship) {  // returns instructions to balance, already bala
     //console.log(ship);
     consolePrintState(ship)
 
-    console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0]))
+    //console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0]))
     console.log("CHECKING BALANCE...")
 
     if (isBalanced(ship)) {
@@ -105,31 +105,14 @@ function isBalanced(state) { // returns true if balanced, false if isn't
 }
 
 function balanceIsPossible(state) { // returns true if possible to balance, false if impossible
-    let weights = []
+    let weights = getWeightsSortedHeaviestToLightest(state)
 
-    let leftSum = 0
-    let rightSum = 0
-    for (let column = 0; column < 12; column++) {
-        let row = 0
-        while (row < 9 && state[row][column].deadSpace == 1)
-            row++
-        
-        while (row < 9 && state[row][column].container !== null) {
-            if (column < 6)
-                leftSum += state[row][column].container.weight
-            else 
-                rightSum += state[row][column].container.weight
-
-            weights.push(state[row][column].container.weight)
-            row++
-        }
-    }
-
-    weights.sort(function(a, b) { // sorts weights from largest to smallest
-        return b - a
+    let sum = 0
+    weights.forEach(weight => {
+        sum += weight
     })
 
-    let idealSum = (leftSum + rightSum) / 2
+    let idealSum = sum / 2
     let lowerBound = idealSum * (18 / 19) // 18/19 ≈ 0.95
     let upperBound = idealSum * (20 / 19) // 20/19 ≈ 1.05
 
@@ -137,22 +120,23 @@ function balanceIsPossible(state) { // returns true if possible to balance, fals
     // console.log("Lower bound: " + lowerBound)
     // console.log("Upper bound: " + upperBound)
     
-    let sum = 0
-    return balanceIsPossibleHelper(lowerBound, upperBound, sum, weights)
+    let partialSum = 0
+    return balanceIsPossibleHelper(lowerBound, upperBound, partialSum, sum, weights)
 }
 
-function balanceIsPossibleHelper(lower, upper, sum, weights) { // recursivly checks all possible weight combinations
+function balanceIsPossibleHelper(lower, upper, sum, weightRemaining, weights) { // recursivly checks all possible weight combinations
     if (weights.length > 0 && sum < upper) {
         let weightsCopy = structuredClone(weights)
         let weight = weightsCopy.shift() // picks the heaviest weight and removes it
 
         sum += weight
+        weightRemaining -= weight
         if (sum >= lower && sum <= upper) { // checks if the current sum is within 10% of ideal sum (NEED TO DOUBLE CHECK [> vs >=]/[< vs <=])
             //console.log("BALANCE FOUND! Possible sum: " + sum)
             return true // current sum balances the ship! Returns true and stops looking
-        } else {
-            return balanceIsPossibleHelper(lower, upper, sum, weightsCopy) || // keep weight and continue looking
-                   balanceIsPossibleHelper(lower, upper, sum - weight, weightsCopy) // skip weight and continue looking
+        } else if (sum + weightRemaining > lower) {
+            return balanceIsPossibleHelper(lower, upper, sum, weightRemaining, weightsCopy) || // keep weight and continue looking
+                   balanceIsPossibleHelper(lower, upper, sum - weight, weightRemaining, weightsCopy) // skip weight and continue looking
         }
     }
     return false

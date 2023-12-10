@@ -120,8 +120,7 @@ function balanceIsPossible(state) { // returns true if possible to balance, fals
     // console.log("Lower bound: " + lowerBound)
     // console.log("Upper bound: " + upperBound)
     
-    let partialSum = 0
-    return balanceIsPossibleHelper(lowerBound, upperBound, partialSum, sum, weights)
+    return balanceIsPossibleHelper(lowerBound, upperBound, 0, sum, weights)
 }
 
 function balanceIsPossibleHelper(lower, upper, sum, weightRemaining, weights) { // recursivly checks all possible weight combinations
@@ -309,17 +308,17 @@ function compareStates(state1, state2) {// returns true if the states are the sa
     for (let column = 0; column < 12; column++) {
         let row = 0
         while (row < 9 && (state1[row][column].deadSpace == 1 || state2[row][column].deadSpace == 1)) {
-            if (state1[row][column].deadSpace != state2[row][column].deadSpace)
+            if (state1[row][column].deadSpace != state2[row][column].deadSpace) // if one state has a different NAN than the other
                 return false
 
             row++
         }
         
         while (row < 9 && (state1[row][column].container !== null || state2[row][column].container !== null)) {
-            if (state1[row][column].container == null || state2[row][column].container == null)
+            if (state1[row][column].container == null || state2[row][column].container == null) // if one state is missing a container the other has
                 return false
             
-            if (state1[row][column].container.weight != state2[row][column].container.weight)
+            if (state1[row][column].container.weight != state2[row][column].container.weight) // if one state has a different container than the other
                 return false
 
             row++
@@ -484,7 +483,7 @@ function getHeuristicCost(state, cranePos) { // returns true if possible to bala
     // console.log("right empty:")
     // console.log(rightAvailableEmptyCells)
 
-    let idealSum = sum / 2 //(leftSum + rightSum) / 2
+    let idealSum = sum / 2 
     let lowerBound = idealSum * (18 / 19) // 18/19 ≈ 0.95
     let upperBound = idealSum * (20 / 19) // 20/19 ≈ 1.05
     
@@ -495,7 +494,7 @@ function getHeuristicCost(state, cranePos) { // returns true if possible to bala
     let combination = []
     let balancedCombinations = []
     
-    let cost = getHeuristicCostHelper(lowerBound, upperBound, 0, containers, combination, balancedCombinations, Number.POSITIVE_INFINITY, containers)
+    let cost = getHeuristicCostHelper(lowerBound, upperBound, 0, containers, combination, balancedCombinations, Number.POSITIVE_INFINITY, containers, sum)
     //console.log(balancedCombinations)
     
     /* // UNCOMMENT COMMENT TO COMMENT
@@ -547,7 +546,7 @@ function getHeuristicCost(state, cranePos) { // returns true if possible to bala
 
 // fills "balancedCombinations" with all possible container combinations that balance the ship
 // can remove sum variable by having it recomputed each time
-function getHeuristicCostHelper(lower, upper, sum, containers, combination, balancedCombinations, cost, originalContainers) { // recursivly checks all possible weight combinations
+function getHeuristicCostHelper(lower, upper, sum, containers, combination, balancedCombinations, cost, originalContainers, weightRemaining) { // recursivly checks all possible weight combinations
     //console.log("RECURSION")
     if (containers.length > 0 && sum < upper) {
         let containersCopy = structuredClone(containers)
@@ -557,8 +556,11 @@ function getHeuristicCostHelper(lower, upper, sum, containers, combination, bala
         let oldCombination = structuredClone(combination)
 
         sum += weight
+        weightRemaining -= weight
         if (sum > upper) // skip weight and continue looking if weight is too heavy too balance
-            return getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations, cost, originalContainers)
+            return getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations, cost, originalContainers, weightRemaining)
+        else if (sum + weightRemaining < lower)
+            return cost
         
         let newCombination = structuredClone(combination)
         newCombination.push(container)
@@ -576,7 +578,7 @@ function getHeuristicCostHelper(lower, upper, sum, containers, combination, bala
         //      return cost // stop searching if combination already went over the lowest cost
 
         if (sum >= lower && sum <= upper) { // checks if the current sum is within 10% of ideal sum (NEED TO DOUBLE CHECK [> vs >=]/[< vs <=])
-            let nextCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations, tempCost, originalContainers) // skip weight and continue looking
+            let nextCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations, tempCost, originalContainers, weightRemaining) // skip weight and continue looking
 
             //if (tempCost <= nextCost) console.log(newCombination)
             balancedCombinations.push(newCombination)
@@ -585,8 +587,8 @@ function getHeuristicCostHelper(lower, upper, sum, containers, combination, bala
             return Math.min(tempCost, nextCost)
         } else if (sum < lower) {
             // console.log("Checking: " + sum + " FAIL " + containersCopy.length)
-            let keepCost = getHeuristicCostHelper(lower, upper, sum, containersCopy, newCombination, balancedCombinations, cost, originalContainers) // keep weight and continue looking
-            let skipCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations, cost, originalContainers) // skip weight and continue looking
+            let keepCost = getHeuristicCostHelper(lower, upper, sum, containersCopy, newCombination, balancedCombinations, cost, originalContainers, weightRemaining) // keep weight and continue looking
+            let skipCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations, cost, originalContainers, weightRemaining) // skip weight and continue looking
 
             return Math.min(keepCost, skipCost, cost)
         }
@@ -621,7 +623,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
 
             rightContainers.push(container)
         }
-    });
+    })
     
     // if all containers are on one side, return cost to move all container to other side
     if (leftContainers.length == 0 || rightContainers.length == 0) {
@@ -631,7 +633,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             } else {
                 cost += container.moveCost * 2
             }
-        });
+        })
 
         return cost
     }  
@@ -645,7 +647,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             leftToRightCost += container.moveCost
         else
             leftToRightCost += container.moveCost * 2
-    });
+    })
 
 
     // moving all containers in combination to left
@@ -656,7 +658,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
         else
             rightToLeftCost += container.moveCost * 2
         //rightToLeftCost += container.moveCost
-    }); 
+    }) 
 
     
     cost = Math.min(leftToRightCost, rightToLeftCost)
@@ -690,7 +692,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             rightContainers.push(container)
 
         sum += container.weight
-    });
+    })
 
     let isBalanced = (sum >= lower && sum <= upper)
     
@@ -736,7 +738,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
                 cost += container.moveCost
             else
                 cost += container.moveCost * 2
-        });
+        })
 
         return cost
     }  
@@ -756,7 +758,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             leftToRightCost += container.moveCost
         else
             leftToRightCost += container.moveCost * 2
-    });
+    })
 
     let oldMinCraneCost = minCraneCost
     if (isBalanced) { // add cost of moving all containers not in combination to other side        
@@ -798,7 +800,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             rightToLeftCost += container.moveCost
         else
             rightToLeftCost += container.moveCost * 2
-    });
+    })
     
     
     if (isBalanced) { // add cost of moving all containers not in combination to other side        

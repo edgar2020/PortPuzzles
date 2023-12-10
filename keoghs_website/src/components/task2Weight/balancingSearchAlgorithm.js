@@ -45,8 +45,8 @@ async function balance(ship) {  // returns instructions to balance, already bala
     console.log("Initial State:")
     //console.log(ship);
     consolePrintState(ship)
-    console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0]))
 
+    //console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0]))
     console.log("CHECKING BALANCE...")
 
     if (isBalanced(ship)) {
@@ -67,7 +67,7 @@ async function balance(ship) {  // returns instructions to balance, already bala
         return performSIFT(ship)
     }
 
-    //console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0])) // FOR TESTING PURPOSES *** COMMENT OUT WHEN RUNNING PROGRAM ***
+    return performSIFT(ship) // FOR TESTING ONLY
 }
 
 function isBalanced(state) { // returns true if balanced, false if isn't 
@@ -105,31 +105,14 @@ function isBalanced(state) { // returns true if balanced, false if isn't
 }
 
 function balanceIsPossible(state) { // returns true if possible to balance, false if impossible
-    let weights = []
+    let weights = getWeightsSortedHeaviestToLightest(state)
 
-    let leftSum = 0
-    let rightSum = 0
-    for (let column = 0; column < 12; column++) {
-        let row = 0
-        while (row < 9 && state[row][column].deadSpace == 1)
-            row++
-        
-        while (row < 9 && state[row][column].container !== null) {
-            if (column < 6)
-                leftSum += state[row][column].container.weight
-            else 
-                rightSum += state[row][column].container.weight
-
-            weights.push(state[row][column].container.weight)
-            row++
-        }
-    }
-
-    weights.sort(function(a, b) { // sorts weights from largest to smallest
-        return b - a
+    let sum = 0
+    weights.forEach(weight => {
+        sum += weight
     })
 
-    let idealSum = (leftSum + rightSum) / 2
+    let idealSum = sum / 2
     let lowerBound = idealSum * (18 / 19) // 18/19 ≈ 0.95
     let upperBound = idealSum * (20 / 19) // 20/19 ≈ 1.05
 
@@ -137,26 +120,37 @@ function balanceIsPossible(state) { // returns true if possible to balance, fals
     // console.log("Lower bound: " + lowerBound)
     // console.log("Upper bound: " + upperBound)
     
-    let sum = 0
-    return balanceIsPossibleHelper(lowerBound, upperBound, sum, weights)
+    return balanceIsPossibleHelper(lowerBound, upperBound, 0, sum, weights)
 }
 
-function balanceIsPossibleHelper(lower, upper, sum, weights) { // recursivly checks all possible weight combinations
+function balanceIsPossibleHelper(lower, upper, sum, weightRemaining, weights) { // recursivly checks all possible weight combinations
     if (weights.length > 0 && sum < upper) {
         let weightsCopy = structuredClone(weights)
         let weight = weightsCopy.shift() // picks the heaviest weight and removes it
 
         sum += weight
+        weightRemaining -= weight
         if (sum >= lower && sum <= upper) { // checks if the current sum is within 10% of ideal sum (NEED TO DOUBLE CHECK [> vs >=]/[< vs <=])
             //console.log("BALANCE FOUND! Possible sum: " + sum)
             return true // current sum balances the ship! Returns true and stops looking
-        } else {
-            return balanceIsPossibleHelper(lower, upper, sum, weightsCopy) || // keep weight and continue looking
-                   balanceIsPossibleHelper(lower, upper, sum - weight, weightsCopy) // skip weight and continue looking
+        } else if (sum + weightRemaining > lower) {
+            return balanceIsPossibleHelper(lower, upper, sum, weightRemaining, weightsCopy) || // keep weight and continue looking
+                   balanceIsPossibleHelper(lower, upper, sum - weight, weightRemaining, weightsCopy) // skip weight and continue looking
         }
     }
     return false
 }
+
+
+
+
+// ***************************************************************************************************************************************************************
+// ***************************************************************************************************************************************************************
+
+
+// Balance search starting below
+// This is for when balancing is POSSIBLE
+
 
 function balanceSearch(state) { // returns instructions for fastest balance
     let initialNode = new Node(state)
@@ -166,13 +160,13 @@ function balanceSearch(state) { // returns instructions for fastest balance
 	// Create an array to store all found states by a state ID
     // A 1 at the index of state ID means the state has been found, a 0 means it hasn't
     // This is to avoid exploring paths that have already been explored
-    var foundStates = new Array(9999999).fill(null) // ***TESTING STATE ID ARRAY*** 
+    var foundStates = new Array(10000000).fill(null) // ***TESTING STATE ID ARRAY*** 
     // need array size to be 350996490 to handle maximum ship weight (full of containers weighing 99999)
     // size greater than 9999999 takes too long to initialize to all 0's
 
     // change this state to found so that it won't be explored anymore
 
-    foundStates[getStateID(state)] = [state] // ***UNCOMMENT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST*** (ship case 2 breaks for some reason)
+    foundStates[getStateID(state)] = [state] // ***UNCOMMENT TO RUN FASTER BUT LESS ACCURATE UNIFORM COST*** 
 
     // While there are paths being explored
     while (frontier.length > 0) {
@@ -184,7 +178,7 @@ function balanceSearch(state) { // returns instructions for fastest balance
         // Choose the lowest-cost path from the frontier
         let node = frontier.shift() // TAKES TOO LONG WHEN FRONTIER IS HUGE
 
-        // ***COMMENT OUT BELOW TO RUN FASTER BUT LESS ACCURATE UNIFORM COST*** (ship case 2 breaks for some reason)
+        // ***COMMENT OUT BELOW TO RUN FASTER BUT LESS ACCURATE UNIFORM COST*** 
         // let stateID = getStateID(node.state)
         // if (foundStates[stateID] === null) 
         //     foundStates[stateID] = [node.state] // create a new array if stateID is new
@@ -255,7 +249,7 @@ function expand(frontier, foundStates, node) { // branching function, max 12x11 
 
                             // Mark the state as found
 
-                            // ***UNCOMMENT BELOW FOR FASTER BUT LESS ACCURATE UNIFORM COST*** (ship case 2 breaks for some reason)
+                            // ***UNCOMMENT BELOW FOR FASTER BUT LESS ACCURATE UNIFORM COST*** 
                             if (foundStates[tempStateID] === null)
                                 foundStates[tempStateID] = [tempState]
                             else 
@@ -284,40 +278,47 @@ function getStateID(state) { // returns (almost) unique ID for each state
         
         while (row < 9 && state[row][column].container !== null) {
             // NEED TO FIND UNIQUE COMBINATION FOR EACH POSSIBLE STATE (test when all containers have weight 1)
-            //id += state[row][column].container.weight * (row + 1) * (column + 1) // fastest but least accurate
 
-            id += state[row][column].container.weight * Math.pow(10, row) * (row + 1) * (column + 1) // slower but accurate
 
-            //id += state[row][column].container.weight * Math.pow(10, row) * (row + 1) * (column + 1) // not accurate
+            //id += state[row][column].container.weight * (row + 1) * (column + 1) // fastest but not accurate
+
+            //id += state[row][column].container.weight * Math.pow(10, row) * (row + 1) * (column + 1) // slower but (almost) accurate
+
+            //id += state[row][column].container.weight * Math.pow(10, row) * ((row + 1) * (column + 1) + row + column) // NEED TO TEST
             //id += state[row][column].container.weight * ((row + 1) * (column + 1) + row + column) // not accurate
-            //id += (state[row][column].container.weight + (row * 10)) * ((row + 1) * (column + 1) + row + column) // even slower but accurate
-            //id += (state[row][column].container.weight + (row + 1) * (10 * (column + 1))) * ((row + 1) * (column + 1) + row + column) // // slowest but accurate
+            //id += (state[row][column].container.weight + (row * 10)) * ((row + 1) * (column + 1) + row + column) // even slower but not accurate
+
+            id += (state[row][column].container.weight + (row + 1) * (10 * (column + 1))) * ((row + 1) * (column + 1) + row + column) // // slowest but accurate (NOT IF SIFT)
+
+            //      *******************         NEED TO FIND STATE ID THAT IS ACCURATE BOTH IN BALANCING AND SIFT           **********************
+
             row++
         }
     }
 
     //console.log("ID: " + id)
-    return id % 9999999
+    return id % 10000000
 }
 
-// REPLACED BY STATE IDs (NOW USE TO HANDLE COLLISIONS)
-/*
+// Used TO HANDLE COLLISIONS in foundStates
+// *************** CURRENTLY NEEDED FOR SIFTING TO WORK (not needed for balancing) ********************
+///*
 function compareStates(state1, state2) {// returns true if the states are the same, false otherwise
     //console.log("HELLO")
     for (let column = 0; column < 12; column++) {
         let row = 0
         while (row < 9 && (state1[row][column].deadSpace == 1 || state2[row][column].deadSpace == 1)) {
-            if (state1[row][column].deadSpace != state2[row][column].deadSpace)
+            if (state1[row][column].deadSpace != state2[row][column].deadSpace) // if one state has a different NAN than the other
                 return false
 
             row++
         }
         
         while (row < 9 && (state1[row][column].container !== null || state2[row][column].container !== null)) {
-            if (state1[row][column].container == null || state2[row][column].container == null)
+            if (state1[row][column].container == null || state2[row][column].container == null) // if one state is missing a container the other has
                 return false
             
-            if (state1[row][column].container.weight != state2[row][column].container.weight)
+            if (state1[row][column].container.weight != state2[row][column].container.weight) // if one state has a different container than the other
                 return false
 
             row++
@@ -330,15 +331,22 @@ function compareStates(state1, state2) {// returns true if the states are the sa
 
     return true
 }
-*/
+//*/
 
 function getMove(state, oldColumn, newColumn) { // returns empty array if move is invalid
+    // first check if it possible to move from oldCoumn to newColumn
+    let column = oldColumn + 1
+    while (column < newColumn) {
+        if (state[8][column].deadSpace == 1 || state[8][column].container !== null) // returns invalid if impossible to move from oldColumn to newColumn
+            return []
+
+        column++
+    }
+
+    // next check if there is a container in oldColumn
     let oldRow = 0
     while (oldRow < 9 && state[oldRow][oldColumn].deadSpace == 1)
         oldRow++
-
-    // ***NEED TO ADD CHECK THAT NO CONTAINERS ARE IN ROW 8 BETWEEN OLD AND NEW COLUMNS***
-    
     if (oldRow == 9 || state[oldRow][oldColumn].container === null) // returns invalid if no containers in oldColumn
         return []
 
@@ -475,7 +483,7 @@ function getHeuristicCost(state, cranePos) { // returns true if possible to bala
     // console.log("right empty:")
     // console.log(rightAvailableEmptyCells)
 
-    let idealSum = sum / 2 //(leftSum + rightSum) / 2
+    let idealSum = sum / 2 
     let lowerBound = idealSum * (18 / 19) // 18/19 ≈ 0.95
     let upperBound = idealSum * (20 / 19) // 20/19 ≈ 1.05
     
@@ -484,42 +492,103 @@ function getHeuristicCost(state, cranePos) { // returns true if possible to bala
     // console.log("Upper bound: " + upperBound)
     
     let combination = []
-    let balancedCombination = []
+    let balancedCombinations = []
     
-    let cost = getHeuristicCostHelper(lowerBound, upperBound, 0, containers, combination, balancedCombination, Number.POSITIVE_INFINITY, containers)
-    //console.log(balancedCombination)
+    let cost = getHeuristicCostHelper(lowerBound, upperBound, 0, containers, combination, balancedCombinations, Number.POSITIVE_INFINITY, containers, sum)
+    //console.log(balancedCombinations)
+    
+    /* // UNCOMMENT COMMENT TO COMMENT
+
+    // need combinations to only have the minimum number of containers needed to balance
+    // NEED TO TEST IF MINIMUM MATTERS
+    let balancedCombinationsCopy = structuredClone(balancedCombinations)
+    console.log(balancedCombinationsCopy)
+
+    for (let small = 0; small < balancedCombinations.length; small++) {
+        for (let big = 0; big < balancedCombinations.length; big++) {
+            if (balancedCombinations[big].length > balancedCombinations[small].length) {
+                let shareAllContainers = true
+                let s = 0
+                while (shareAllContainers && s < balancedCombinations[small].length) {
+                    let b = 0
+                    // look to see if bigger combination has the smaller combination's container at index s
+                    while (b < balancedCombinations[big].length && (balancedCombinations[small][s].pos[ROW] != balancedCombinations[big][b].pos[ROW] || balancedCombinations[small][s].pos[COLUMN] != balancedCombinations[big][b].pos[COLUMN])) {
+                        b++
+                    }
+                    if (b == balancedCombinations[big].length) 
+                        shareAllContainers = false // if the bigger combination did not have the smaller combination's container at index s, they do not share all the containers (in smaller combination)
+                    s++
+                }
+
+                if (shareAllContainers) { // If they share all the containers (in smaller combination), then the bigger combination is the exact same comination as the smaller with just added containers
+                    //balancedCombinations.splice(big, 1) // remove the bigger combination from balanced combinations
+                    //console.log(balancedCombinations[big])
+                    balancedCombinations[big] = []
+                }
+            }
+        }
+    }
+
+    let newBalancedCombinations = []
+    balancedCombinations.forEach(combination => {
+        if (combination.length > 0)
+            newBalancedCombinations.push(combination)
+    }) 
+    console.log(newBalancedCombinations)
+
+    //*/
+
+
+
+
     return cost
 }
 
 // fills "balancedCombinations" with all possible container combinations that balance the ship
 // can remove sum variable by having it recomputed each time
-function getHeuristicCostHelper(lower, upper, sum, containers, combination, balancedCombination, cost, originalContainers) { // recursivly checks all possible weight combinations
+function getHeuristicCostHelper(lower, upper, sum, containers, combination, balancedCombinations, cost, originalContainers, weightRemaining) { // recursivly checks all possible weight combinations
     //console.log("RECURSION")
     if (containers.length > 0 && sum < upper) {
         let containersCopy = structuredClone(containers)
         let container = containersCopy.shift() // picks the heaviest container and removes it
         let weight = container.weight
 
-        let newCombination = structuredClone(combination)
-        newCombination.push(container)
         let oldCombination = structuredClone(combination)
 
-        let tempCost = totalMovingCost(newCombination, lower, upper, originalContainers)
-        if (cost <= tempCost)
-            return cost // stop searching if combination already went over the lowest cost
-
         sum += weight
+        weightRemaining -= weight
+        if (sum > upper) // skip weight and continue looking if weight is too heavy too balance
+            return getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations, cost, originalContainers, weightRemaining)
+        else if (sum + weightRemaining < lower)
+            return cost
+        
+        let newCombination = structuredClone(combination)
+        newCombination.push(container)
+
+
+
+        // WANT TO CHECK BALANCED COMBINATIONS HERE TO AVOID REPEATING COMBINATIONS WHERE CONTAINERS ARE ALL ON THE SAME SIDE
+        //if (balancedCombinations.length > 0) return cost
+
+
+        let tempCost = totalMovingCost(newCombination, lower, upper, originalContainers)
+
+
+        // if (tempCost >= cost) // ADDED EXTRA COMPARISON HERE TO STOP RECURSION EARLIER            ** NOT SURE IF I SHOULD INCLUDE BALANCED COMBINATIONS THAT HAVE HIGH COST IN HEURISTIC ** EDIT: I DO NEED THEM ALL
+        //      return cost // stop searching if combination already went over the lowest cost
+
         if (sum >= lower && sum <= upper) { // checks if the current sum is within 10% of ideal sum (NEED TO DOUBLE CHECK [> vs >=]/[< vs <=])
-            let nextCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombination, tempCost, originalContainers) // skip weight and continue looking
+            let nextCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations, tempCost, originalContainers, weightRemaining) // skip weight and continue looking
 
             //if (tempCost <= nextCost) console.log(newCombination)
-            //if (tempCost <= nextCost) balancedCombination.push(newCombination)
+            balancedCombinations.push(newCombination)
 
+            //return tempCost // NOT ACCURATE
             return Math.min(tempCost, nextCost)
-        } else {
+        } else if (sum < lower) {
             // console.log("Checking: " + sum + " FAIL " + containersCopy.length)
-            let keepCost = getHeuristicCostHelper(lower, upper, sum, containersCopy, newCombination, balancedCombination, cost, originalContainers) // keep weight and continue looking
-            let skipCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombination, cost, originalContainers) // skip weight and continue looking
+            let keepCost = getHeuristicCostHelper(lower, upper, sum, containersCopy, newCombination, balancedCombinations, cost, originalContainers, weightRemaining) // keep weight and continue looking
+            let skipCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations, cost, originalContainers, weightRemaining) // skip weight and continue looking
 
             return Math.min(keepCost, skipCost, cost)
         }
@@ -527,7 +596,7 @@ function getHeuristicCostHelper(lower, upper, sum, containers, combination, bala
     return cost
 }
 
-/* // OLD VERSION (works for 6 one's)
+/* // OLD VERSION 
 // returns the cost to move all the containers in the combination to the same side (other side if already on the same side)
 function totalMovingCost(combination, lower, upper, originalContainers) {
     let cost = Number.POSITIVE_INFINITY
@@ -554,7 +623,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
 
             rightContainers.push(container)
         }
-    });
+    })
     
     // if all containers are on one side, return cost to move all container to other side
     if (leftContainers.length == 0 || rightContainers.length == 0) {
@@ -564,7 +633,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             } else {
                 cost += container.moveCost * 2
             }
-        });
+        })
 
         return cost
     }  
@@ -578,7 +647,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             leftToRightCost += container.moveCost
         else
             leftToRightCost += container.moveCost * 2
-    });
+    })
 
 
     // moving all containers in combination to left
@@ -589,7 +658,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
         else
             rightToLeftCost += container.moveCost * 2
         //rightToLeftCost += container.moveCost
-    }); 
+    }) 
 
     
     cost = Math.min(leftToRightCost, rightToLeftCost)
@@ -623,7 +692,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             rightContainers.push(container)
 
         sum += container.weight
-    });
+    })
 
     let isBalanced = (sum >= lower && sum <= upper)
     
@@ -669,7 +738,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
                 cost += container.moveCost
             else
                 cost += container.moveCost * 2
-        });
+        })
 
         return cost
     }  
@@ -689,7 +758,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             leftToRightCost += container.moveCost
         else
             leftToRightCost += container.moveCost * 2
-    });
+    })
 
     let oldMinCraneCost = minCraneCost
     if (isBalanced) { // add cost of moving all containers not in combination to other side        
@@ -731,7 +800,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             rightToLeftCost += container.moveCost
         else
             rightToLeftCost += container.moveCost * 2
-    });
+    })
     
     
     if (isBalanced) { // add cost of moving all containers not in combination to other side        
@@ -769,34 +838,322 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
 }
 
 
+// GOD SPEED HEURISTIC
 
 
 
 
 
+// ***************************************************************************************************************************************************************
+// ***************************************************************************************************************************************************************
+
+
+// SIFT starting below
+// This is for when balancing is IMPOSSIBLE
+
+
+function performSIFT(state) { // returns instructions for SIFT
+    let initialNode = new Node(state)
+	// Create a data structure to store the paths that are being explored
+	let frontier = [initialNode]
+
+	// Create an array to store all found states by a state ID
+    // A 1 at the index of state ID means the state has been found, a 0 means it hasn't
+    // This is to avoid exploring paths that have already been explored
+    var foundStates = new Array(10000000).fill(null) // ***TESTING STATE ID ARRAY*** 
+    // need array size to be 350996490 to handle maximum ship weight (full of containers weighing 99999)
+    // size greater than 9999999 takes too long to initialize to all 0's
+
+    // change this state to found so that it won't be explored anymore
+
+    foundStates[getStateID(state)] = [state]
+
+    // While there are paths being explored
+    while (frontier.length > 0) {
+        // Sort the paths in the frontier by total cost (path + heuristic cost), with the lowest-cost paths first
+        frontier.sort(function(a, b) {
+            return (a.pathCost + a.heuristicCost) - (b.pathCost + b.heuristicCost)
+        })
+
+        // Choose the lowest-cost path from the frontier
+        let node = frontier.shift() // TAKES TOO LONG WHEN FRONTIER IS HUGE
+
+        // If this node reaches the goal, return the node 
+        if (isSIFTed(node.state)) {
+        //if (node.heuristicCost == 0) {
+            console.log("SUCCESS!")
+            console.log("SIFTed State:")
+            consolePrintState(node.state)
+
+            // frontier.forEach(node => {
+            //     consolePrintState(node.state)
+            //     console.log("CRANE POS: " + node.move[NEW])
+            //     console.log("HEURISTIC COST: " + getHeuristicCost(node.state, [8,0]))
+            // })
+
+            return getInstructions(node)
+        }
+
+        frontier = expandSIFT(frontier, foundStates, node) // ***TESTING STATE ID***
+    }
+
+    // If there are no paths left to explore, return null to indicate that the goal cannot be reached
+    console.log("ERROR: No SIFT found!")
+    return null //Should never reach here
+}
+
+function expandSIFT(frontier, foundStates, node) { // branching function, max 12x11 branches
+    console.log("EXPANDING NODE")
+
+    // For every column, check every column
+    // o: old column, n: new column
+    for (let o = 0; o < 12; o++) {
+        // if not moving container just moved OR doing first move 
+        // formerly used to check if column has containers by only checking bottom row, but this would not work if first row is NANs
+        if (o != node.move[NEW][COLUMN] || node.move[OLD] == node.move[NEW]) {       // **NEED TO CHANGE TO CORRECTLY COMPARE ARRAYS**
+            for (let n = 0; n < 12; n++) {
+                if (n != o && node.state[8][n].container === null) { // if not making redundant move, and coulumn has available spot at top
+                    let move = getMove(node.state, o, n)
+                    if (move.length > 0) { // if move is valid (old column must have at least 1 container)
+                        let tempState = getNewState(node.state, move)
+                        let tempStateID = getStateID(tempState) // ***TESTING STATE ID***
+
+
+
+                        // If the stateID has already been generated, checks if the state has actually been found
+                        // *** NEEDED FOR SIFT TO WORK, SIFT GENERATES LOTS OF REPEATED STATE ID's ***
+                        let isNewState = true
+                        if (foundStates[tempStateID] !== null) {
+                            //console.log(foundStates[tempStateID])
+                            for (let i = 0; i < foundStates[tempStateID].length; i++)
+                                if (compareStates(tempState, foundStates[tempStateID][i]))
+                                    isNewState = false
+                        }
 
 
 
 
+                        //foundStates[tempStateID] = null // ****************** REMOVE BEFORE FLIGHT *************************
 
+                        // If this state has not been explored/found
+                        //if (foundStates[tempStateID] === null) { 
+                        if (isNewState) { //                     ******************** NEEDED BECAUSE STATE ID NOT UNIQUE IN SIFT ******************
+                            let tempNode = new Node(tempState)
+                            tempNode.pathCost = node.pathCost + getPathCost(node, move)
+                            tempNode.heuristicCost = getSIFTHeuristicCost(tempState)              // *** REMOVE BEFORE FLIGHT ***
+                            tempNode.move = move
+                            tempNode.parent = node
 
+                            // Add the step to the frontier, using the cost and the heuristic function to estimate the total cost to reach the goal
+                            frontier.push(tempNode)
 
+                            // Mark the state as found
+                            if (foundStates[tempStateID] === null)
+                                foundStates[tempStateID] = [tempState]
+                            else 
+                                foundStates[tempStateID].push(tempState)
+                        } else {
+                            //console.log("DID NOT EXPAND NODE")
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return frontier
+}
 
+function isSIFTed(state) { // returns true if SIFTed, false if not
+    let weights = getWeightsSortedHeaviestToLightest(state)
 
+    // NEED TO ALSO CHECK NO CONTAINERS ON 9TH ROW
 
-function performSIFT(state) { // return instructions for SIFT
-    return []
+    // SIFTing layer by layer
+    /*
+    let SIFTrow = 0 // what row of SIFTing we're on
+    while (weights.length > 0) {
+        for (let i = 0; i < 6; i++) {
+            let row = 0
+            let column = 5 - i // checks left container in SIFT row
+            while (row < 9 && state[row][column].deadSpace == 1) // go to lowest container in column
+                row++
+            
+            row += SIFTrow // go to current SIFT row
+
+            if (row < 9) {
+                if (weights.length > 0) {
+                    let weight = weights.shift()
+                    if (state[row][column].container == null || state[row][column].container.weight != weight)
+                        return false
+                }
+                else return true
+
+                // ship is symmetric so SIFT container is on other side
+                column = 6 + i          // checks right container in SIFT row
+                if (weights.length > 0) {
+                    let weight = weights.shift()
+                    if (state[row][column].container == null || state[row][column].container.weight != weight)
+                        return false
+                }
+                else return true
+            }
+        } 
+        SIFTrow++
+    }
+    //*/
+
+    // SIFTing row by row
+    let row = 0
+    while (weights.length > 0 && row < 8) {
+        for (let i = 0; i < 6; i++) {
+            let column = 5 - i // checks left container in SIFT row
+            if (state[row][column].deadSpace == 0) {// if not a NAN
+                if (weights.length > 0) {
+                    let weight = weights.shift()
+                    if (state[row][column].container == null || state[row][column].container.weight != weight)
+                        return false
+                }
+                else return true
+
+                // ship is symmetric so SIFT container is on other side
+                column = 6 + i          // checks right container in SIFT row
+                if (weights.length > 0) {
+                    let weight = weights.shift()
+                    if (state[row][column].container == null || state[row][column].container.weight != weight)
+                        return false
+                }
+                else return true
+            }
+        } 
+        row++
+    }
+
+    return true
+}
+
+function getSIFTHeuristicCost(state) { // returns true if SIFTed, false if not
+    let weights = getWeightsSortedHeaviestToLightest(state)
+
+    let cost = 0
+
+    // SIFTing layer by layer
+    /*
+    let SIFTrow = 0 // what row of SIFTing we're on
+    while (weights.length > 0) {
+        for (let i = 0; i < 6; i++) {
+            let row = 0
+            let column = 5 - i
+            while (row < 9 && state[row][column].deadSpace == 1) // go to lowest container in column
+                row++
+            
+            row += SIFTrow // go to current SIFT row
+            
+            if (row < 9) {
+                let startRow = row // save starting row for checking the right side
+                if (weights.length > 0) { // checks left container in SIFT row
+                    let weight = weights.shift()
+                    if (state[row][column].container == null || state[row][column].container.weight != weight) { // if the SIFT container is not there   
+                        while (row < 9 && state[row][column].container !== null) { // adds cost of moving all containers out of that spot
+                            cost += 100000 // need to clear the SIFT cells of all other containers (top priority)
+                            row++
+                        }
+                    }
+                    else cost -= 100000 // subtract from cost any SIFT cells that already have their proper containers
+                }
+
+                // ship is symmetric so SIFT container is on other side
+                row = startRow
+                column = 6 + i          // checks right container in SIFT row
+                if (weights.length > 0) { // checks left container in SIFT row
+                    let weight = weights.shift()
+                    if (state[row][column].container == null || state[row][column].container.weight != weight) { // if the SIFT container is not there
+                        while (row < 9 && state[row][column].container !== null) { // adds cost of moving all containers out of that spot
+                            cost += 100000 // need to clear the SIFT cells of all other containers (top priority)
+                            row++
+                        }
+                    }
+                    else cost -= 100000 // subtract from cost any SIFT cells that already have their proper containers
+                }
+            }
+        } 
+        SIFTrow++
+    }
+    //*/
+
+    // SIFTing row by row
+    let row = 0
+    while (weights.length > 0 && row < 8) {
+        for (let i = 0; i < 6; i++) {
+            let currentRow = row // save current row to go back to it after
+
+            let column = 5 - i // checks left container in SIFT row
+            if (state[row][column].deadSpace == 0) { // if not a NAN
+                if (weights.length > 0) {
+                    let weight = weights.shift()
+                    if (state[row][column].container == null || state[row][column].container.weight != weight) { // if the SIFT container is not there   
+                        while (row < 9 && state[row][column].container !== null) { // adds cost of moving all containers out of that spot
+                            cost += 100000 // need to clear the SIFT cells of all other containers (top priority)
+                            row++
+                        }
+                    }
+                    else cost -= 100000 // subtract from cost any SIFT cells that already have their proper containers
+                }
+
+                row = currentRow // go back to current row
+
+                // ship is symmetric so SIFT container is on other side
+                column = 6 + i          // checks right container in SIFT row
+                if (weights.length > 0) {
+                    let weight = weights.shift()
+                    if (state[row][column].container == null || state[row][column].container.weight != weight) { // if the SIFT container is not there
+                        while (row < 9 && state[row][column].container !== null) { // adds cost of moving all containers out of that spot
+                            cost += 100000 // need to clear the SIFT cells of all other containers (top priority)
+                            row++
+                        }
+                    }
+                    else cost -= 100000 // subtract from cost any SIFT cells that already have their proper containers
+                }
+            }
+            row = currentRow // go back to current row
+        } 
+        row++
+    }
+
+    return cost
+}
+
+function getWeightsSortedHeaviestToLightest(state) {
+    let weights = []
+
+    for (let column = 0; column < 12; column++) {
+        let row = 0
+        while (row < 9 && state[row][column].deadSpace == 1)
+            row++
+        
+        while (row < 9 && state[row][column].container !== null) {
+            if (state[row][column].container.weight > 0) // only care about non-empty containers
+                weights.push(state[row][column].container.weight)
+
+            row++
+        }
+    }
+
+    weights.sort(function(a, b) { // sorts weights from largest to smallest
+        return b - a
+    })
+
+    return weights
 }
 
 
 
 
-
-
-
+// ***************************************************************************************************************************************************************
+// ***************************************************************************************************************************************************************
 
 
 // Everything below is for returning the instructions only
+
 
 function getInstructions(node) { // Calls recursive function to return all steps
     var instructions = []

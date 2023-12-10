@@ -49,7 +49,7 @@ async function balance(ship) {  // returns instructions to balance, already bala
     //console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0]))
     console.log("CHECKING BALANCE...")
 
-    if (isBalanced(ship)) {
+    if (isBalanced(ship)) { // returns the same input state if already balanced
         console.log("ALREADY BALANCED")
 
         let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
@@ -58,11 +58,19 @@ async function balance(ship) {  // returns instructions to balance, already bala
         // returns empty instructions if already balanced
         return [{cost: 0, state: state, initialPos: {pos: [-1, -1], loc: 1}, finalPos: {pos: [-1, -1], loc: 1}}]
     } 
-    else if (balanceIsPossible(ship)) {
+    else if (balanceIsPossible(ship)) { // if balance is possible, searches for a balance and returns the instructions
         console.log("UNBALANCED & BALANCE POSSIBLE, BALANCING...")
         return balanceSearch(ship) 
     } 
-    else {
+    else if (isSIFTed(ship)) { // // if balance is impossibe, returns the same input state if already SIFTed
+        console.log("UNBALANCED & IMPOSSIBLE TO BALANCE, ALREADY SIFTED")
+
+        let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
+        let state = {ship: ship, buffer: buffer, truck: 0}
+
+        // returns empty instructions if already balanced
+        return [{cost: 0, state: state, initialPos: {pos: [-1, -1], loc: 1}, finalPos: {pos: [-1, -1], loc: 1}}]
+    } else { // if balance is impossible, searches for a SIFT and returns the instructions
         console.log("UNBALANCED & IMPOSSIBLE TO BALANCE, SIFTING...")
         return performSIFT(ship)
     }

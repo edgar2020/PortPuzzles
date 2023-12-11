@@ -80,7 +80,7 @@ class Node {
     isEqual(other) 
     {
         // TODO: are the load_left and loads_unleft really necessary? And differences will already be visible when you checkStatesEqual 
-        return (checkStatesEqual(this.shipState, other.shipState) && this.unloads_left == other.unloads_left && this.loads_left == other.loads_left)
+        return (checkStatesEqual(this.shipState, other.shipState))
         //Note for later: maybe also check equality for initial_loc and final_loc
     }
     // use as ``node1.isEqual(node2)''
@@ -88,22 +88,27 @@ class Node {
     //function to check if (thisNode's f is < otherNode's f)
     isLessThan(other)
     {
-        if(this.f  == other.f)
+        let this_f = this.pathCost + this.heuristicCost
+        let other_f = other.pathCost + other.heuristicCost
+        if(this_f  == other_f)
         {
-            return this.h < other.h
+            return this.heuristicCost < other.heuristicCost
         }
         else
         {
-            return this.f < other.f;
+            return this_f < other_f;
         }
     }
     //function to check if (thisNode's f is > otherNode's f)
     isGreaterThan(other)
     {
-        if (this.f == other.f)
-            return this.h > other.h
+        let this_f = this.pathCost + this.heuristicCost
+        let other_f = other.pathCost + other.heuristicCost
+
+        if (this_f == other_f)
+            return this.heuristicCost > other.heuristicCost
         else
-            return this.f > other.f
+            return this_f > other_f
     }
 
 }
@@ -116,8 +121,8 @@ function finalStateSearch(ss, loads, unloads) {
     if(unloads.length == 0 && loads.length == 0)
     {
         console.log(" --!!NOTHING TO LOAD/UNLOAD!!-- ")
-        // TODO add return object here
-        return
+        
+        return getInstructions(ss);
     }
     
     // returns instructions for fastest load/unload

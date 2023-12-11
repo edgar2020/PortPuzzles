@@ -617,6 +617,11 @@ function taskComplete(node) // returns true if no unloading/loading to be done
     // console.log(node.loads_left.length + " - "+ node.unloads_left.length);
     if(node.loads_left.length === 0 && node.unloads_left.length === 0)
     {
+        for(let row = 0; row <= 11; row++)
+        {
+            if(node.shipState[8][row] !== null)
+                return false
+        }
         finished_load = true;
         finished_unload = true;
         return true;

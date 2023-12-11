@@ -383,7 +383,7 @@ function getPathCost(node, move) {
     let left = Math.min(node.move[NEW][COLUMN], move[OLD][COLUMN])
     let right = Math.max(node.move[NEW][COLUMN], move[OLD][COLUMN])
     
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 2; i++) { // first crane cost, then move cost
         // add Manhattan Distance to cost
         if (i == 0) { // First will add cost to move crane to old container location
             cost += Math.abs(node.move[NEW][ROW] - move[OLD][ROW]) // add vertical crane distance to cost
@@ -982,29 +982,27 @@ function isSIFTed(state) { // returns true if SIFTed, false if not
     let SIFTrow = 0 // what row of SIFTing we're on
     while (weights.length > 0) {
         for (let i = 0; i < 6; i++) {
-            let row = 0
-            let column = 5 - i // checks left container in SIFT row
-            while (row < 9 && state[row][column].deadSpace == 1) // go to lowest container in column
-                row++
-            
-            row += SIFTrow // go to current SIFT row
+            for (let s = 0; s < 2; s++) { // what side we're checking (s: 0 = left, 1 = right)
+                var column // ship and SIFT is symmetric so need to check both left and right sides
+                if (s == 0)
+                    column = 5 - i // checks left container in SIFT row
+                else
+                    column = 6 + i // checks right container in SIFT row
 
-            if (row < 9) {
-                if (weights.length > 0) {
-                    let weight = weights.shift()
-                    if (state[row][column].container == null || state[row][column].container.weight != weight)
-                        return false
-                }
-                else return true
+                let row = 0
+                while (row < 9 && state[row][column].deadSpace == 1) // go to lowest container in column
+                    row++
+                
+                row += SIFTrow // go to current SIFT row
 
-                // ship is symmetric so SIFT container is on other side
-                column = 6 + i          // checks right container in SIFT row
-                if (weights.length > 0) {
-                    let weight = weights.shift()
-                    if (state[row][column].container == null || state[row][column].container.weight != weight)
-                        return false
+                if (row < 9) {
+                    if (weights.length > 0) {
+                        let weight = weights.shift()
+                        if (state[row][column].container == null || state[row][column].container.weight != weight)
+                            return false
+                    }
+                    else return true
                 }
-                else return true
             }
         } 
         SIFTrow++
@@ -1015,25 +1013,23 @@ function isSIFTed(state) { // returns true if SIFTed, false if not
     let row = 0
     while (weights.length > 0 && row < 8) {
         for (let i = 0; i < 6; i++) {
-            let column = 5 - i // checks left container in SIFT row
-            if (state[row][column].deadSpace == 0) {// if not a NAN
-                if (weights.length > 0) {
-                    let weight = weights.shift()
-                    if (state[row][column].container == null || state[row][column].container.weight != weight)
-                        return false
-                }
-                else return true
+            for (let s = 0; s < 2; s++) { // what side we're checking (s: 0 = left, 1 = right)
+                var column // ship and SIFT is symmetric so need to check both left and right sides
+                if (s == 0)
+                    column = 5 - i // checks left container in SIFT row
+                else
+                    column = 6 + i // checks right container in SIFT row
 
-                // ship is symmetric so SIFT container is on other side
-                column = 6 + i          // checks right container in SIFT row
-                if (weights.length > 0) {
-                    let weight = weights.shift()
-                    if (state[row][column].container == null || state[row][column].container.weight != weight)
-                        return false
+                if (state[row][column].deadSpace == 0) { // if not a NAN
+                    if (weights.length > 0) {
+                        let weight = weights.shift()
+                        if (state[row][column].container == null || state[row][column].container.weight != weight) // if SIFT container is not there
+                            return false
+                    }
+                    else return true
                 }
-                else return true
             }
-        } 
+        }
         row++
     }
 
@@ -1050,38 +1046,30 @@ function getSIFTHeuristicCost(state) { // returns true if SIFTed, false if not
     let SIFTrow = 0 // what row of SIFTing we're on
     while (weights.length > 0) {
         for (let i = 0; i < 6; i++) {
-            let row = 0
-            let column = 5 - i
-            while (row < 9 && state[row][column].deadSpace == 1) // go to lowest container in column
-                row++
-            
-            row += SIFTrow // go to current SIFT row
-            
-            if (row < 9) {
-                let startRow = row // save starting row for checking the right side
-                if (weights.length > 0) { // checks left container in SIFT row
-                    let weight = weights.shift()
-                    if (state[row][column].container == null || state[row][column].container.weight != weight) { // if the SIFT container is not there   
-                        while (row < 9 && state[row][column].container !== null) { // adds cost of moving all containers out of that spot
-                            cost += 100000 // need to clear the SIFT cells of all other containers (top priority)
-                            row++
-                        }
-                    }
-                    else cost -= 100000 // subtract from cost any SIFT cells that already have their proper containers
-                }
+            for (let s = 0; s < 2; s++) { // what side we're checking (s: 0 = left, 1 = right)
+                var column // ship and SIFT is symmetric so need to check both left and right sides
+                if (s == 0)
+                    column = 5 - i // checks left container in SIFT row
+                else
+                    column = 6 + i // checks right container in SIFT row
 
-                // ship is symmetric so SIFT container is on other side
-                row = startRow
-                column = 6 + i          // checks right container in SIFT row
-                if (weights.length > 0) { // checks left container in SIFT row
-                    let weight = weights.shift()
-                    if (state[row][column].container == null || state[row][column].container.weight != weight) { // if the SIFT container is not there
-                        while (row < 9 && state[row][column].container !== null) { // adds cost of moving all containers out of that spot
-                            cost += 100000 // need to clear the SIFT cells of all other containers (top priority)
-                            row++
+                let row = 0
+                while (row < 9 && state[row][column].deadSpace == 1) // go to lowest container in column
+                    row++
+                
+                row += SIFTrow // go to current SIFT row
+                
+                if (row < 9) {
+                    if (weights.length > 0) { // checks left container in SIFT row
+                        let weight = weights.shift()
+                        if (state[row][column].container == null || state[row][column].container.weight != weight) { // if the SIFT container is not there
+                            while (row < 9 && state[row][column].container !== null) { // adds cost of moving all containers out of that spot
+                                cost += 100000 // need to clear the SIFT cells of all other containers (top priority)
+                                row++
+                            }
                         }
+                        else cost -= 100000 // subtract from cost any SIFT cells that already have their proper containers
                     }
-                    else cost -= 100000 // subtract from cost any SIFT cells that already have their proper containers
                 }
             }
         } 
@@ -1093,26 +1081,16 @@ function getSIFTHeuristicCost(state) { // returns true if SIFTed, false if not
     let row = 0
     while (weights.length > 0 && row < 8) {
         for (let i = 0; i < 6; i++) {
-            let currentRow = row // save current row to go back to it after
+            for (let s = 0; s < 2; s++) { // what side we're checking (s: 0 = left, 1 = right)
+                var column // ship and SIFT is symmetric so need to check both left and right sides
+                if (s == 0)
+                    column = 5 - i // checks left container in SIFT row
+                else
+                    column = 6 + i // checks right container in SIFT row
 
-            let column = 5 - i // checks left container in SIFT row
-            if (state[row][column].deadSpace == 0) { // if not a NAN
-                if (weights.length > 0) {
-                    let weight = weights.shift()
-                    if (state[row][column].container == null || state[row][column].container.weight != weight) { // if the SIFT container is not there   
-                        while (row < 9 && state[row][column].container !== null) { // adds cost of moving all containers out of that spot
-                            cost += 100000 // need to clear the SIFT cells of all other containers (top priority)
-                            row++
-                        }
-                    }
-                    else cost -= 100000 // subtract from cost any SIFT cells that already have their proper containers
-                }
+                let currentRow = row // save current row to go back to it after
 
-                row = currentRow // go back to current row
-
-                // ship is symmetric so SIFT container is on other side
-                column = 6 + i          // checks right container in SIFT row
-                if (weights.length > 0) {
+                if (state[row][column].deadSpace == 0 && weights.length > 0) { // if not a NAN
                     let weight = weights.shift()
                     if (state[row][column].container == null || state[row][column].container.weight != weight) { // if the SIFT container is not there
                         while (row < 9 && state[row][column].container !== null) { // adds cost of moving all containers out of that spot
@@ -1122,8 +1100,8 @@ function getSIFTHeuristicCost(state) { // returns true if SIFTed, false if not
                     }
                     else cost -= 100000 // subtract from cost any SIFT cells that already have their proper containers
                 }
+                row = currentRow // go back to current row
             }
-            row = currentRow // go back to current row
         } 
         row++
     }

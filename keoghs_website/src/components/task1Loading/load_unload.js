@@ -462,7 +462,12 @@ function getPathCost(node, move) {
     }
     else if(oldLocation === 3 && newLocation === 1) //truck to ship
     {
-        
+        if(node.final_loc.loc === 1)
+        {
+            cost+=2
+            cost += Math.abs(8 - node.final_loc.pos[ROW]) // add vertical crane distance to cost
+            cost += Math.abs(0 - node.final_loc.pos[COLUMN]) // add vertical crane distance to cost
+        }
         cost += 2 //time it takes to go from pink portal to
 
         let left = 0

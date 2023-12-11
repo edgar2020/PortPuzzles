@@ -1,13 +1,13 @@
 import React, { useEffect, useState, Component } from 'react';
 // function to print a State or 2D array of ship
-function consolePrintState(state) {
-    
+function consolePrintState(node) {
+    let state = node.shipState
     for (let row = 8; row >= 0; row--) {
         let a = []
         a.push(row + 1)
         for (let column = 0; column < 12; column++) {
             if (state[row][column].container)
-                a.push(state[row][column].container.weight)
+                a.push(state[row][column].container.name[0])
             else if (state[row][column].deadSpace)
                 a.push("X")
             else   
@@ -22,6 +22,32 @@ function consolePrintState(state) {
         a.push(i)
     }
     console.log(a.join('\t'))
+
+    console.log(node.loads_left);
+    console.log(node.unloads_left);
+}
+function printShip(ship) {
+    for (let row = 8; row >= 0; row--) {
+        let a = []
+        a.push(row + 1)
+        for (let column = 0; column < 12; column++) {
+            if (ship[row][column].container)
+                a.push(ship[row][column].container.name[0])
+            else if (ship[row][column].deadSpace)
+                a.push("X")
+            else   
+                a.push('•')
+        }
+        console.log(a.join('\t'))
+    }
+
+    let a = []
+    a.push(' ')
+    for (let i = 1; i < 13; i++) {
+        a.push(i)
+    }
+    console.log(a.join('\t'))
+
 }
 
 //function to print a Node
@@ -300,10 +326,16 @@ function getMove(state, start, end)
                 return []
             column++
         }
-        // next check if there is a container in oldColumn
+        
         let newRow = 0
         while (newRow < 8 && (state[newRow][newColumn].container !== null || state[newRow][newColumn].deadSpace == true)) // finds top empty cell in new column
             newRow++ // increment if cell has container
+
+        if(newRow === 8)
+            {
+                return []
+            }
+
 
         return [{pos: [0, 0], loc: 3},{pos: [newRow, newColumn], loc: 1}] // the move is returned     
     }
@@ -318,7 +350,7 @@ function getMove(state, start, end)
     // buffer to ship
 }
 
-function getNewState(oldState, move) {
+function getNewState(oldState, move, container) {
     let oldLocation = move[OLD].loc
     let oldPos = move[OLD].pos
     let newLocation = move[NEW].loc
@@ -338,8 +370,12 @@ function getNewState(oldState, move) {
         return newState
     } else if(oldLocation === 3 && newLocation === 1) //moving truck to ship
     {
+        // console.log(container)
         // TODO getNewState for truuck to ship (make it so you can call a container over)
-        // newState[newPos[ROW]][newPos[COLUMN]] = oldState[oldPos[ROW]][oldPos[COLUMN]] // container is now in new cell    
+        newState[newPos[ROW]][newPos[COLUMN]] = {container: container, deadSpace: false, offload: false} // container is now in new cell    
+        printShip(newState)
+        console.log("-------------");
+        // console.log(newState[newPos[ROW]][newPos[COLUMN]])
         return newState
     } else
     {
@@ -460,7 +496,7 @@ function getHeuristicCost(node, move) {
 
 function expand(frontier, node) { // branching function, max 12x11 branches
     console.log("EXPANDING NODE ")
-
+    // consolePrintState(node)
     // TODO: look at the columns of all containers to remove (coordinates are NOT 0 indexed)
     // TODO: Look at columns with container to be remove - move to truck (if removable),move to other column, move to buffer,
     // TODO: Load Container onto ship in a column that does not have a container to be removeed
@@ -566,17 +602,20 @@ function expand(frontier, node) { // branching function, max 12x11 branches
             } 
         }
     }
-    // try adding a container
-    if(node.loads_left.length >0 )
+    // try adding a container from truck to ship
+    if(node.loads_left.length > 0 )
     {
         let columns_Without_ContainersToMove = [0,1,2,3,4,5,6,7,8,9,10,11].filter(x => !columns_With_ContainersToMove.includes(x));
         
         for(let destCol in columns_Without_ContainersToMove)
         {
+            // console.log("DestCol: "+destCol);
             let move = getMove(node.shipState, {loc: 3, col: 1}, {loc: 1, col: parseInt(destCol)})
             if(move.length>0)
             {
-                let tempState = getNewState(node.shipState, move)
+                let newListOfLoads = structuredClone(node.loads_left)
+                let curContainer = newListOfLoads.shift();
+                let tempState = getNewState(node.shipState, move, curContainer)
                 let tempStateID = mapStates.get(JSON.stringify(tempState.shipState))
                 
                 // If this state has not been explored/found
@@ -587,13 +626,12 @@ function expand(frontier, node) { // branching function, max 12x11 branches
                     tempNode.heuristicCost = getHeuristicCost(tempState, move[NEW])        
                     tempNode.initial_loc = move[OLD]
                     tempNode.final_loc = move[NEW]
-                    let newListOfLoads = structuredClone(node.loads_left)
-                    newListOfLoads.shift();
                     tempNode.loads_left = newListOfLoads
                     tempNode.unloads_left = structuredClone(node.unloads_left)
                     tempNode.parent = structuredClone(node);
                     
                     mapStates.set(JSON.stringify(tempNode.shipState), tempNode);
+                   
                     frontier.push(tempNode)
                 } 
             }

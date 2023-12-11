@@ -171,8 +171,8 @@ function finalStateSearch(ss, loads, unloads) {
         // If this node reaches the goal, return the node 
         if (taskComplete(curr_node)) 
         {
-            // console.log("SUCCESS! Instructions:")
-            // return
+            console.log("SUCCESS! Instructions:")
+            return;
             // return getInstructions(node)
         }
 
@@ -198,7 +198,6 @@ function getMove(state, start, end)
     // if move from ship tp ship
     if(start.location === '1' && end.location === '1')
     {
-        // console.log("ship to ship");
         let column = Math.min(oldColumn + 1, newColumn + 1)
         while (column < Math.max(oldColumn, newColumn)) {
             if (state[8][column].deadSpace == 1 || state[8][column].container !== null) // returns invalid if impossible to move from oldColumn to newColumn
@@ -206,7 +205,6 @@ function getMove(state, start, end)
 
             column++
         }
-
         // next check if there is a container in oldColumn
         let oldRow = 0
         while (oldRow < 9 && state[oldRow][oldColumn].deadSpace == 1)
@@ -224,13 +222,40 @@ function getMove(state, start, end)
                 
         return [{location: '1', pos: [oldRow, oldColumn]},{location: '1', pos: [newRow, newColumn]}] // the move is returned               
     }
-    else if(start.location === '1' && end.location === '3')  // move shift to truck
+    else if(start.location === '1' && end.location === '3')  // move ship to truck
     {
-        // TODO getMove for ship to truck
+        let column = oldColumn;
+        while (column >= 0) { //pink square is 8,0
+            if (state[8][column].deadSpace == true || state[8][column].container !== null) // returns invalid if impossible to move from oldColumn to newColumn
+                return []
+            column--
+        }
+        // next check if there is a container in oldColumn
+        let oldRow = 0
+        while (oldRow < 8 && state[oldRow][oldColumn].deadSpace == true) //find where unusable slots stops
+            oldRow++
+        if (oldRow == 8 || state[oldRow][oldColumn].container === null) // returns invalid if no containers in oldColumn
+            return []
+
+        while (oldRow < 9 && state[oldRow + 1][oldColumn].container !== null) // finds top container row in old column
+            oldRow++ // increment if container on top of cell
+
+        return [{location: '1', pos: [oldRow, oldColumn]},{location: '3', pos: [1, 1]}] // the move is returned              
     }
     else if(start.location === '3' && end.location === '1')// move truck to ship
     {
-        // TODO getMove for truck to ship
+        let column = 0;
+        while (column <= newColumn) { //pink square is 8,0
+            if (state[8][column].deadSpace == true || state[8][column].container !== null) // returns invalid if impossible to move from oldColumn to newColumn
+                return []
+            column++
+        }
+        // next check if there is a container in oldColumn
+        let newRow = 0
+        while (newRow < 8 && (state[newRow][newColumn].container !== null || state[newRow][newColumn].deadSpace == true)) // finds top empty cell in new column
+            newRow++ // increment if cell has container
+
+        return [{location: '3', pos: [1, 1]},{location: '1', pos: [newRow, newColumn]}] // the move is returned     
     }
     else
     {
@@ -327,10 +352,46 @@ function getPathCost(node, move) {
     }
     else if(oldLocation === '1' && newLocation === '3') //ship to truck
     {
+        let left = 0
+        let right = oldPos[COLUMN]
+
+        cost += Math.abs(node.final_loc.pos[COLUMN] - oldPos[COLUMN]) // add horizontal crane distance to cost 
+        cost += Math.abs(node.final_loc.pos[ROW] - oldPos[ROW]) // add vertical crane distance to cost 
+
+        let maxMoveHeight = Math.max(node.final_loc.pos[ROW], oldPos[ROW])
+        left = Math.min(node.final_loc.pos[COLUMN], oldPos[COLUMN])
+        right = Math.max(node.final_loc.pos[COLUMN], oldPos[COLUMN])
+
+        // add any additional cost caused by containers blocking path
+        let maxObstacleHeight = maxMoveHeight    
+        for (let column = left + 1; column < right; column++) { // for all columns between old and new locations
+            let row = 0
+            while (row < 9 && node.shipState[row][column].deadSpace == true)
+                row++
+            while (row < 9 && node.shipState[row][column].container !== null)
+                row++
+            if (row > maxObstacleHeight)
+                maxObstacleHeight = row
+        }
+         cost += 2 * (maxObstacleHeight - maxMoveHeight) // what goes up must come down
+
+         cost += Math.abs(8 - oldPos[ROW]) // add vertical crane distance to cost
+         cost += Math.abs(0 - oldPos[COLUMN]) // add vertical crane distance to cost
+         cost += 2 //time it takes to go from pink portal to
+        return cost
+
     }
     else if(oldLocation === '3' && newLocation === '1') //truck to ship
     {
+        
+        cost += 2 //time it takes to go from pink portal to
 
+        let left = 0
+        let right = newPos[COLUMN]
+
+        cost += Math.abs(0 - newPos[COLUMN]) // add horizontal crane distance to cost 
+        cost += Math.abs(8 - newPos[ROW]) // add vertical crane distance to cost 
+        return cost
     }
     else
     {
@@ -371,6 +432,8 @@ function expand(frontier, node) { // branching function, max 12x11 branches
     }
     // remove duplicates columns
     columns_With_ContainersToMove = [... new Set(columns_With_ContainersToMove)]
+
+    // got to the columns with a container that need to be offloaded
     for(let i = 0; i < columns_With_ContainersToMove.length; i++)
     {
         let origCol = columns_With_ContainersToMove[i]
@@ -382,11 +445,13 @@ function expand(frontier, node) { // branching function, max 12x11 branches
         }
         // curContainer is the current container that will be moved
         let curContainer = node.shipState[rowNum][origCol];
+        let startOfMove = {location: '1', col: origCol}
+    
+        // create a node for where a blocking container can move too
         if(curContainer.offload !== true) //container does not need to be removed
         {
             // if not moving container just moved OR doing first move 
             if (origCol != node.final_loc.pos[COLUMN] || node.parent === null) {
-                let startOfMove = {location: '1', col: origCol}
                 for (let destCol = 0; destCol < 12; destCol++) 
                 {
                     let endOfMove = {location: '1', col: destCol}
@@ -417,24 +482,85 @@ function expand(frontier, node) { // branching function, max 12x11 branches
                     }
                 }
             }
-        } else //moving to truck
+        } 
+        else //create a node where container to be offloaded is moved from ship to truck
         {
-            // TODO move to truck
-            // console.log("can mvoe to truck");
+            let endOfMove = {location: '3', col: 0}
+            let move = getMove(node.shipState, startOfMove, endOfMove)
+            let tempState = getNewState(node.shipState, move)
+            let tempStateID = mapStates.get(JSON.stringify(tempState.shipState))
+            // console.log(move[OLD].pos)
+            // If this state has not been explored/found
+            if (tempStateID === undefined) 
+            {
+                let tempNode = new Node(tempState, [])
+                tempNode.pathCost = node.pathCost + getPathCost(node, move)
+                tempNode.heuristicCost = getHeuristicCost(tempState, move[NEW])        
+                tempNode.initial_loc = move[OLD]
+                tempNode.final_loc = move[NEW]
+                tempNode.loads_left = structuredClone(node.loads_left)
+                let newListOfUnloads = structuredClone(node.unloads_left);
+                for(let it = 0; it < newListOfUnloads.length; it++)
+                {
+                    if(move[OLD].pos[COLUMN] === newListOfUnloads[it][COLUMN] && move[OLD].pos[ROW] === newListOfUnloads[it][ROW])
+                    {
+                        newListOfUnloads.splice(it, 1);
+                        break;
+                    }
+                }
+                tempNode.unloads_left = newListOfUnloads
+                tempNode.parent = tempStateID
+                
+                mapStates.set(JSON.stringify(tempNode.shipState), tempNode);
+                frontier.push(tempNode)
+            } 
+        }
+    }
+    // try adding a container
+    if(node.loads_left.length >0 )
+    {
+        let columns_Without_ContainersToMove = [0,1,2,3,4,5,6,7,8,9,10,11].filter(x => !columns_With_ContainersToMove.includes(x));
+        
+        for(let destCol in columns_Without_ContainersToMove)
+        {
+            let move = getMove(node.shipState, {location: '3', col: 1}, {location: '1', col: parseInt(destCol)})
+            if(move.length>0)
+            {
+                let tempState = getNewState(node.shipState, move)
+                let tempStateID = mapStates.get(JSON.stringify(tempState.shipState))
+                
+                // If this state has not been explored/found
+                if (tempStateID === undefined) 
+                {
+                    let tempNode = new Node(tempState, [])
+                    tempNode.pathCost = node.pathCost + getPathCost(node, move)
+                    tempNode.heuristicCost = getHeuristicCost(tempState, move[NEW])        
+                    tempNode.initial_loc = move[OLD]
+                    tempNode.final_loc = move[NEW]
+                    let newListOfLoads = structuredClone(node.loads_left)
+                    newListOfLoads.shift();
+                    tempNode.loads_left = newListOfLoads
+                    tempNode.unloads_left = structuredClone(node.unloads_left)
+                    tempNode.parent = tempStateID
+                    
+                    mapStates.set(JSON.stringify(tempNode.shipState), tempNode);
+                    frontier.push(tempNode)
+                } 
+            }
         }
 
     }
     // for every column with container to remove ==
         // find the container at the very top ==
             // if it needs to go to the truck ==
-                // create a new node where the container was moved to truck
-            // else (it does not need to be removed)
-                // do something
-                // create a node for every column where the container is not currently in
+                // create a new node where the container was moved to truck==
+            // else (it does not need to be removed)==
+                // do something==
+                // create a node for every column where the container is not currently in==
                 // TODO: currently not considereing the buffer
-    // if containers to load
-        // for every available column
-            // create a node where the container is moved to that column
+    // if containers to load==
+        // for every available column==
+            // create a node where the container is moved to that column==
 
 
     // console.log(frontier.length)
@@ -443,6 +569,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
 
 function taskComplete(node) // returns true if no unloading/loading to be done
 {
+    // console.log(node.loads_left.length + " - "+ node.unloads_left.length);
     if(node.loads_left.length === 0 && node.unloads_left.length === 0)
     {
         finished_load = true;

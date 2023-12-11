@@ -1,11 +1,11 @@
 import React,{ Component } from 'react';
-import '../tasks.css';
+import '../../css/tasks.css';
 import FileUploader from '../fileUploader';
 import ToggleGrid from './toggleGrid';
 import ComputeSteps from './load_unload';
 
-// import DisplaySteps from '../displaySteps';
-// import { balance } from './balancingSearchAlgorithm';
+import DisplaySteps from '../displaySteps';
+
 import {saveEvent } from '../../logFile'
 
 import AddContainers from './addContainers';
@@ -165,6 +165,8 @@ import AddContainers from './addContainers';
       
       return (
         <div>
+          
+            <div className='loadedFileName'>Current File: {this.state.loadedFileName}</div>
             <div id="loadUnloadInputs" className='page'>
               <AddContainers parentAddContainers={this.handleNewContainers} />
               <ToggleGrid parentToggleButton={this.handleButtonToggle} numberToOffload={LocalNumberToOffload} grid={grid}/>
@@ -175,10 +177,10 @@ import AddContainers from './addContainers';
                 </button>
               </div>
             </div>
+            <br/>
+            <br/>
+            <br/>
           </div>
-
-
-      //  </div> 
       );
     }
     // #TODO: #3 logic for Computeing the steps (where our search function is going to go) 
@@ -193,7 +195,7 @@ import AddContainers from './addContainers';
     renderShowSteps() {
       return (
        <>
-          {/* <DisplaySteps fileName={this.state.loadedFileName} steps={steps} /> */}
+          <DisplaySteps fileName={this.state.loadedFileName} steps={steps} />
         </>
       );
     }

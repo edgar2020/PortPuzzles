@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './tasks.css' 
+import '../css/tasks.css' 
 
 
 
@@ -16,7 +16,7 @@ class FileUploader extends Component
     
     sendDataUp = (event) => {
         // Call the parent callback function 
-        this.props.parentCallback( {name: this.fileName, text: this.textFromFile});
+        this.props.parentCallback( {name: this.fileName, text: this.textFromFile.trim()});
         // event.preventDefault();
     }
 

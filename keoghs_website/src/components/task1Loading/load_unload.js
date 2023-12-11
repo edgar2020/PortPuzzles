@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Component } from 'react';
-
 // function to print a State or 2D array of ship
 function consolePrintState(state) {
+    
     for (let row = 8; row >= 0; row--) {
         let a = []
         a.push(row + 1)
@@ -32,7 +32,7 @@ function show_Node(node)
     s += "\tH: " + node.heuristicCost;
     s += "\tF: " + node.f;
     
-    // consolePrintState(node.state)
+    // consolePrintState(node.shipState)
     console.log("----------------------------------")
     console.log("\tUnloads left: "+ node.unloads_left.length)
     console.log("\tLoads left: "+ node.loads_left.length)
@@ -45,6 +45,11 @@ const rows = 9
 const cols = 12
 let finished_load = false;
 let finished_unload = false;
+
+const OLD = 0
+const NEW = 1
+const ROW = 0
+const COLUMN = 1
 
 let list_of_unloads = [] // assuming fileReader gives me this array/list
 let list_of_loads = [] //assuming fileReader gives me this number 
@@ -59,24 +64,16 @@ let num_iterations = 0 // start at 0, increment at each iteration
 class Node {
 	constructor(ship, buffer) {
 		this.shipState = structuredClone(ship) // should make a copy of "ship" grid array
-
-        // Added buffer state
+        // TODO Added buffer state
 		this.bufferState = structuredClone(buffer) // Buffer for the array
 		this.pathCost = 0
 		this.heuristicCost = 0
-
-        // on;y needed for sort and sort is already using p+h
-        // this.f = this.pathCost + this.heuristicCost // f = g+h
-        
 		this.parent = null // copy of previous Node
-
         this.unloads_left = [] // list of containers coordinates left to be unloaded
-        // changed loads_left to be an array of containers that still need to be offloaded
-        // that way it will be easier to copy container data to the ship
         this.loads_left = [] // list of containers left to be loaded
         // location: '1' if ship, '2' if buffer, '3' if truck, also changed format to better mimic adolfos
-        this.initial_loc = {location: '1', pos: [9, 0]} // initial location of crane
-        this.final_loc = {location: '1', pos: [9,0]}  // final location of crane
+        this.initial_loc = {location: '1', pos: [8, 0]} // initial location of crane
+        this.final_loc = {location: '1', pos: [8,0]}  // final location of crane
 	}
 
     //function to check if two nodes are equal
@@ -112,7 +109,8 @@ class Node {
 }
 
 // GENERAL SEARCH ALGORITHM (searches for states, enqueues explored ones, checks if its final state )
-function finalStateSearch(shipState, loads, unloads) {
+function finalStateSearch(ss, loads, unloads) {
+
     console.log("Starting algo");
     
     // condition where no steps necessary (working)
@@ -125,10 +123,10 @@ function finalStateSearch(shipState, loads, unloads) {
     
     // returns instructions for fastest load/unload
     // TODO add buffer instead of []
-    let initialNode = new Node(shipState, [])
+    let initialNode = new Node(structuredClone(ss), [])
 
     // hash map for repeated states
-    mapStates.set(initialNode.shipState, initialNode);
+    mapStates.set(JSON.stringify(initialNode.shipState), initialNode);
     
     if(unloads.length!=0)
     {
@@ -173,11 +171,12 @@ function finalStateSearch(shipState, loads, unloads) {
         // If this node reaches the goal, return the node 
         if (taskComplete(curr_node)) 
         {
-            console.log("SUCCESS! Instructions:")
+            // console.log("SUCCESS! Instructions:")
+            // return
             // return getInstructions(node)
         }
 
-        frontier = expand(frontier, explored, curr_node)
+        frontier = expand(frontier, curr_node)
     }
 
     // If there are no paths left to explore, return null to indicate that the goal cannot be reached
@@ -185,28 +184,250 @@ function finalStateSearch(shipState, loads, unloads) {
     return null //Should never reach here
 }
 
-function expand(frontier, explored, node) { // branching function, max 12x11 branches
-    console.log("EXPANDING NODE")
+// state is the 2d ship array
+// old columm where move originates( use index aka start at 0)
+// new columm where move ends( use index aka start at 0)
+
+function getMove(state, start, end)
+{ // returns empty array if move is invalid
+    // first check what type of move it is
+    // ship to ship
+    let oldColumn = start.col
+    let newColumn = end.col
+
+    // if move from ship tp ship
+    if(start.location === '1' && end.location === '1')
+    {
+        // console.log("ship to ship");
+        let column = Math.min(oldColumn + 1, newColumn + 1)
+        while (column < Math.max(oldColumn, newColumn)) {
+            if (state[8][column].deadSpace == 1 || state[8][column].container !== null) // returns invalid if impossible to move from oldColumn to newColumn
+                return []
+
+            column++
+        }
+
+        // next check if there is a container in oldColumn
+        let oldRow = 0
+        while (oldRow < 9 && state[oldRow][oldColumn].deadSpace == 1)
+            oldRow++
+        if (oldRow == 9 || state[oldRow][oldColumn].container === null) // returns invalid if no containers in oldColumn
+            return []
+
+        while (oldRow < 8 && state[oldRow + 1][oldColumn].container !== null) // finds top container row in old column
+            oldRow++ // increment if container on top of cell
+
+        let newRow = 0
+        while (newRow < 9 && (state[newRow][newColumn].container !== null || state[newRow][newColumn].deadSpace == 1)) // finds top empty cell in new column
+            newRow++ // increment if cell has container
+
+                
+        return [{location: '1', pos: [oldRow, oldColumn]},{location: '1', pos: [newRow, newColumn]}] // the move is returned               
+    }
+    else if(start.location === '1' && end.location === '3')  // move shift to truck
+    {
+        // TODO getMove for ship to truck
+    }
+    else if(start.location === '3' && end.location === '1')// move truck to ship
+    {
+        // TODO getMove for truck to ship
+    }
+    else
+    {
+        // TODO buffer stuff
+    }
+    return [];
+    // ship to truck 
+    // truck to ship
+    // ship tp buffer
+    // buffer to ship
+}
+
+function getNewState(oldState, move) {
+    let oldLocation = move[OLD].location
+    let oldPos = move[OLD].pos
+    let newLocation = move[NEW].location
+    let newPos = move[NEW].pos
+    
+    var newState = structuredClone(oldState) //2d ship array
+    
+    // console.log(oldState);
+    if(oldLocation === '1' && newLocation === '1')// moving from ship to ship
+    {
+        newState[oldPos[ROW]][oldPos[COLUMN]] = {container: null, deadSpace: false} // replace old location with empty cell
+        newState[newPos[ROW]][newPos[COLUMN]] = oldState[oldPos[ROW]][oldPos[COLUMN]] // container is now in new cell    
+        return newState
+    } else if (oldLocation === '1' && newLocation === '3') //moving ship to truck
+    {
+        newState[oldPos[ROW]][oldPos[COLUMN]] = {container: null, deadSpace: false} // replace old location with empty cell
+        return newState
+    } else if(oldLocation === '3' && newLocation === '1') //moving truck to ship
+    {
+        // TODO getNewState for truuck to ship (make it so you can call a container over)
+        // newState[newPos[ROW]][newPos[COLUMN]] = oldState[oldPos[ROW]][oldPos[COLUMN]] // container is now in new cell    
+        return newState
+    } else
+    {
+        // TODO buffer stuff
+    }
+    // 
+
+    // newState[move[OLD][ROW]][move[OLD][COLUMN]] = {container: null, deadSpace: false} // replace old location with empty cell
+    // newState[move[NEW][ROW]][move[NEW][COLUMN]] = oldState[move[OLD][ROW]][move[OLD][COLUMN]] // container is now in new cell    
+    return newState
+}
+
+function getPathCost(node, move) {
+    let oldLocation = move[OLD].location
+    let oldPos = move[OLD].pos
+    let newLocation = move[NEW].location
+    let newPos = move[NEW].pos
+
+    let cost = 0
+    // cost of path within ship
+    if(oldLocation === '1' && newLocation === '1')
+    {
+        // first initializes values to calculate cost moving crane to position
+        let maxMoveHeight = Math.max(node.final_loc.pos[ROW], oldPos[ROW])
+        let left = Math.min(node.final_loc.pos[COLUMN], oldPos[COLUMN])
+        let right = Math.max(node.final_loc.pos[COLUMN], oldPos[COLUMN])
+        
+        for (let i = 0; i < 2; i++) {
+            // add Manhattan Distance to cost
+            if (i == 0) { // First will add cost to move crane to old container location
+                cost += Math.abs(node.final_loc.pos[ROW] - oldPos[ROW]) // add vertical crane distance to cost
+                cost += Math.abs(node.final_loc.pos[COLUMN] - oldPos[COLUMN]) // add horizontal crane distance to cost 
+            } 
+            else { // Then will add actual cost of move
+                cost += Math.abs(newPos[ROW] - oldPos[ROW]) // add vertical distance to cost
+                cost += Math.abs(newPos[COLUMN] - oldPos[COLUMN]) // add horizontal distance to cost
+
+                maxMoveHeight = Math.max(newPos[ROW], oldPos[ROW])
+                left = Math.min(newPos[COLUMN], oldPos[COLUMN])
+                right = Math.max(newPos[COLUMN], oldPos[COLUMN])
+            }
+
+            // add any additional cost caused by containers blocking path
+            let maxObstacleHeight = maxMoveHeight    
+            for (let column = left + 1; column < right; column++) { // for all columns between old and new locations
+                let row = 0
+                while (row < 9 && node.shipState[row][column].deadSpace == 1)
+                    row++
+                
+                while (row < 9 && node.shipState[row][column].container !== null)
+                    row++
+                
+                if (row > maxObstacleHeight)
+                    maxObstacleHeight = row
+            }
+            cost += 2 * (maxObstacleHeight - maxMoveHeight) // what goes up must come down
+        }
+        // console.log(cost);
+        return cost
+    }
+    else if(oldLocation === '1' && newLocation === '3') //ship to truck
+    {
+    }
+    else if(oldLocation === '3' && newLocation === '1') //truck to ship
+    {
+
+    }
+    else
+    {
+        // TODO buffer stuff
+    }
+    
+    return cost
+}
+function getHeuristicCost(node, move) {
+    let H = 0
+    
+    
+    return H
+}
+
+
+function expand(frontier, node) { // branching function, max 12x11 branches
+    console.log("EXPANDING NODE ")
 
     // TODO: look at the columns of all containers to remove (coordinates are NOT 0 indexed)
     // TODO: Look at columns with container to be remove - move to truck (if removable),move to other column, move to buffer,
     // TODO: Load Container onto ship in a column that does not have a container to be removeed
-    let columns_With_ContainersToRemove = []; 
-    // find all columns with containers to remove
+    let columns_With_ContainersToMove = []; 
+    // find all columns with containers to remove in them
     for(var i = 0; i < node.unloads_left.length; i++)
     {
-        columns_With_ContainersToRemove.push(node.unloads_left[i][0]);
+        columns_With_ContainersToMove.push(node.unloads_left[i][1]);
+    }
+    // add all columns with containers in the 9th row
+    for(var i = 0; i < 12; i++)
+    {
+        try {
+            if(node.shipState[8][i].container !== null)
+            {
+                columns_With_ContainersToMove.push(i);
+            }
+        } catch (error) {console.log(error)}
     }
     // remove duplicates columns
-    columns_With_ContainersToRemove = [... new Set(columns_With_ContainersToRemove)]
-    let columns_Without_ContainersToRemove = [1,2,3,4,5,6,7,8,9,10,11,12].filter(x => !columns_With_ContainersToRemove.includes(x));
-    // console.log(columns_With_ContainersToRemove)
-    // console.log(columns_Without_ContainersToRemove)
-    
-    // for every column with container to remove
-        // find the container at the very top
-            // if it needs to go to the truck
-                // create a new node where the container was moved to a new truck
+    columns_With_ContainersToMove = [... new Set(columns_With_ContainersToMove)]
+    for(let i = 0; i < columns_With_ContainersToMove.length; i++)
+    {
+        let origCol = columns_With_ContainersToMove[i]
+        let rowNum = 0;
+        // find container at the top of the column
+        while(rowNum < 8 && node.shipState[rowNum+1][origCol].container != null)
+        {
+            rowNum++;
+        }
+        // curContainer is the current container that will be moved
+        let curContainer = node.shipState[rowNum][origCol];
+        if(curContainer.offload !== true) //container does not need to be removed
+        {
+            // if not moving container just moved OR doing first move 
+            if (origCol != node.final_loc.pos[COLUMN] || node.parent === null) {
+                let startOfMove = {location: '1', col: origCol}
+                for (let destCol = 0; destCol < 12; destCol++) 
+                {
+                    let endOfMove = {location: '1', col: destCol}
+                    if (destCol !== origCol && node.shipState[8][destCol].container === null) 
+                    { // if not making redundant move, and coulumn has available spot at top
+                        let move = getMove(node.shipState, startOfMove, endOfMove)
+                        if(move.length>0)
+                        {
+                            let tempState = getNewState(node.shipState, move)
+                            let tempStateID = mapStates.get(JSON.stringify(tempState.shipState))
+                            
+                            // If this state has not been explored/found
+                            if (tempStateID === undefined) 
+                            {
+                                let tempNode = new Node(tempState, [])
+                                tempNode.pathCost = node.pathCost + getPathCost(node, move)
+                                tempNode.heuristicCost = getHeuristicCost(tempState, move[NEW])        
+                                tempNode.initial_loc = move[OLD]
+                                tempNode.final_loc = move[NEW]
+                                tempNode.loads_left = structuredClone(node.loads_left)
+                                tempNode.unloads_left = structuredClone(node.unloads_left)
+                                tempNode.parent = tempStateID
+                                
+                                mapStates.set(JSON.stringify(tempNode.shipState), tempNode);
+                                frontier.push(tempNode)
+                            } 
+                        }
+                    }
+                }
+            }
+        } else //moving to truck
+        {
+            // TODO move to truck
+            // console.log("can mvoe to truck");
+        }
+
+    }
+    // for every column with container to remove ==
+        // find the container at the very top ==
+            // if it needs to go to the truck ==
+                // create a new node where the container was moved to truck
             // else (it does not need to be removed)
                 // do something
                 // create a node for every column where the container is not currently in
@@ -216,7 +437,7 @@ function expand(frontier, explored, node) { // branching function, max 12x11 bra
             // create a node where the container is moved to that column
 
 
-    
+    // console.log(frontier.length)
     return frontier
 }
 
@@ -252,28 +473,16 @@ function checkStatesEqual(state1, state2)
 
 async function main(shipState, load_list)
 {
-    // load list porperly loaded 
-        // console.log("Load List: ");
-        // console.log(load_list);
-    // Ship state properly loaded
-        // console.log("Ship: ");
-        // console.log(shipState);
-    // list_of_loads properly assigned
-    // console.log("READING CONTAINERS TO UNLOAD")
-    // list_of_loads = load_list;
     for(let i=0; i< rows-1; i++)
     {
         for(let j=0; j<cols; j++)
         {
             if(shipState[i][j].offload == true)
             {
-                // console.log("i: "+i,"j: "+j)
-                // console.log(shipState[i][j].container)
-                list_of_unloads.push([i+1, j+1])
+                list_of_unloads.push([i, j])
             }
         }
     }
-    // console.log(list_of_unloads);
     finalStateSearch(shipState, load_list, list_of_unloads)
     
 }

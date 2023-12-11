@@ -23,8 +23,7 @@ function consolePrintState(node) {
     }
     console.log(a.join('\t'))
 
-    console.log(node.loads_left);
-    console.log(node.unloads_left);
+    console.log("H: "+ node.heuristicCost);
 }
 function printShip(ship) {
     for (let row = 8; row >= 0; row--) {
@@ -484,9 +483,62 @@ function getPathCost(node, move) {
     
     return cost
 }
-function getHeuristicCost(node, move) {
+function getHeuristicCost(shipState, toUnload, toLoad ) {
     let H = 0
+    // minimum cost of moving containers from toLoad
+    for(let i = 0; i < toLoad.length; i++)
+    {
+        H += 3+i;
+
+    }
+    // calculate the cost of manhattan distance for every container to offload
+    for(let j = 0; j < toUnload.length; j++)
+    {
+        H += 8-toUnload[j][ROW] //vertical distance
+        // console.log("("+toUnload[j][ROW]+", "+toUnload[j][COLUMN]+")")
+        H += toUnload[j][COLUMN] //horizontal distance
+        H += 2 //cost to get to ship
+    }
+
+    // Add cost of containers blocking the unloads
+    let columns_With_ContainersToMove = []; 
+    // find all columns with containers to remove in them
+    for(var i = 0; i < toUnload.length; i++)
+    {
+        columns_With_ContainersToMove.push(toUnload[i][COLUMN]);
+    }
+    // remove duplicate columns
+    columns_With_ContainersToMove = [... new Set(columns_With_ContainersToMove)]
+    for(var i = 0; i < columns_With_ContainersToMove.length; i++)
+    {
+        let seenOffload = false;
+        let col = columns_With_ContainersToMove[i];
+        // check every row except row 8
+        for(let row = 0; row <= 7; row++)
+        {
+            // if a container whose offload === false add a cost
+            if(shipState[row][col].offload === true)
+            {
+                seenOffload = true;
+            }
+            else if(seenOffload && shipState[row][col].container !== null && shipState[row][col].offload === false)
+            {
+                H++;
+            }
+        }
+    }
     
+    // console.log("H3:"+H)
+    // add cost for anything in the 9th row
+    for(var col = 0; col < 12; col++)
+    {
+        if(shipState[8][col].container !== null)
+        {
+            H += 2
+        }
+    }
+
+    // console.log("H4:"+H)
     
     return H
 }
@@ -494,6 +546,7 @@ function getHeuristicCost(node, move) {
 
 function expand(frontier, node) { // branching function, max 12x11 branches
     console.log("EXPANDING NODE ")
+    // consolePrintState(node);
     // consolePrintState(node)
     // TODO: look at the columns of all containers to remove (coordinates are NOT 0 indexed)
     // TODO: Look at columns with container to be remove - move to truck (if removable),move to other column, move to buffer,
@@ -502,7 +555,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
     // find all columns with containers to remove in them
     for(var i = 0; i < node.unloads_left.length; i++)
     {
-        columns_With_ContainersToMove.push(node.unloads_left[i][1]);
+        columns_With_ContainersToMove.push(node.unloads_left[i][COLUMN]);
     }
     // add all columns with containers in the 9th row
     for(var i = 0; i < 12; i++)
@@ -551,12 +604,14 @@ function expand(frontier, node) { // branching function, max 12x11 branches
                             if (tempStateID === undefined) 
                             {
                                 let tempNode = new Node(tempState, [])
+                                let unloads = structuredClone(node.unloads_left)
+                                let loads = structuredClone(node.loads_left)
+                                tempNode.heuristicCost = getHeuristicCost(tempState, unloads, loads)        
+                                tempNode.loads_left = loads
+                                tempNode.unloads_left = unloads
                                 tempNode.pathCost = node.pathCost + getPathCost(node, move)
-                                tempNode.heuristicCost = getHeuristicCost(tempState, move[NEW])        
                                 tempNode.initial_loc = move[OLD]
                                 tempNode.final_loc = move[NEW]
-                                tempNode.loads_left = structuredClone(node.loads_left)
-                                tempNode.unloads_left = structuredClone(node.unloads_left)
                                 tempNode.parent = structuredClone(node);
                                 
                                 mapStates.set(JSON.stringify(tempNode.shipState), tempNode);
@@ -578,21 +633,22 @@ function expand(frontier, node) { // branching function, max 12x11 branches
             if (tempStateID === undefined) 
             {
                 let tempNode = new Node(tempState, [])
-                tempNode.pathCost = node.pathCost + getPathCost(node, move)
-                tempNode.heuristicCost = getHeuristicCost(tempState, move[NEW])        
-                tempNode.initial_loc = move[OLD]
-                tempNode.final_loc = move[NEW]
-                tempNode.loads_left = structuredClone(node.loads_left)
-                let newListOfUnloads = structuredClone(node.unloads_left);
-                for(let it = 0; it < newListOfUnloads.length; it++)
+                let loads = structuredClone(node.loads_left)
+                let unloads = structuredClone(node.unloads_left);
+                for(let it = 0; it < unloads.length; it++)
                 {
-                    if(move[OLD].pos[COLUMN] === newListOfUnloads[it][COLUMN] && move[OLD].pos[ROW] === newListOfUnloads[it][ROW])
+                    if(move[OLD].pos[COLUMN] === unloads[it][COLUMN] && move[OLD].pos[ROW] === unloads[it][ROW])
                     {
-                        newListOfUnloads.splice(it, 1);
+                        unloads.splice(it, 1);
                         break;
                     }
                 }
-                tempNode.unloads_left = newListOfUnloads
+                tempNode.heuristicCost = getHeuristicCost(tempState, unloads, loads)        
+                tempNode.loads_left = loads
+                tempNode.unloads_left = unloads
+                tempNode.pathCost = node.pathCost + getPathCost(node, move)
+                tempNode.initial_loc = move[OLD]
+                tempNode.final_loc = move[NEW]
                 tempNode.parent = structuredClone(node);
                 
                 mapStates.set(JSON.stringify(tempNode.shipState), tempNode);
@@ -611,8 +667,8 @@ function expand(frontier, node) { // branching function, max 12x11 branches
             let move = getMove(node.shipState, {loc: 3, col: 1}, {loc: 1, col: parseInt(destCol)})
             if(move.length>0)
             {
-                let newListOfLoads = structuredClone(node.loads_left)
-                let curContainer = newListOfLoads.shift();
+                let loads = structuredClone(node.loads_left)
+                let curContainer = loads.shift();
                 let tempState = getNewState(node.shipState, move, curContainer)
                 let tempStateID = mapStates.get(JSON.stringify(tempState.shipState))
                 
@@ -620,12 +676,13 @@ function expand(frontier, node) { // branching function, max 12x11 branches
                 if (tempStateID === undefined) 
                 {
                     let tempNode = new Node(tempState, [])
+                    let unloads = structuredClone(node.unloads_left)
+                    tempNode.heuristicCost = getHeuristicCost(tempState, unloads, loads)        
+                    tempNode.loads_left = loads
+                    tempNode.unloads_left = unloads
                     tempNode.pathCost = node.pathCost + getPathCost(node, move)
-                    tempNode.heuristicCost = getHeuristicCost(tempState, move[NEW])        
                     tempNode.initial_loc = move[OLD]
                     tempNode.final_loc = move[NEW]
-                    tempNode.loads_left = newListOfLoads
-                    tempNode.unloads_left = structuredClone(node.unloads_left)
                     tempNode.parent = structuredClone(node);
                     
                     mapStates.set(JSON.stringify(tempNode.shipState), tempNode);

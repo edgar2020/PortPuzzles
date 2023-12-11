@@ -343,8 +343,8 @@ function compareStates(state1, state2) {// returns true if the states are the sa
 
 function getMove(state, oldColumn, newColumn) { // returns empty array if move is invalid
     // first check if it possible to move from oldCoumn to newColumn
-    let column = oldColumn + 1
-    while (column < newColumn) {
+    let column = Math.min(oldColumn + 1, newColumn + 1)
+    while (column < Math.max(oldColumn, newColumn)) {
         if (state[8][column].deadSpace == 1 || state[8][column].container !== null) // returns invalid if impossible to move from oldColumn to newColumn
             return []
 

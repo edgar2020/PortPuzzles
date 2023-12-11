@@ -71,9 +71,9 @@ class Node {
 		this.parent = null // copy of previous Node
         this.unloads_left = [] // list of containers coordinates left to be unloaded
         this.loads_left = [] // list of containers left to be loaded
-        // location: '1' if ship, '2' if buffer, '3' if truck, also changed format to better mimic adolfos
-        this.initial_loc = {location: '1', pos: [8, 0]} // initial location of crane
-        this.final_loc = {location: '1', pos: [8,0]}  // final location of crane
+        // loc: '1' if ship, '2' if buffer, '3' if truck, also changed format to better mimic adolfos
+        this.initial_loc = {pos: [8, 0], loc: '1' } // initial location of crane
+        this.final_loc = {pos: [8,0], loc: '1', }  // final location of crane
 	}
 
     //function to check if two nodes are equal
@@ -156,6 +156,7 @@ function finalStateSearch(ss, loads, unloads) {
             console.log("FAILURE: Unable to find load/unload operation list in time")
             console.log("Final manifest preview shown below:\n")
             // return getInstructions(min_f)
+            return
         }
 
         // Sort the paths in the frontier by f(g+h), with the lowest-cost paths first
@@ -172,8 +173,9 @@ function finalStateSearch(ss, loads, unloads) {
         if (taskComplete(curr_node)) 
         {
             console.log("SUCCESS! Instructions:")
-            return;
-            // return getInstructions(node)
+            // console.log(curr_node)
+            // return;
+            return getInstructions(curr_node)
         }
 
         frontier = expand(frontier, curr_node)
@@ -183,6 +185,50 @@ function finalStateSearch(ss, loads, unloads) {
     console.log("ERROR: No paths left to explore found!")
     return null //Should never reach here
 }
+
+
+function getInstructions(node) { // Calls recursive function to return all steps
+    // console.log(node);
+    // console.log(1);
+    var instructions = []
+    // console.log(2);
+	instructions = getInstructionsHelper(node, 0, instructions)
+    
+    let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
+    let state = {ship: node.shipState, buffer: buffer, truck: 0}
+
+    instructions.push({cost: 0, state: state, initialPos: {pos: [-1, -1], loc: 1}, finalPos: {pos: [-1 , -1], loc: 1}})
+
+    console.log("ACTUAL COST: " + instructions[0].cost)
+
+    //return {cost: node.pathCost, steps: instructions}
+    console.log(instructions);
+    return instructions
+}
+
+function getInstructionsHelper(node, cost, instructions) { // Recursively returns instructions in order
+    if(node.parent === null)
+    {
+        return instructions
+    }
+    // console.log(node.parent);
+    cost += node.pathCost - node.parent.pathCost
+
+    // Retruns steps in order but not the very first redundant one (used to store intial crane position)
+    if (node.parent != null && node.parent.parent != null)
+        getInstructionsHelper(node.parent, cost, instructions)
+    
+    //instructions.push(node.move)
+    //instructions.push({stepCost: (node.pathCost - node.parent.pathCost), stepState: node.state, step: node.move})
+    
+    let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
+    let state = {ship: node.parent.shipState, buffer: buffer, truck: 0}
+
+    instructions.push({cost: cost, state: state, initialPos: node.initial_loc, finalPos: node.final_loc})
+
+    return instructions
+}
+
 
 // state is the 2d ship array
 // old columm where move originates( use index aka start at 0)
@@ -196,7 +242,7 @@ function getMove(state, start, end)
     let newColumn = end.col
 
     // if move from ship tp ship
-    if(start.location === '1' && end.location === '1')
+    if(start.loc === '1' && end.loc === '1')
     {
         let column = Math.min(oldColumn + 1, newColumn + 1)
         while (column < Math.max(oldColumn, newColumn)) {
@@ -220,9 +266,9 @@ function getMove(state, start, end)
             newRow++ // increment if cell has container
 
                 
-        return [{location: '1', pos: [oldRow, oldColumn]},{location: '1', pos: [newRow, newColumn]}] // the move is returned               
+        return [{pos: [oldRow, oldColumn], loc: '1'},{pos: [newRow, newColumn], loc: '1'}] // the move is returned               
     }
-    else if(start.location === '1' && end.location === '3')  // move ship to truck
+    else if(start.loc === '1' && end.loc === '3')  // move ship to truck
     {
         let column = oldColumn;
         while (column >= 0) { //pink square is 8,0
@@ -240,9 +286,9 @@ function getMove(state, start, end)
         while (oldRow < 9 && state[oldRow + 1][oldColumn].container !== null) // finds top container row in old column
             oldRow++ // increment if container on top of cell
 
-        return [{location: '1', pos: [oldRow, oldColumn]},{location: '3', pos: [1, 1]}] // the move is returned              
+        return [{pos: [oldRow, oldColumn], loc: '1'},{pos: [1, 1], loc: '1'}] // the move is returned              
     }
-    else if(start.location === '3' && end.location === '1')// move truck to ship
+    else if(start.loc === '3' && end.loc === '1')// move truck to ship
     {
         let column = 0;
         while (column <= newColumn) { //pink square is 8,0
@@ -255,7 +301,7 @@ function getMove(state, start, end)
         while (newRow < 8 && (state[newRow][newColumn].container !== null || state[newRow][newColumn].deadSpace == true)) // finds top empty cell in new column
             newRow++ // increment if cell has container
 
-        return [{location: '3', pos: [1, 1]},{location: '1', pos: [newRow, newColumn]}] // the move is returned     
+        return [{pos: [1, 1], loc: '1'},{pos: [newRow, newColumn], loc: '1'}] // the move is returned     
     }
     else
     {
@@ -269,9 +315,9 @@ function getMove(state, start, end)
 }
 
 function getNewState(oldState, move) {
-    let oldLocation = move[OLD].location
+    let oldLocation = move[OLD].loc
     let oldPos = move[OLD].pos
-    let newLocation = move[NEW].location
+    let newLocation = move[NEW].loc
     let newPos = move[NEW].pos
     
     var newState = structuredClone(oldState) //2d ship array
@@ -303,9 +349,9 @@ function getNewState(oldState, move) {
 }
 
 function getPathCost(node, move) {
-    let oldLocation = move[OLD].location
+    let oldLocation = move[OLD].loc
     let oldPos = move[OLD].pos
-    let newLocation = move[NEW].location
+    let newLocation = move[NEW].loc
     let newPos = move[NEW].pos
 
     let cost = 0
@@ -445,7 +491,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
         }
         // curContainer is the current container that will be moved
         let curContainer = node.shipState[rowNum][origCol];
-        let startOfMove = {location: '1', col: origCol}
+        let startOfMove = {loc: '1', col: origCol}
     
         // create a node for where a blocking container can move too
         if(curContainer.offload !== true) //container does not need to be removed
@@ -454,7 +500,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
             if (origCol != node.final_loc.pos[COLUMN] || node.parent === null) {
                 for (let destCol = 0; destCol < 12; destCol++) 
                 {
-                    let endOfMove = {location: '1', col: destCol}
+                    let endOfMove = {loc: '1', col: destCol}
                     if (destCol !== origCol && node.shipState[8][destCol].container === null) 
                     { // if not making redundant move, and coulumn has available spot at top
                         let move = getMove(node.shipState, startOfMove, endOfMove)
@@ -473,7 +519,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
                                 tempNode.final_loc = move[NEW]
                                 tempNode.loads_left = structuredClone(node.loads_left)
                                 tempNode.unloads_left = structuredClone(node.unloads_left)
-                                tempNode.parent = tempStateID
+                                tempNode.parent = structuredClone(node);
                                 
                                 mapStates.set(JSON.stringify(tempNode.shipState), tempNode);
                                 frontier.push(tempNode)
@@ -485,7 +531,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
         } 
         else //create a node where container to be offloaded is moved from ship to truck
         {
-            let endOfMove = {location: '3', col: 0}
+            let endOfMove = {loc: '3', col: 0}
             let move = getMove(node.shipState, startOfMove, endOfMove)
             let tempState = getNewState(node.shipState, move)
             let tempStateID = mapStates.get(JSON.stringify(tempState.shipState))
@@ -509,7 +555,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
                     }
                 }
                 tempNode.unloads_left = newListOfUnloads
-                tempNode.parent = tempStateID
+                tempNode.parent = structuredClone(node);
                 
                 mapStates.set(JSON.stringify(tempNode.shipState), tempNode);
                 frontier.push(tempNode)
@@ -523,7 +569,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
         
         for(let destCol in columns_Without_ContainersToMove)
         {
-            let move = getMove(node.shipState, {location: '3', col: 1}, {location: '1', col: parseInt(destCol)})
+            let move = getMove(node.shipState, {loc: '3', col: 1}, {loc: '1', col: parseInt(destCol)})
             if(move.length>0)
             {
                 let tempState = getNewState(node.shipState, move)
@@ -541,7 +587,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
                     newListOfLoads.shift();
                     tempNode.loads_left = newListOfLoads
                     tempNode.unloads_left = structuredClone(node.unloads_left)
-                    tempNode.parent = tempStateID
+                    tempNode.parent = structuredClone(node);
                     
                     mapStates.set(JSON.stringify(tempNode.shipState), tempNode);
                     frontier.push(tempNode)

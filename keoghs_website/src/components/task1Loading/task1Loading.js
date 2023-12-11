@@ -49,7 +49,8 @@ import AddContainers from './addContainers';
         [ {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}],//9th row
       ];
     let steps = null;
-  let containersToLoad = [new Container("AA", null), new Container("BB", null), new Container("CC", null)];
+  let containersToLoad = [new Container("AA", null)];
+  // let containersToLoad = [new Container("AA", null), new Container("BB", null), new Container("CC", null)];
   // let containersToLoad = [];
   let LocalNumberToOffload = 0;
 
@@ -151,9 +152,9 @@ import AddContainers from './addContainers';
       {
         return (
           <div>
-          <ComputeSteps parentRecieveSteps={this.recieveSteps} load = {containersToLoad} grid={grid} />
-          <ToggleGrid parentToggleButton={this.handleButtonToggle} numberToOffload={LocalNumberToOffload} grid={grid}/>
-          {/* <FileUploader parentCallback={this.handleFileCallback}/> */}
+          {/* <ComputeSteps parentRecieveSteps={this.recieveSteps} load = {containersToLoad} grid={grid} />
+          <ToggleGrid parentToggleButton={this.handleButtonToggle} numberToOffload={LocalNumberToOffload} grid={grid}/> */}
+          <FileUploader parentCallback={this.handleFileCallback}/>
         </div>
       );
       
@@ -184,7 +185,7 @@ import AddContainers from './addContainers';
     renderComputeSteps() {
       return (
         <>
-        <ComputeSteps parentRecieveSteps={this.recieveSteps} load = {containersToLoad} grid={grid} />
+          <ComputeSteps parentRecieveSteps={this.recieveSteps} load = {containersToLoad} grid={grid} />
         </>
       );
     }

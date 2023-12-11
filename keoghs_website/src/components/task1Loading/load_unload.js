@@ -71,9 +71,9 @@ class Node {
 		this.parent = null // copy of previous Node
         this.unloads_left = [] // list of containers coordinates left to be unloaded
         this.loads_left = [] // list of containers left to be loaded
-        // loc: '1' if ship, '2' if buffer, '3' if truck, also changed format to better mimic adolfos
-        this.initial_loc = {pos: [8, 0], loc: '1' } // initial location of crane
-        this.final_loc = {pos: [8,0], loc: '1', }  // final location of crane
+        // loc: 1 if ship, 2 if buffer, 3 if truck, also changed format to better mimic adolfos
+        this.initial_loc = {pos: [8, 0], loc: 1 } // initial location of crane
+        this.final_loc = {pos: [8,0], loc: 1 }  // final location of crane
 	}
 
     //function to check if two nodes are equal
@@ -112,19 +112,18 @@ class Node {
 function finalStateSearch(ss, loads, unloads) {
 
     console.log("Starting algo");
-    
     // condition where no steps necessary (working)
     if(unloads.length == 0 && loads.length == 0)
     {
-            console.log(" --!!NOTHING TO LOAD/UNLOAD!!-- ")
-            // TODO add return object here
-            return
+        console.log(" --!!NOTHING TO LOAD/UNLOAD!!-- ")
+        // TODO add return object here
+        return
     }
     
     // returns instructions for fastest load/unload
     // TODO add buffer instead of []
     let initialNode = new Node(structuredClone(ss), [])
-
+    
     // hash map for repeated states
     mapStates.set(JSON.stringify(initialNode.shipState), initialNode);
     
@@ -136,7 +135,7 @@ function finalStateSearch(ss, loads, unloads) {
     {
         initialNode.loads_left = loads
     }
-
+    
     console.log("---Printing initial node--")
     show_Node(initialNode)
     console.log(initialNode)
@@ -242,7 +241,7 @@ function getMove(state, start, end)
     let newColumn = end.col
 
     // if move from ship tp ship
-    if(start.loc === '1' && end.loc === '1')
+    if(start.loc === 1 && end.loc === 1)
     {
         let column = Math.min(oldColumn + 1, newColumn + 1)
         while (column < Math.max(oldColumn, newColumn)) {
@@ -266,9 +265,9 @@ function getMove(state, start, end)
             newRow++ // increment if cell has container
 
                 
-        return [{pos: [oldRow, oldColumn], loc: '1'},{pos: [newRow, newColumn], loc: '1'}] // the move is returned               
+        return [{pos: [oldRow, oldColumn], loc: 1},{pos: [newRow, newColumn], loc: 1}] // the move is returned               
     }
-    else if(start.loc === '1' && end.loc === '3')  // move ship to truck
+    else if(start.loc === 1 && end.loc === 3)  // move ship to truck
     {
         let column = oldColumn;
         while (column >= 0) { //pink square is 8,0
@@ -286,9 +285,9 @@ function getMove(state, start, end)
         while (oldRow < 9 && state[oldRow + 1][oldColumn].container !== null) // finds top container row in old column
             oldRow++ // increment if container on top of cell
 
-        return [{pos: [oldRow, oldColumn], loc: '1'},{pos: [1, 1], loc: '1'}] // the move is returned              
+        return [{pos: [oldRow, oldColumn], loc: 1},{pos: [0, 0], loc: 3}] // the move is returned              
     }
-    else if(start.loc === '3' && end.loc === '1')// move truck to ship
+    else if(start.loc === 3 && end.loc === 1)// move truck to ship
     {
         let column = 0;
         while (column <= newColumn) { //pink square is 8,0
@@ -301,7 +300,7 @@ function getMove(state, start, end)
         while (newRow < 8 && (state[newRow][newColumn].container !== null || state[newRow][newColumn].deadSpace == true)) // finds top empty cell in new column
             newRow++ // increment if cell has container
 
-        return [{pos: [1, 1], loc: '1'},{pos: [newRow, newColumn], loc: '1'}] // the move is returned     
+        return [{pos: [0, 0], loc: 3},{pos: [newRow, newColumn], loc: 1}] // the move is returned     
     }
     else
     {
@@ -323,16 +322,16 @@ function getNewState(oldState, move) {
     var newState = structuredClone(oldState) //2d ship array
     
     // console.log(oldState);
-    if(oldLocation === '1' && newLocation === '1')// moving from ship to ship
+    if(oldLocation === 1 && newLocation === 1)// moving from ship to ship
     {
         newState[oldPos[ROW]][oldPos[COLUMN]] = {container: null, deadSpace: false} // replace old location with empty cell
         newState[newPos[ROW]][newPos[COLUMN]] = oldState[oldPos[ROW]][oldPos[COLUMN]] // container is now in new cell    
         return newState
-    } else if (oldLocation === '1' && newLocation === '3') //moving ship to truck
+    } else if (oldLocation === 1 && newLocation === 3) //moving ship to truck
     {
         newState[oldPos[ROW]][oldPos[COLUMN]] = {container: null, deadSpace: false} // replace old location with empty cell
         return newState
-    } else if(oldLocation === '3' && newLocation === '1') //moving truck to ship
+    } else if(oldLocation === 3 && newLocation === 1) //moving truck to ship
     {
         // TODO getNewState for truuck to ship (make it so you can call a container over)
         // newState[newPos[ROW]][newPos[COLUMN]] = oldState[oldPos[ROW]][oldPos[COLUMN]] // container is now in new cell    
@@ -356,7 +355,7 @@ function getPathCost(node, move) {
 
     let cost = 0
     // cost of path within ship
-    if(oldLocation === '1' && newLocation === '1')
+    if(oldLocation === 1 && newLocation === 1)
     {
         // first initializes values to calculate cost moving crane to position
         let maxMoveHeight = Math.max(node.final_loc.pos[ROW], oldPos[ROW])
@@ -396,7 +395,7 @@ function getPathCost(node, move) {
         // console.log(cost);
         return cost
     }
-    else if(oldLocation === '1' && newLocation === '3') //ship to truck
+    else if(oldLocation === 1 && newLocation === 3) //ship to truck
     {
         let left = 0
         let right = oldPos[COLUMN]
@@ -427,7 +426,7 @@ function getPathCost(node, move) {
         return cost
 
     }
-    else if(oldLocation === '3' && newLocation === '1') //truck to ship
+    else if(oldLocation === 3 && newLocation === 1) //truck to ship
     {
         
         cost += 2 //time it takes to go from pink portal to
@@ -491,7 +490,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
         }
         // curContainer is the current container that will be moved
         let curContainer = node.shipState[rowNum][origCol];
-        let startOfMove = {loc: '1', col: origCol}
+        let startOfMove = {loc: 1, col: origCol}
     
         // create a node for where a blocking container can move too
         if(curContainer.offload !== true) //container does not need to be removed
@@ -500,7 +499,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
             if (origCol != node.final_loc.pos[COLUMN] || node.parent === null) {
                 for (let destCol = 0; destCol < 12; destCol++) 
                 {
-                    let endOfMove = {loc: '1', col: destCol}
+                    let endOfMove = {loc: 1, col: destCol}
                     if (destCol !== origCol && node.shipState[8][destCol].container === null) 
                     { // if not making redundant move, and coulumn has available spot at top
                         let move = getMove(node.shipState, startOfMove, endOfMove)
@@ -531,7 +530,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
         } 
         else //create a node where container to be offloaded is moved from ship to truck
         {
-            let endOfMove = {loc: '3', col: 0}
+            let endOfMove = {loc: 3, col: 0}
             let move = getMove(node.shipState, startOfMove, endOfMove)
             let tempState = getNewState(node.shipState, move)
             let tempStateID = mapStates.get(JSON.stringify(tempState.shipState))
@@ -569,7 +568,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
         
         for(let destCol in columns_Without_ContainersToMove)
         {
-            let move = getMove(node.shipState, {loc: '3', col: 1}, {loc: '1', col: parseInt(destCol)})
+            let move = getMove(node.shipState, {loc: 3, col: 1}, {loc: 1, col: parseInt(destCol)})
             if(move.length>0)
             {
                 let tempState = getNewState(node.shipState, move)
@@ -646,9 +645,9 @@ function checkStatesEqual(state1, state2)
 
 async function main(shipState, load_list)
 {
-    for(let i=0; i< rows-1; i++)
+    for(let i=0; i< 8; i++)
     {
-        for(let j=0; j<cols; j++)
+        for(let j=0; j<11; j++)
         {
             if(shipState[i][j].offload == true)
             {
@@ -656,7 +655,7 @@ async function main(shipState, load_list)
             }
         }
     }
-    finalStateSearch(shipState, load_list, list_of_unloads)
+    return finalStateSearch(shipState, load_list, list_of_unloads)
     
 }
 // Display the component on the screen

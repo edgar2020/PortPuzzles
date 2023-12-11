@@ -49,9 +49,9 @@ import AddContainers from './addContainers';
         [ {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}],//9th row
       ];
     let steps = null;
-  let containersToLoad = [new Container("AA", null)];
+  // let containersToLoad = [new Container("AA", null)];
   // let containersToLoad = [new Container("AA", null), new Container("BB", null), new Container("CC", null)];
-  // let containersToLoad = [];
+  let containersToLoad = [];
   let LocalNumberToOffload = 0;
 
   class task1Loading extends Component {

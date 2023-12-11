@@ -118,17 +118,17 @@ function finalStateSearch(ss, loads, unloads) {
 
     console.log("Starting algo");
     // condition where no steps necessary (working)
-    if(unloads.length == 0 && loads.length == 0)
-    {
-        console.log(" --!!NOTHING TO LOAD/UNLOAD!!-- ")
-        
-        return getInstructions(ss);
-    }
+    
     
     // returns instructions for fastest load/unload
     // TODO add buffer instead of []
     let initialNode = new Node(structuredClone(ss), [])
-    
+    if(unloads.length == 0 && loads.length == 0)
+    {
+        console.log(" --!!NOTHING TO LOAD/UNLOAD!!-- ")
+        
+        return getInstructions(initialNode);
+    }
     // hash map for repeated states
     mapStates.set(JSON.stringify(initialNode.shipState), initialNode);
     
@@ -215,7 +215,7 @@ function getInstructionsHelper(node, cost, instructions) { // Recursively return
     {
         return instructions
     }
-    // console.log(node.parent);
+    console.log(node);
     cost += node.pathCost - node.parent.pathCost
 
     // Retruns steps in order but not the very first redundant one (used to store intial crane position)

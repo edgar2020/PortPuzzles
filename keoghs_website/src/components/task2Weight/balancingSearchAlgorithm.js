@@ -70,7 +70,8 @@ async function balance(ship) {  // returns instructions to balance, already bala
 
         // returns empty instructions if already balanced
         return [{cost: 0, state: state, initialPos: {pos: [-1, -1], loc: 1}, finalPos: {pos: [-1, -1], loc: 1}}]
-    } else { // if balance is impossible, searches for a SIFT and returns the instructions
+    } 
+    else { // if balance is impossible, searches for a SIFT and returns the instructions
         console.log("UNBALANCED & IMPOSSIBLE TO BALANCE, SIFTING...")
         return performSIFT(ship)
     }
@@ -286,12 +287,10 @@ function getStateID(state) { // returns (almost) unique ID for each state
         
         while (row < 9 && state[row][column].container !== null) {
             // NEED TO FIND UNIQUE COMBINATION FOR EACH POSSIBLE STATE (test when all containers have weight 1)
-
-
-            //id += state[row][column].container.weight * (row + 1) * (column + 1) // fastest but not accurate
-
+            
             //id += state[row][column].container.weight * Math.pow(10, row) * (row + 1) * (column + 1) // slower but (almost) accurate
-
+            
+            //id += state[row][column].container.weight * (row + 1) * (column + 1) // fastest but not accurate
             //id += state[row][column].container.weight * Math.pow(10, row) * ((row + 1) * (column + 1) + row + column) // NEED TO TEST
             //id += state[row][column].container.weight * ((row + 1) * (column + 1) + row + column) // not accurate
             //id += (state[row][column].container.weight + (row * 10)) * ((row + 1) * (column + 1) + row + column) // even slower but not accurate

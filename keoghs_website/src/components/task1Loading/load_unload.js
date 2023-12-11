@@ -657,16 +657,13 @@ function taskComplete(node) // returns true if no unloading/loading to be done
         {
             if(node.shipState[8][c].container !== null)
             {
-                console.log("fs");
                 return false
             }
         }
-        console.log("passed");
         finished_load = true;
         finished_unload = true;
         return true;
     }
-    console.log("failed");
     return false;
 }
 

@@ -149,12 +149,7 @@ function finalStateSearch(ss, loads, unloads) {
     // returns instructions for fastest load/unload
     // TODO add buffer instead of []
     let initialNode = new Node(structuredClone(ss), [])
-    if(unloads.length == 0 && loads.length == 0)
-    {
-        console.log(" --!!NOTHING TO LOAD/UNLOAD!!-- ")
-        
-        return getInstructions(initialNode);
-    }
+    
     // hash map for repeated states
     mapStates.set(JSON.stringify(initialNode.shipState), initialNode);
     
@@ -373,8 +368,6 @@ function getNewState(oldState, move, container) {
         // console.log(container)
         // TODO getNewState for truuck to ship (make it so you can call a container over)
         newState[newPos[ROW]][newPos[COLUMN]] = {container: container, deadSpace: false, offload: false} // container is now in new cell    
-        printShip(newState)
-        console.log("-------------");
         // console.log(newState[newPos[ROW]][newPos[COLUMN]])
         return newState
     } else
@@ -657,18 +650,23 @@ function expand(frontier, node) { // branching function, max 12x11 branches
 
 function taskComplete(node) // returns true if no unloading/loading to be done
 {
-    // console.log(node.loads_left.length + " - "+ node.unloads_left.length);
-    if(node.loads_left.length === 0 && node.unloads_left.length === 0)
+    if(node.loads_left.length <= 0 && node.unloads_left.length <= 0)
     {
-        for(let row = 0; row <= 11; row++)
+        // checls that no containers in the 9th row
+        for(let c = 0; c <= 11; c++)
         {
-            if(node.shipState[8][row] !== null)
+            if(node.shipState[8][c].container !== null)
+            {
+                console.log("fs");
                 return false
+            }
         }
+        console.log("passed");
         finished_load = true;
         finished_unload = true;
         return true;
     }
+    console.log("failed");
     return false;
 }
 

@@ -84,6 +84,7 @@
 {
   margin:  0 auto;
   width: 90%;
+  line-height: 5px;
   height: 150px;
   margin-bottom: 10px;
   border:3px double;
@@ -130,16 +131,18 @@ align-self: end;
     grid-row-gap: 0px;
   }
   .individualStepContainerOuter.activeSlide {
-    animation-duration: 0.1s;
-    opacity: 1;
+    animation-duration: 0.07s;
+    visibility: visible;
+    /* opacity: 1; */
   }
   /* .individualStepContainerOuter.lastSlide {
     animation-duration: 0.1s;
     opacity: 1;
   } */
   .individualStepContainerOuter.nonActive {
-    animation-duration: 0.1s;
-    opacity: 0;
+    animation-duration: 0.07;
+    /* opacity: 0; */
+    visibility: hidden;
   }
 
   @keyframes animateInitial{ 

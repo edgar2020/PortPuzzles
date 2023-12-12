@@ -555,16 +555,16 @@ function getPathCost(node, move) {
 function getHeuristicCost(shipState, toUnload, toLoad ) {
     let H = 0
     
-    H += toLoad.length * 100000
+    H += toLoad.length * 100000 // add to H how many containers are left to load x big constant
 
     toUnload.forEach(container => {
         let row = container[ROW]
         let column = container[COLUMN]
         while (row < 9 && shipState[row][column].container !== null) {
-            H += 100000
+            H += 100000 // add to H how many containers are left to unload + number of containers on top x big constant
             row++
         }
-    });
+    })
     
     return H
 }

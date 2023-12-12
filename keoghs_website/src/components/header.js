@@ -1,7 +1,7 @@
 import React,{ Component } from 'react';
 import '../css/header.css';
 import { signIn } from '../logFile';
-import keoghLogo from '../other/placeholder-logo.png'
+import keoghLogo from '../other/Logo_3.png'
   
 
 class SiteHeader extends Component

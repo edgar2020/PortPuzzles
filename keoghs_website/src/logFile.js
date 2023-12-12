@@ -44,7 +44,6 @@ export async function signIn(name)
 
 }
 
-
 const LogPage = () =>
 {
     const [loading, setLoading] = useState(true);

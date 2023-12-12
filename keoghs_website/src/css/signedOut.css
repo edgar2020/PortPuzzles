@@ -76,11 +76,12 @@ used to create the snow fall animation
         transform:translateX(0px)
     }
 }
+
 .snowflake
 {
     position:fixed;
     top:-10%;
-    z-index:9999;
+    z-index:500;
     -webkit-user-select:none;
     -moz-user-select:none;
     -ms-user-select:none;

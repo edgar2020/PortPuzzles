@@ -356,7 +356,7 @@ function getMove(state, start, end)
 }
 
 function getNewState(oldState, move, container) {
-    console.log(move[OLD]);
+    // console.log(move[OLD]);
     let oldLocation = move[OLD].loc
     let oldPos = move[OLD].pos
     let newLocation = move[NEW].loc
@@ -579,12 +579,12 @@ function expand(frontier, node) { // branching function, max 12x11 branches
     // TODO: Load Container onto ship in a column that does not have a container to be removeed
     let columns_With_ContainersToMove = []; 
     // find all columns with containers to remove in them
-    for(var i = 0; i < node.unloads_left.length; i++)
+    for(let i = 0; i < node.unloads_left.length; i++)
     {
         columns_With_ContainersToMove.push(node.unloads_left[i][COLUMN]);
     }
     // add all columns with containers in the 9th row
-    for(var i = 0; i < 12; i++)
+    for(let i = 0; i < 12; i++)
     {
         try {
             if(node.shipState[8][i].container !== null)
@@ -594,7 +594,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
         } catch (error) {console.log(error)}
     }
     // remove duplicates columns
-    columns_With_ContainersToMove = [... new Set(columns_With_ContainersToMove)]
+    columns_With_ContainersToMove = [...new Set(columns_With_ContainersToMove)]
 
     // got to the columns with a container that need to be offloaded
     for(let i = 0; i < columns_With_ContainersToMove.length; i++)
@@ -812,7 +812,7 @@ function ComputeSteps(props)
            }
         }
         runAlgorithm();
-    }, []);
+    }, [props.grid, props.load]);
     if (isLoading) {
         return (
             <div id="UbloadingSteps">

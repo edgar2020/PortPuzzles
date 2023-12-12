@@ -1,7 +1,7 @@
 import React,{ Component } from 'react';
 import '../css/header.css';
 import { signIn } from '../logFile';
-import keoghLogo from '../other/placeholder-logo.png'
+import keoghLogo from '../other/Logo_3.png'
   
 
 class SiteHeader extends Component
@@ -37,7 +37,7 @@ class SiteHeader extends Component
         {/* right */}
 
         <div className='rightSideOfHeader'>
-          <h1 className='headerTitle'>Keogh's Port</h1>
+          <h1 className='headerTitle'>Keogha Port</h1>
           <div className="signInContainer">
             <form id="signInForm">
               <input id="signIn" className='signInInput' type="text" placeholder="Username" name="username" onChange={this.updateInput}/>

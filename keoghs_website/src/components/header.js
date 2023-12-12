@@ -61,7 +61,9 @@ class SiteHeader extends Component
             </form>
           </div>
         </div>
-        <button id='endOfYearSignOut' onClick={(e)=> this.endOfYearSignOut(e)}>End of Year</button>
+        { this.props.signOut &&
+            <button id='endOfYearSignOut' onClick={(e)=> this.endOfYearSignOut(e)}>End of Year</button>
+        }
 
 
       </div>

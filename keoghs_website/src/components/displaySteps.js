@@ -197,9 +197,7 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
         function checkAllowNext()
         {
             try {
-                let num = document.getElementById("addWeight");
                 console.log(initialPos);
-                let value = num.value
 
                 if(initialPos.loc !== 3)
                 {

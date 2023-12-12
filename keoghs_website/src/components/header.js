@@ -37,7 +37,7 @@ class SiteHeader extends Component
         {/* right */}
 
         <div className='rightSideOfHeader'>
-          <h1 className='headerTitle'>Keogh's Port</h1>
+          <h1 className='headerTitle'>Keogha Port</h1>
           <div className="signInContainer">
             <form id="signInForm">
               <input id="signIn" className='signInInput' type="text" placeholder="Username" name="username" onChange={this.updateInput}/>

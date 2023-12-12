@@ -70,30 +70,20 @@ async function balance(ship) {  // returns instructions to balance, already bala
     console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0], initializeStateMap(ship)))
     console.log("CHECKING BALANCE...")
 
-    if (isBalanced(ship)) { // returns the same input state if already balanced
-        console.log("ALREADY BALANCED")
+    if (balanceIsPossible(ship)) { // if balance is possible, searches for a balance and returns the instructions
+        if (isBalanced(ship))
+            console.log("ALREADY BALANCED")
+        else
+            console.log("UNBALANCED & BALANCE POSSIBLE, BALANCING...")
 
-        let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
-        let state = {ship: ship, buffer: buffer, truck: 0}
-
-        // returns empty instructions if already balanced
-        return [{cost: 0, state: state, initialPos: {pos: [-1, -1], loc: 1}, finalPos: {pos: [-1, -1], loc: 1}}]
-    } 
-    else if (balanceIsPossible(ship)) { // if balance is possible, searches for a balance and returns the instructions
-        console.log("UNBALANCED & BALANCE POSSIBLE, BALANCING...")
         return balanceSearch(ship) 
     } 
-    else if (isSIFTed(ship)) { // // if balance is impossibe, returns the same input state if already SIFTed
-        console.log("UNBALANCED & IMPOSSIBLE TO BALANCE, ALREADY SIFTED")
-
-        let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
-        let state = {ship: ship, buffer: buffer, truck: 0}
-
-        // returns empty instructions if already balanced
-        return [{cost: 0, state: state, initialPos: {pos: [-1, -1], loc: 1}, finalPos: {pos: [-1, -1], loc: 1}}]
-    } 
     else { // if balance is impossible, searches for a SIFT and returns the instructions
-        console.log("UNBALANCED & IMPOSSIBLE TO BALANCE, SIFTING...")
+        if (isSIFTed(ship))
+            console.log("UNBALANCED & IMPOSSIBLE TO BALANCE, ALREADY SIFTED")
+        else
+            console.log("UNBALANCED & IMPOSSIBLE TO BALANCE, SIFTING...")
+
         return performSIFT(ship)
     }
 
@@ -107,7 +97,7 @@ function isBalanced(state) { // returns true if balanced, false if isn't
     let topRowEmpty = true
     for (let column = 0; column < 12; column++) {
         let row = 0
-        while (row < 9 && state[row][column].deadSpace == 1)
+        while (row < 8 && state[row][column].deadSpace == 1)
             row++
         
         while (row < 9 && state[row][column].container !== null) {
@@ -308,7 +298,7 @@ function getStateID(state) { // returns (almost) unique ID for each state
     let id = 0
     for (let column = 0; column < 12; column++) {
         let row = 0
-        while (row < 9 && state[row][column].deadSpace == 1)
+        while (row < 8 && state[row][column].deadSpace == 1)
             row++
         
         while (row < 9 && state[row][column].container !== null) {
@@ -340,7 +330,7 @@ function compareStates(state1, state2) {// returns true if the states are the sa
     //console.log("HELLO")
     for (let column = 0; column < 12; column++) {
         let row = 0
-        while (row < 9 && (state1[row][column].deadSpace == 1 || state2[row][column].deadSpace == 1)) {
+        while (row < 8 && (state1[row][column].deadSpace == 1 || state2[row][column].deadSpace == 1)) {
             if (state1[row][column].deadSpace != state2[row][column].deadSpace) // if one state has a different NAN than the other
                 return false
 
@@ -378,17 +368,17 @@ function getMove(state, oldColumn, newColumn) { // returns empty array if move i
 
     // next check if there is a container in oldColumn
     let oldRow = 0
-    while (oldRow < 9 && state[oldRow][oldColumn].deadSpace == 1)
+    while (oldRow < 8 && state[oldRow][oldColumn].deadSpace == 1)
         oldRow++
-    if (oldRow == 9 || state[oldRow][oldColumn].container === null) // returns invalid if no containers in oldColumn
+    if (state[oldRow][oldColumn].container === null) // returns invalid if no containers in oldColumn
         return []
 
     while (oldRow < 8 && state[oldRow + 1][oldColumn].container !== null) // finds top container row in old column
         oldRow++ // increment if container on top of cell
 
     let newRow = 0
-    while (newRow < 9 && (state[newRow][newColumn].container !== null || state[newRow][newColumn].deadSpace == 1)) // finds top empty cell in new column
-        newRow++ // increment if cell has container
+    while (newRow < 8 && (state[newRow][newColumn].container !== null || state[newRow][newColumn].deadSpace == 1)) // finds top empty cell in new column
+        newRow++ // getMove assumes there is a empty cell on top of newColumn, else getMove isn't called
 
     return [[oldRow, oldColumn], [newRow, newColumn]] // the move is returned               
 }
@@ -448,10 +438,10 @@ function getPathCost(state, cranePos, move) {
         let maxObstacleHeight = maxMoveHeight    
         for (let column = left + 1; column < right; column++) { // for all columns between old and new locations
             let row = 0
-            while (row < 9 && state[row][column].deadSpace == 1)
+            while (row < 8 && state[row][column].deadSpace == 1)
                 row++
             
-            while (row < 9 && state[row][column].container !== null)
+            while (row < 8 && state[row][column].container !== null) // assumes no containers in top row between move columns
                 row++
             
             if (row > maxObstacleHeight)
@@ -1184,7 +1174,7 @@ function getWeightsSortedHeaviestToLightest(state) {
 
     for (let column = 0; column < 12; column++) {
         let row = 0
-        while (row < 9 && state[row][column].deadSpace == 1)
+        while (row < 8 && state[row][column].deadSpace == 1)
             row++
         
         while (row < 9 && state[row][column].container !== null) {

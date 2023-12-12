@@ -2,6 +2,9 @@ import React,{ Component } from 'react';
 import '../../css/tasks.css';
 import FileUploader from '../fileUploader';
 import ToggleGrid from './toggleGrid';
+import ComputeSteps from './load_unload';
+
+import DisplaySteps from '../displaySteps';
 
 import {saveEvent } from '../../logFile'
 
@@ -21,19 +24,33 @@ import AddContainers from './addContainers';
       this.weight = weight;
     }
   }
-
+  // let grid =
+  // [
+  //   [ {container: new Container("A", 2432), deadSpace: false, offload:true}, {container: new Container("J", 5442), deadSpace: false, offload: true}, {container: null, deadSpace: true}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: new Container("Q", 2432), deadSpace: false, offload:false}],
+  //   [ {container: new Container("B", 5442), deadSpace: false, offload: false}, {container: new Container("K", 5442), deadSpace: false, offload: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: new Container("R", 2432), deadSpace: false, offload:false}],
+  //   [ {container: new Container("C", 5442), deadSpace: false, offload: false}, {container: new Container("L", 5442), deadSpace: false, offload: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: new Container("S", 2432), deadSpace: false, offload:false}],
+  //   [ {container: new Container("D", 5442), deadSpace: false, offload: false}, {container: new Container("M", 5442), deadSpace: false, offload: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: new Container("T", 2432), deadSpace: false, offload:false}],
+  //   [ {container: new Container("E", 5442), deadSpace: false, offload: false}, {container: new Container("N", 5442), deadSpace: false, offload: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: new Container("U", 2432), deadSpace: false, offload:false}],
+  //   [ {container: new Container("F", 5442), deadSpace: false, offload: false}, {container: new Container("O", 5442), deadSpace: false, offload: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: new Container("V", 2432), deadSpace: false, offload:false}],
+  //   [ {container: new Container("G", 5442), deadSpace: false, offload: false}, {container: new Container("P", 5442), deadSpace: false, offload: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: new Container("W", 2432), deadSpace: false, offload:false}],
+  //   [ {container: new Container("H", 5442), deadSpace: false, offload: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: new Container("X", 2432), deadSpace: false, offload:false}],
+  //   [ {container: new Container("I", 5442), deadSpace: false, offload: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: new Container("Y", 2432), deadSpace: false, offload:false}] //9th row
+  // ];
   let grid =
       [
-        [ {container: new Container("amazon warehous", 2432), deadSpace: 0, offload:false}, {container: null, deadSpace: 1}, {container: null, deadSpace: 1}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [ {container: new Container("THIS STRING here", 5442), deadSpace: 0, offload: true}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],
-        [ {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}, {container: null, deadSpace: 0}],//9th row
+        [ {container: new Container("amazon warehous", 2432), deadSpace: false, offload:true}, {container: null, deadSpace: false}, {container: null, deadSpace: true}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}],
+        [ {container: new Container("THIS STRING here", 5442), deadSpace: false, offload: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}],
+        [ {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}],
+        [ {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}],
+        [ {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}],
+        [ {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}],
+        [ {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}],
+        [ {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}],
+        [ {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}, {container: null, deadSpace: false}],//9th row
       ];
+    let steps = null;
+  // let containersToLoad = [new Container("AA", null)];
+  // let containersToLoad = [new Container("AA", null), new Container("BB", null), new Container("CC", null)];
   let containersToLoad = [];
   let LocalNumberToOffload = 0;
 
@@ -46,6 +63,7 @@ import AddContainers from './addContainers';
       gridState: grid,
       offloadStateCounter: LocalNumberToOffload,
       addContainersState: false,
+      stepsFound: null            // (array of obj) steps that have been found
     };
 
     handleNewContainers = (containerArray) => {
@@ -101,7 +119,16 @@ import AddContainers from './addContainers';
         this.transition(Task1_States.INIT);
       }
     }
-
+    /**
+     * recieveSteps:
+     */
+    recieveSteps = (s) =>
+    {
+      steps = s.steps;
+      this.setState({steps: s});
+      console.log(steps);
+      this.transition(Task1_States.DISPLAY_STEPS);
+    }
     transition(to) {
       this.setState({current: to});
     }
@@ -125,6 +152,8 @@ import AddContainers from './addContainers';
       {
         return (
           <div>
+          {/* <ComputeSteps parentRecieveSteps={this.recieveSteps} load = {containersToLoad} grid={grid} />
+          <ToggleGrid parentToggleButton={this.handleButtonToggle} numberToOffload={LocalNumberToOffload} grid={grid}/> */}
           <FileUploader parentCallback={this.handleFileCallback}/>
         </div>
       );
@@ -157,19 +186,16 @@ import AddContainers from './addContainers';
     // #TODO: #3 logic for Computeing the steps (where our search function is going to go) 
     renderComputeSteps() {
       return (
-        <button onClick={() => this.transition(Task1_States.INIT)}>
-          No Logic Yet
-        </button>
+        <>
+          <ComputeSteps parentRecieveSteps={this.recieveSteps} load = {containersToLoad} grid={grid} />
+        </>
       );
     }
     // logic for showing steps
     renderShowSteps() {
       return (
-        <>
-        <div className='loadedFileName'>Current File: {this.state.loadedFileName}</div>
-        <button onClick={() => this.transition(Task1_States.INIT)}>
-          Currently computing steps 
-        </button>
+       <>
+          <DisplaySteps fileName={this.state.loadedFileName} steps={steps} />
         </>
       );
     }

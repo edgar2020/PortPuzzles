@@ -19,12 +19,14 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
         } 
         else
         {
-            let end = (loc === finalPos.location);
+            // console.log(finalPos.location);
+            let end = (loc === finalPos.loc);
+            let start = (loc === initialPos.loc);
             return (
                 <>
                     <button
                         id={'toggleCell_['+row+','+col+']'}
-                        className= {`displayCell gridToggleButton empty ${end ? " end " : ""}`}>
+                        className= {`displayCell gridToggleButton empty ${end ? " end " : ""}${start ? " end " : ""}`}>
                     </button>
                 </>
             );
@@ -59,7 +61,7 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
             return (
                 <>
                 <button id={'toggleCell_['+row+','+col+']'} className={`displayCell gridToggleButton containerPresent ${start ? " start " : ""}`}>
-                    {displayCell.container.weight}
+                    {displayCell.container.name}
                 </button>
                 </>
             );

@@ -6,7 +6,7 @@ import TASK2 from './components/task2Weight/task2Weight'
 function weightBalancing() {
   return (
     <div className="weightBalancingContainer">
-      <SiteHeader/>
+      <SiteHeader value={"Balance Weight"}/>
       <TASK2/>
       <SiteFooter/>
     </div>

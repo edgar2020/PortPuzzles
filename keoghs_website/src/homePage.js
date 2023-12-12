@@ -6,7 +6,7 @@ import SiteFooter from './components/footer'
 function homePage() {
   return (
     <div className="homePage">
-        <SiteHeader/>
+        <SiteHeader value={"Home Page"}/>
         <HomeOptions/>
         <SiteFooter/>
     </div>

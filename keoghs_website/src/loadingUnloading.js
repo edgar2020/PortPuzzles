@@ -8,7 +8,7 @@ import TASK1 from './components/task1Loading/task1Loading'
 function loadingUnloading() {
   return (
     <div className="loadingUnloadingContainer">
-      <SiteHeader/>
+      <SiteHeader value={"Unloading & Offloading"}/>
         <TASK1/>
         <br></br>
         <br></br>

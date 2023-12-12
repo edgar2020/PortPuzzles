@@ -25,35 +25,23 @@ function getFormatedDate(date)
         return "["+curDate+"]";
 }
 
-// function createTimestamp()
-// {
-//     var date = new Date();
-//     var year = date.getFullYear();
-//     var month = date.getMonth() + 1;
-//     var day = date.getDate();
-//     var hh = date.getHours();
-//     var mm = date.getMinutes();
-//     let curDate = ((month < 10 ? "0" + month : month)+'/'+
-//                    (day < 10 ? "0" + day : day) +'/'+
-//                    (year%1000) + ' '+ 
-//                    (hh < 10 ? "0" + hh : hh) + ':'+
-//                    (mm < 10 ? "0" + mm : mm));
-//     // let unixTime = Date.parse(curDate);
-//     return  curDate;
-//     // return new Timestamp.fromDate(unixTime);
-//     // return  Timestamp.fromDate(date);
-
-// };
-
-
 export function saveEvent(m)
 {   
     db.collection(getCurrentLogFile()).add({
         time_stamp:  Timestamp.fromDate(new Date()),
         message: m,
     });
-    // console.log(m);
-    // alert(m);
+}
+
+export async function signIn(name)
+{   let out = (await db.collection('curUser').doc('1').get()).data().name
+    saveEvent(out + " logged out");
+    db.collection('curUser').doc('1').update({
+        name: name,
+    });
+    saveEvent(name + " logged in");
+    // console.log("Name "+ name );
+
 }
 
 

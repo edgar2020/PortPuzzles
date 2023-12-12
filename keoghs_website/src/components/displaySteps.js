@@ -4,8 +4,12 @@ import '../css/displaySteps.css'
 import {saveEvent } from '../logFile'
 // import '../css/tasks.css'
 
-const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, fileName}) => {
-    {/* {cost: 14, state:{ship: grid, buffer: buffer},initialPos:{position: [1, 1], location: 1}, finalPos: {position: [1, 1], location: 12} },  */}
+let arrayOfNullWeightsGlobal = [];
+
+const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, fileName, ParentRecieveButtonInput}) => {
+    const [weightInput, setWeightInput] = useState('');
+    const [arrayOfNullWeights, updateArray] = useState([]);
+{/* {cost: 14, state:{ship: grid, buffer: buffer},initialPos:{position: [1, 1], location: 1}, finalPos: {position: [1, 1], location: 12} },  */}
     function determineTypeOfCell (loc, row, col) 
     {
         let section = 0;
@@ -22,15 +26,37 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
             // console.log(finalPos.location);
             let end = (loc === finalPos.loc);
             let start = (loc === initialPos.loc);
-            return (
-                <>
+            
+            if(start === true)
+            {
+                let containerName = "";
+                if(initialPos.newContainer !== undefined)
+                {
+                    containerName = initialPos.newContainer.name
+                }  
+                return (
+                    <>
                     <button
                         id={'toggleCell_['+row+','+col+']'}
-                        className= {`displayCell gridToggleButton empty ${end ? " end " : ""}${start ? " end " : ""}`}>
+                        className= {`displayCell gridToggleButton containerPresent ${start ? " start " : ""}`}>
+                            {containerName}
+                    </button>
+                </>
+                );
+            }
+            else
+            {
+
+                return (
+                    <>
+                    <button
+                        id={'toggleCell_['+row+','+col+']'}
+                        className= {`displayCell gridToggleButton empty ${end ? " end " : ""}`}>
                     </button>
                 </>
             );
         }
+    }
         let displayCell = section[row-1][col-1];
         if(displayCell.container === null && displayCell.deadSpace === true)
         {
@@ -68,13 +94,24 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
         }
     }
 
+   
     let position = "nonActive";
     if(stepIndex === index){
        position = 'activeSlide'
       }
       
       const downloadOutBoundManifest = () => {
+        console.log(arrayOfNullWeightsGlobal);
         let generatedText = "";
+
+        // for every null container that was seen lets update it
+        
+        arrayOfNullWeightsGlobal.forEach((val) => {
+            // console.log({ val });
+            state.ship[val.location.pos[0]][val.location.pos[1]].container.weight = val.weight;
+          });
+        // console.log(state.ship);
+
         for(var rowNum = 0; rowNum < 8; rowNum++)
         {
             for(var colNum = 0; colNum < 12; colNum++)
@@ -111,9 +148,94 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
         window.location.href="/";
       }
     
+      function getTimeRemainingText ()
+      {
+        if (cost > 60)
+        {
+            if (Math.floor(cost/60) == 1)
+            {
+                return Math.floor(cost/60) + " hour " + (cost - 60 * Math.floor(cost/60)) + " minute (" + cost + " minutes total)";
+            }
+            else
+            {
+                return Math.floor(cost/60) + " hours " + (cost - 60 * Math.floor(cost/60)) + " minute (" + cost + " minutes total)";
+            }
+        }
+        else
+        {
+            if (cost == 1)
+            {
+                return cost + " minute";
+            }
+            else
+            {
+                return cost + " minutes";
+            }
+        }
+      }
+      function askForNewWeight ()
+      {
+        if(initialPos.newContainer !== undefined)
+        {
 
+            return(
+                <>
+                    <label htmlFor="addWeight">Pick Up Container: '{initialPos.newContainer.name}' and input its weight: </label>
+                    <input type="number" value={weightInput} id="addWeight" name="addWeight" min="0" max="99999" onChange={e => setWeightInput(e.target.value)}></input>
+                </>
+            )
+        }
+        else
+        {
+            return(<></>)
+        }
+      }
+
+      
       const generateInfoBox = () =>
       {
+        function checkAllowNext()
+        {
+            try {
+                let num = document.getElementById("addWeight");
+                console.log(initialPos);
+                let value = num.value
+
+                if(initialPos.loc !== 3)
+                {
+                    ParentRecieveButtonInput();  
+                    return true;
+                }
+                else if(weightInput === undefined || weightInput === '')
+                {
+                    alert("Remember to Insert the Container Weight!");
+                    return false;
+                }
+                else if(weightInput >= 0 && weightInput <= 99999 )
+                {
+                    // num.value='';
+                    console.log(weightInput);
+                    // console.log(value);
+                    arrayOfNullWeightsGlobal.push({location: finalPos, weight: weightInput});
+                    updateArray(arrayOfNullWeightsGlobal);
+                    // console.log(arrayOfNullWeights);
+                    setWeightInput('');
+                    ParentRecieveButtonInput();  
+                    return true;
+                }
+                else
+                {
+                    alert("Make sure the weight is within the range 0-99999");
+                    return false
+                }
+                
+                // console.log(num);
+            } catch (error) {
+                console.log(error)
+                return false;
+            }
+            return false;
+        }
         if(length-1 === index){
             // document.getElementById('nextStepButton').style.visibility  = 'hidden';
             return(
@@ -125,52 +247,19 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
                 </div>
             )
         }
-        else if (cost > 60)
-        {
-            if (cost - 60 * Math.floor(cost/60) == 1)
-            {
-                return(
-                    <>
-                        <h3>Information:</h3>
-                        <p>Time Remaining: {Math.floor(cost/60)} hours {cost - 60 * Math.floor(cost/60)} minute ({cost} minutes total)</p>
-                        <p>Step: {index+1} of {length-1}</p>
-                    </>
-                )
-            }
-            else
-            {
-                return(
-                    <>
-                        <h3>Information:</h3>
-                        <p>Time Remaining: {Math.floor(cost/60)} hours {cost - 60 * Math.floor(cost/60)} minutes ({cost} minutes total)</p>
-                        <p>Step: {index+1} of {length-1}</p>
-                    </>
-                )
-            }
-        }
         else
         {
-            if (cost == 1)
-            {
-                return(
+            return(
                 <>
                     <h3>Information:</h3>
-                    <p>Time Remaining: {cost} minute</p>
+                    <p>Time Remaining: {getTimeRemainingText()}</p>
                     <p>Step: {index+1} of {length-1}</p>
+                    {askForNewWeight()}
+                    <button id="nextStepButton" className="next" onClick={() => checkAllowNext()}>Next Step</button>
                 </>
                 )
-            }
-            else
-            {
-                return(
-                    <>
-                        <h3>Information:</h3>
-                        <p>Time Remaining: {cost} minutes</p>
-                        <p>Step: {index+1} of {length-1}</p>
-                    </>
-                )
-            }
         }
+        
           
       }
      return(
@@ -482,35 +571,39 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
         </div>
         )
 
-       }
+}
 
 
  
 function DisplaySteps(props) 
 {
     const [steps, setSteps] = useState(props.steps);
-    const [showButton, setShowButton] = useState(false);
+    // const [showButton, setShowButton] = useState(false);
     const [index, setIndex] = useState(0);
 
     useEffect(() => {
-        if(index === steps.length-1)
-        {
-           setShowButton(false);
-        }
-        else
-        {
+        // if(index === steps.length-1)
+        // {
+        //    setShowButton(false);
+        // }
+        // else
+        // {
             
-            setShowButton(true);
-        }
+        //     setShowButton(true);
+        // }
       }, );
+
+    const allowNext = () =>
+    {
+        setIndex(index + 1)
+    }
         
     return (
         <div id="displayStepsContainer">
                 
                     {steps.map((step, stepIndex) => {
-                return <Step key={stepIndex} {...step} stepIndex={stepIndex} index={index} length={steps.length} fileName={props.fileName} />
+                return <Step ParentRecieveButtonInput={allowNext} key={stepIndex} {...step} stepIndex={stepIndex} index={index} length={steps.length} fileName={props.fileName} />
             })}
-            {showButton && <button id="nextStepButton" className="next" onClick={() => setIndex(index + 1)}>Next Step</button>}
             
         </div>
     )

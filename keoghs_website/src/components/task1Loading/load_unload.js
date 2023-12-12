@@ -247,8 +247,16 @@ function getInstructionsHelper(node, cost, instructions) { // Recursively return
     
     let buffer = new Array(4).fill(new Array(24).fill({container: null, deadSpace: false})) // 4x24 array of empty cells
     let state = {ship: node.parent.shipState, buffer: buffer, truck: 0}
+    
+    let moveThisContainer = node.initial_loc;
+    console.log(node.parent.loads_left);
+    if(node.initial_loc.loc === 3)
+    {
+        // console.log(node.parent.loads_left[0]);
+        moveThisContainer.newContainer = node.parent.loads_left[0];
+    }
 
-    instructions.push({cost: cost, state: state, initialPos: node.initial_loc, finalPos: node.final_loc})
+    instructions.push({cost: cost, state: state, initialPos: moveThisContainer, finalPos: node.final_loc})
 
     return instructions
 }

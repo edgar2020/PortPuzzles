@@ -24,6 +24,22 @@ class SiteHeader extends Component
     }
 
   }
+  endOfYearSignOut(e)
+  {
+    try {
+      e.preventDefault();
+      let response = prompt("Initiate END OF YEAR SIGN OUT PROTOCOL?\nType \"YES\" if you want to initialte protocol");
+      if(response === "YES")
+      {
+        window.location.href="/Signed-out";
+      }
+
+
+    } catch (error) {
+      
+    }
+
+  }
 
   render () 
   {
@@ -45,6 +61,7 @@ class SiteHeader extends Component
             </form>
           </div>
         </div>
+        <button id='endOfYearSignOut' onClick={(e)=> this.endOfYearSignOut(e)}>End of Year</button>
 
 
       </div>

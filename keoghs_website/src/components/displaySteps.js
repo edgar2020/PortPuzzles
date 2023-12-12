@@ -145,7 +145,7 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
             document.body.appendChild(element);
             element.click();
             saveEvent("Finished a Cycle. Manifest "+downloadFileName+" was downloaded, and a reminder pop-up to operator to send the file was displayed.");
-        window.location.href="/";
+            window.location.href="/";
       }
     
       function getTimeRemainingText ()

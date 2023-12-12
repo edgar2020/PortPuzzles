@@ -203,6 +203,12 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
 
                 if(initialPos.loc !== 3)
                 {
+                    if(initialPos.loc === 1 && finalPos.loc === 3)
+                    { 
+                        // console.log(state.ship[initialPos.pos[0]][initialPos.pos[1]].container);
+                        saveEvent("\""+state.ship[initialPos.pos[0]][initialPos.pos[1]].container.name+"\" is offloaded");
+                    }
+                    
                     ParentRecieveButtonInput();  
                     return true;
                 }
@@ -213,12 +219,10 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
                 }
                 else if(weightInput >= 0 && weightInput <= 99999 )
                 {
-                    // num.value='';
                     console.log(weightInput);
-                    // console.log(value);
                     arrayOfNullWeightsGlobal.push({location: finalPos, weight: weightInput});
+                    saveEvent("\""+initialPos.newContainer.name+"\" is onloaded");
                     updateArray(arrayOfNullWeightsGlobal);
-                    // console.log(arrayOfNullWeights);
                     setWeightInput('');
                     ParentRecieveButtonInput();  
                     return true;
@@ -228,8 +232,6 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
                     alert("Make sure the weight is within the range 0-99999");
                     return false
                 }
-                
-                // console.log(num);
             } catch (error) {
                 console.log(error)
                 return false;

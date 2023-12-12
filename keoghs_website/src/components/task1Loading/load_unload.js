@@ -491,62 +491,80 @@ function getPathCost(node, move) {
     
     return cost
 }
+// function getHeuristicCost(shipState, toUnload, toLoad ) {
+//     let H = 0
+//     // minimum cost of moving containers from toLoad
+//     for(let i = 0; i < toLoad.length; i++)
+//     {
+//         H += 3+i;
+
+//     }
+//     // calculate the cost of manhattan distance for every container to offload
+//     for(let j = 0; j < toUnload.length; j++)
+//     {
+//         H += 8-toUnload[j][ROW] //vertical distance
+//         // console.log("("+toUnload[j][ROW]+", "+toUnload[j][COLUMN]+")")
+//         H += toUnload[j][COLUMN] //horizontal distance
+//         H += 2 //cost to get to ship
+//     }
+
+//     // Add cost of containers blocking the unloads
+//     let columns_With_ContainersToMove = []; 
+//     // find all columns with containers to remove in them
+//     for(var i = 0; i < toUnload.length; i++)
+//     {
+//         columns_With_ContainersToMove.push(toUnload[i][COLUMN]);
+//     }
+//     // remove duplicate columns
+//     columns_With_ContainersToMove = [... new Set(columns_With_ContainersToMove)]
+//     for(var i = 0; i < columns_With_ContainersToMove.length; i++)
+//     {
+//         let seenOffload = false;
+//         let col = columns_With_ContainersToMove[i];
+//         // check every row except row 8
+//         for(let row = 0; row <= 7; row++)
+//         {
+//             // if a container whose offload === false add a cost
+//             if(shipState[row][col].offload === true)
+//             {
+//                 seenOffload = true;
+//             }
+//             else if(seenOffload && shipState[row][col].container !== null && shipState[row][col].offload === false)
+//             {
+//                 H++;
+//             }
+//         }
+//     }
+    
+//     // console.log("H3:"+H)
+//     // add cost for anything in the 9th row
+//     for(var col = 0; col < 12; col++)
+//     {
+//         if(shipState[8][col].container !== null)
+//         {
+//             H += 2
+//         }
+//     }
+
+//     // console.log("H4:"+H)
+    
+//     return H
+// }
+
+// Adolfo's Heuristic:
 function getHeuristicCost(shipState, toUnload, toLoad ) {
     let H = 0
-    // minimum cost of moving containers from toLoad
-    for(let i = 0; i < toLoad.length; i++)
-    {
-        H += 3+i;
-
-    }
-    // calculate the cost of manhattan distance for every container to offload
-    for(let j = 0; j < toUnload.length; j++)
-    {
-        H += 8-toUnload[j][ROW] //vertical distance
-        // console.log("("+toUnload[j][ROW]+", "+toUnload[j][COLUMN]+")")
-        H += toUnload[j][COLUMN] //horizontal distance
-        H += 2 //cost to get to ship
-    }
-
-    // Add cost of containers blocking the unloads
-    let columns_With_ContainersToMove = []; 
-    // find all columns with containers to remove in them
-    for(var i = 0; i < toUnload.length; i++)
-    {
-        columns_With_ContainersToMove.push(toUnload[i][COLUMN]);
-    }
-    // remove duplicate columns
-    columns_With_ContainersToMove = [... new Set(columns_With_ContainersToMove)]
-    for(var i = 0; i < columns_With_ContainersToMove.length; i++)
-    {
-        let seenOffload = false;
-        let col = columns_With_ContainersToMove[i];
-        // check every row except row 8
-        for(let row = 0; row <= 7; row++)
-        {
-            // if a container whose offload === false add a cost
-            if(shipState[row][col].offload === true)
-            {
-                seenOffload = true;
-            }
-            else if(seenOffload && shipState[row][col].container !== null && shipState[row][col].offload === false)
-            {
-                H++;
-            }
-        }
-    }
     
-    // console.log("H3:"+H)
-    // add cost for anything in the 9th row
-    for(var col = 0; col < 12; col++)
-    {
-        if(shipState[8][col].container !== null)
-        {
-            H += 2
-        }
-    }
+    H += toLoad.length * 100000 // add to H (the # of containers left to load) x (big constant)
 
-    // console.log("H4:"+H)
+    toUnload.forEach(container => {
+        let row = container[ROW]
+        let column = container[COLUMN]
+        while (row < 9 && shipState[row][column].container !== null) {
+            H += 100000 // add to H ((the # of containers left to unload) + (# of containers on top)) x (big constant)
+            row++
+        }
+    })
     
     return H
 }

@@ -25,6 +25,25 @@ function consolePrintState(state) {
     console.log(a.join('\t'))
 }
 
+// This function is strictly for debugging
+function consolePrintStateMap(stateMap) {
+    for (let row = 8; row >= 0; row--) {
+        let a = []
+        a.push(row + 1)
+        for (let column = 0; column < 12; column++) {
+            a.push(stateMap[row][column])
+        }
+        console.log(a.join('\t'))
+    }
+
+    let a = []
+    a.push(' ')
+    for (let i = 1; i < 13; i++) {
+        a.push(i)
+    }
+    console.log(a.join('\t'))
+}
+
 class Node {
 	constructor(ship) {
 		this.state = structuredClone(ship) // should make a copy of "ship" grid array
@@ -33,6 +52,8 @@ class Node {
         // ((old row, old column), (new row, new column))
 		this.move = [[8,0],[8,0]] // initial crane position
 		this.parent = null
+
+        this.stateMap = [] // only used to speed up balancing heuristic
 	}
 }
 
@@ -46,7 +67,7 @@ async function balance(ship) {  // returns instructions to balance, already bala
     //console.log(ship);
     consolePrintState(ship)
 
-    console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0]))
+    console.log("HEURISTIC COST: " + getHeuristicCost(ship, [8,0], initializeStateMap(ship)))
     console.log("CHECKING BALANCE...")
 
     if (isBalanced(ship)) { // returns the same input state if already balanced
@@ -163,6 +184,8 @@ function balanceIsPossibleHelper(lower, upper, sum, weightRemaining, weights) { 
 
 function balanceSearch(state) { // returns instructions for fastest balance
     let initialNode = new Node(state)
+    initialNode.stateMap = initializeStateMap(state) // only used to speed up balancing heuristic
+
 	// Create a data structure to store the paths that are being explored
 	let frontier = [initialNode]
 
@@ -232,6 +255,7 @@ function expand(frontier, foundStates, node) { // branching function, max 12x11 
                     let move = getMove(node.state, o, n)
                     if (move.length > 0) { // if move is valid (old column must have at least 1 container)
                         let tempState = getNewState(node.state, move)
+                        let tempStateMap = getNewStateMap(node.stateMap, move) // only used to speed up balancing heuristic
                         let tempStateID = getStateID(tempState) // ***TESTING STATE ID***
 
                         // *** COMMENTED OUT BECAUSE DIDN'T IMPROVE SEARCH TIME (FOR UNIFORM COST) ***
@@ -249,9 +273,11 @@ function expand(frontier, foundStates, node) { // branching function, max 12x11 
                         //if (isNewState) {
                             let tempNode = new Node(tempState)
                             tempNode.pathCost = node.pathCost + getPathCost(node.state, node.move[NEW], move) // sends old state, old crane position, and new move as inputs
-                            tempNode.heuristicCost = getHeuristicCost(tempState, node.move[NEW]) // sends new state and old crane position as inputs
+                            tempNode.heuristicCost = getHeuristicCost(tempState, node.move[NEW], tempStateMap) // sends new state and old crane position as inputs
                             tempNode.move = move
                             tempNode.parent = node
+
+                            tempNode.stateMap = tempStateMap // only used to speed up balancing heuristic
 
                             // Add the step to the frontier, using the cost and the heuristic function to estimate the total cost to reach the goal
                             frontier.push(tempNode)
@@ -374,6 +400,27 @@ function getNewState(oldState, move) {
     return newState
 }
 
+function initializeStateMap(state) { // only used to speed up balancing heuristic
+    let stateMap = structuredClone(state)
+    
+    // gives each container its unique id
+    for (let row = 0; row < 9; row++)
+        for (let column = 0; column < 12; column++)
+            if (state[row][column].container !== null)
+                stateMap[row][column] = row * 100 + column
+            else
+            stateMap[row][column] = -1
+
+    return stateMap
+}
+
+function getNewStateMap(oldStateMap, move) { // only used to speed up balancing heuristic
+    var newStateMap = structuredClone(oldStateMap)
+    newStateMap[move[OLD][ROW]][move[OLD][COLUMN]] = -1 // replace old location with empty cell
+    newStateMap[move[NEW][ROW]][move[NEW][COLUMN]] = oldStateMap[move[OLD][ROW]][move[OLD][COLUMN]] // container is now in new cell    
+    return newStateMap
+}
+
 function getPathCost(state, cranePos, move) {
     let cost = 0
 
@@ -416,8 +463,9 @@ function getPathCost(state, cranePos, move) {
     return cost
 }
 
-let balancedCombinations = [] // stores all the minimal balancing combinations in the ship (i.e. if {5,4} and {5,4,1} both balance, then only keep {5,4})
-function getHeuristicCost(state, cranePos) { // returns true if possible to balance, false if impossible
+let everyBalancingCombination = [] // stores all the minimal balancing combinations in the ship (i.e. if {5,4} and {5,4,1} both balance, then only keep {5,4})
+
+function getHeuristicCost(state, cranePos, stateMap) { // returns true if possible to balance, false if impossible
     if (isBalanced(state)) // heuristic cost is 0 if already balanced
         return 0
     
@@ -429,24 +477,21 @@ function getHeuristicCost(state, cranePos) { // returns true if possible to bala
         let topLeftEmptyRow = 9 // initially out of bounds
         let topRightEmptyRow = 9 // initially out of bounds
         for (let row = 8; row >= 0; row--) {
-            // left side
-            let column = 5 - i
+            let column = 5 - i // left side
             if (state[row][column].deadSpace == 0) {
                 if (state[row][column].container == null)
                     topLeftEmptyRow--
                 else
-                    containers.push({weight: state[row][column].container.weight, pos: [row, column], moveCost: 0, craneCost: 0})
+                    containers.push({id: stateMap[row][column], weight: state[row][column].container.weight, pos: [row, column], moveCost: 0, craneCost: 0})
             }// moveCost is min cost to move to other side, craneCost is min cost to move crane to it
 
-
-            // right side
-            column = 6 + i
+            column = 6 + i // right side
             if (state[row][column].deadSpace == 0) {
                 if (state[row][column].container == null)
                     topRightEmptyRow--
                 else
-                    containers.push({weight: state[row][column].container.weight, pos: [row, column], moveCost: 0, craneCost: 0})
-            }
+                    containers.push({id: stateMap[row][column], weight: state[row][column].container.weight, pos: [row, column], moveCost: 0, craneCost: 0})
+            }// moveCost is min cost to move to other side, craneCost is min cost to move crane to it
         }
         if (topLeftEmptyRow < 9)
             leftAvailableEmptyCells.push([topLeftEmptyRow, 5 - i])
@@ -501,60 +546,69 @@ function getHeuristicCost(state, cranePos) { // returns true if possible to bala
     // console.log("Upper bound: " + upperBound)
 
     let cost = Number.POSITIVE_INFINITY
-    //if (balancedCombinations.length == 0) {
-    if (true) {
+    if (everyBalancingCombination.length == 0) {
         let combination = []
-        let allBalancedCombinations = []
+        let balancedCombinations = []
         
-        cost = getHeuristicCostHelper(lowerBound, upperBound, 0, containers, combination, allBalancedCombinations, Number.POSITIVE_INFINITY, containers, sum)
+        cost = getHeuristicCostHelper(lowerBound, upperBound, 0, containers, combination, balancedCombinations, Number.POSITIVE_INFINITY, containers, sum)
         //console.log(balancedCombinations)
         
         // UNCOMMENT COMMENT TO COMMENT
 
         // need combinations to only have the minimum number of containers needed to balance
         // NEED TO TEST IF MINIMUM MATTERS
-        let balancedCombinationsCopy = structuredClone(allBalancedCombinations)
+        let balancedCombinationsCopy = structuredClone(balancedCombinations)
         //console.log(balancedCombinationsCopy)
 
-        for (let small = 0; small < allBalancedCombinations.length; small++) {
-            for (let big = 0; big < allBalancedCombinations.length; big++) {
-                if (allBalancedCombinations[big].length > allBalancedCombinations[small].length) {
+        for (let small = 0; small < balancedCombinations.length; small++) {
+            for (let big = 0; big < balancedCombinations.length; big++) {
+                if (balancedCombinations[big].length > balancedCombinations[small].length) {
                     let shareAllContainers = true
                     let s = 0
-                    while (shareAllContainers && s < allBalancedCombinations[small].length) {
+                    while (shareAllContainers && s < balancedCombinations[small].length) {
                         let b = 0
                         // look to see if bigger combination has the smaller combination's container at index s
-                        while (b < allBalancedCombinations[big].length && (allBalancedCombinations[small][s].pos[ROW] != allBalancedCombinations[big][b].pos[ROW] || allBalancedCombinations[small][s].pos[COLUMN] != allBalancedCombinations[big][b].pos[COLUMN])) {
+                        while (b < balancedCombinations[big].length && (balancedCombinations[small][s].pos[ROW] != balancedCombinations[big][b].pos[ROW] || balancedCombinations[small][s].pos[COLUMN] != balancedCombinations[big][b].pos[COLUMN])) {
                             b++
                         }
-                        if (b == allBalancedCombinations[big].length) 
+                        if (b == balancedCombinations[big].length) 
                             shareAllContainers = false // if the bigger combination did not have the smaller combination's container at index s, they do not share all the containers (in smaller combination)
                         s++
                     }
 
                     if (shareAllContainers) { // If they share all the containers (in smaller combination), then the bigger combination is the exact same comination as the smaller with just added containers
-                        //allBalancedCombinations.splice(big, 1) // remove the bigger combination from balanced combinations
-                        //console.log(allBalancedCombinations[big])
-                        allBalancedCombinations[big] = []
+                        //balancedCombinations.splice(big, 1) // remove the bigger combination from balanced combinations
+                        //console.log(balancedCombinations[big])
+                        balancedCombinations[big] = []
                     }
                 }
             }
         }
 
         // let newBalancedCombinations = []
-        allBalancedCombinations.forEach(combination => {
+        balancedCombinations.forEach(combination => {
             if (combination.length > 0)
-                balancedCombinations.push(combination)
+                everyBalancingCombination.push(combination)
         }) 
-        //console.log(balancedCombinations)
+        console.log(balancedCombinations.length + " => " + everyBalancingCombination.length)
 
         //*/
     } else {
         // IMPLEMENT NEW LOGIC HERE
+        //console.log("OOF")
+        let balancedCombinations = structuredClone(everyBalancingCombination)
+        
         // need to first update combination to correct values
-        balancedCombinations.forEach(combination => {
+        for (let i = 0; i < balancedCombinations.length; i++) {
+            for (let j = 0; j < balancedCombinations[i].length; j++) {
+                containers.forEach((container, index) => {
+                    if (balancedCombinations[i][j].id == container.id)
+                        balancedCombinations[i][j] = container
+                })
+            }
+        }
 
-        })
+        //console.log(balancedCombinations)
 
         // then return minimum cost
         balancedCombinations.forEach(combination => {
@@ -597,8 +651,8 @@ function getHeuristicCostHelper(lower, upper, sum, containers, combination, bala
         let tempCost = totalMovingCost(newCombination, lower, upper, originalContainers)
 
 
-        // if (tempCost >= cost) // ADDED EXTRA COMPARISON HERE TO STOP RECURSION EARLIER            ** NOT SURE IF I SHOULD INCLUDE BALANCED COMBINATIONS THAT HAVE HIGH COST IN HEURISTIC ** EDIT: I DO NEED THEM ALL
-        //     return cost // stop searching if combination already went over the lowest cost
+        if (tempCost >= cost) // ADDED EXTRA COMPARISON HERE TO STOP RECURSION EARLIER            ** NOT SURE IF I SHOULD INCLUDE BALANCED COMBINATIONS THAT HAVE HIGH COST IN HEURISTIC ** EDIT: I DO NEED THEM ALL
+            return cost // stop searching if combination already went over the lowest cost
 
         if (sum >= lower && sum <= upper) { // checks if the current sum is within 10% of ideal sum (NEED TO DOUBLE CHECK [> vs >=]/[< vs <=])
             let nextCost = getHeuristicCostHelper(lower, upper, sum - weight, containersCopy, oldCombination, balancedCombinations, tempCost, originalContainers, weightRemaining) // skip weight and continue looking

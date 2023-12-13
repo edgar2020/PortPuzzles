@@ -456,7 +456,7 @@ function getPathCost(state, cranePos, move) {
 let everyBalancingCombination = [] // stores all the minimal balancing combinations in the ship (i.e. if {5,4} and {5,4,1} both balance, then only keep {5,4})
 // This is so that recursion is only run the first time the heuristic is called
 
-function getHeuristicCost(state, cranePos, stateMap) { // returns true if possible to balance, false if impossible
+function getHeuristicCost(state, cranePos, stateMap) { // returns estimated cost to balance ship from current state (tries to get as close to the actual cost without going over)
     if (isBalanced(state)) // heuristic cost is 0 if already balanced
         return 0
     

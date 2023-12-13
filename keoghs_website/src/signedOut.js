@@ -1,5 +1,11 @@
 import './css/signedOut.css';
-import { saveEvent } from './logFile';
+import { saveEvent, signIn } from './logFile';
+
+function signBackIn()
+{
+    // signIn()
+    window.location.href="/";
+}
 
 function SignedOut() {
   return (
@@ -7,7 +13,7 @@ function SignedOut() {
         <div id="signedOutPageContent">
             <h1>Software Signed Out</h1>
             <h2>Happy Holidys!</h2>
-            <p>Sign back in: <button id='return' className="signedOutButton" /*onClick={}*/>Sign-In</button></p>
+            <p>Sign back in: <button id='return' className="signedOutButton" onClick={() => signBackIn()}>Sign-In</button></p>
             {/* <iframe
             width="860"
             height="484"

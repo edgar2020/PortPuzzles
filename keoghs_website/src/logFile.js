@@ -42,7 +42,6 @@ export async function signOut()
 {  
 
     try {
-        
         console.log("signOut");
         //     const querySnapshot = await db.collection(getCurrentLogFile()).get()
         //     if (!querySnapshot.empty) {
@@ -59,27 +58,29 @@ export async function signOut()
         
     }
 }
+
 export async function signIn(name)
 {
     try {
-        
-        console.log("signIn");   
-        let out = (await db.collection('curUser').doc('1').get()).data().name
-        //if no user currently signed in
-        if(out === "No One Logged in to loggout")
-        {
-            saveEvent(out);
+        // const querySnapshot = await db.collection(getCurrentLogFile()).get()
+        // if (querySnapshot.empty) { 
+            console.log("signIn");   
+            let out = (await db.collection('curUser').doc('1').get()).data().name
+            //if no user currently signed in
+            // if(out === "No One Logged in to loggout")
+            // {
+            //     saveEvent(out);
+            // }
+            // else
+            // {
+                saveEvent(out + " logged out");
+            // }
+            db.collection('curUser').doc('1').update({
+                name: name,
+            });
+            saveEvent(name + " logged in");
+            // console.log("Name "+ name );
         }
-        else
-        {
-            saveEvent(out + " logged out");
-        }
-        db.collection('curUser').doc('1').update({
-            name: name,
-        });
-        saveEvent(name + " logged in");
-        // console.log("Name "+ name );
-        
     } catch (error) {
         console.log(error); 
     }

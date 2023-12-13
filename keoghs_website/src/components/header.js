@@ -32,7 +32,7 @@ class SiteHeader extends Component
       if(response === "YES")
       {
         // signOut();
-        // saveEvent("Signed out for the year");
+        saveEvent("Signed out for the year");
         window.location.href="/Signed-out";
       }
 

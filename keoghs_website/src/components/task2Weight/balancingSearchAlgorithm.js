@@ -1,6 +1,8 @@
 import React, { useEffect, useState, Component } from 'react';
 import '../../css/tasks.css'
 
+// EDGAR'S CODE ABOVE
+
 // This function is strictly for debugging
 function consolePrintState(state) {
     for (let row = 8; row >= 0; row--) {
@@ -43,6 +45,16 @@ function consolePrintStateMap(stateMap) {
     }
     console.log(a.join('\t'))
 }
+
+
+
+
+// ***************************************************************************************************************************************************************
+// ***************************************************************************************************************************************************************
+
+
+// Algorithm's code starts below
+
 
 class Node {
 	constructor(ship) {
@@ -168,7 +180,7 @@ function balanceIsPossibleHelper(lower, upper, sum, weightRemaining, weights) { 
 // ***************************************************************************************************************************************************************
 
 
-// Balance search starting below
+// Balance search starts below
 // This is for when balancing is POSSIBLE
 
 
@@ -411,7 +423,7 @@ function getNewStateMap(oldStateMap, move) { // only used to speed up balancing 
     return newStateMap
 }
 
-function getPathCost(state, cranePos, move) {
+function getPathCost(state, cranePos, move) { // returns the path cost (minutes) to get to the state
     let cost = 0
 
     // first initializes values to calculate cost moving crane to position
@@ -456,7 +468,7 @@ function getPathCost(state, cranePos, move) {
 let everyBalancingCombination = [] // stores all the minimal balancing combinations in the ship (i.e. if {5,4} and {5,4,1} both balance, then only keep {5,4})
 // This is so that recursion is only run the first time the heuristic is called
 
-function getHeuristicCost(state, cranePos, stateMap) { // returns true if possible to balance, false if impossible
+function getHeuristicCost(state, cranePos, stateMap) { // returns estimated cost to balance ship from current state (tries to get as close to the actual cost without going over)
     if (isBalanced(state)) // heuristic cost is 0 if already balanced
         return 0
     
@@ -464,7 +476,7 @@ function getHeuristicCost(state, cranePos, stateMap) { // returns true if possib
     let leftAvailableEmptyCells = []
     let rightAvailableEmptyCells = []
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) { // adds all containers into array in order starting from middle and going outwards, top to down
         let topLeftEmptyRow = 9 // initially out of bounds
         let topRightEmptyRow = 9 // initially out of bounds
         for (let row = 8; row >= 0; row--) {
@@ -730,7 +742,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
     return cost
 }*/
 
- //(Super fast now!, except 6 one's breaks it)
+// a lot more accurate
 // returns the cost to move all the containers in the combination to the same side (other side if already on the same side)
 function totalMovingCost(combination, lower, upper, originalContainers) {
     //console.log('GETTING TOTAL COST')
@@ -848,10 +860,8 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
 
 
 
-
-
-
     // else return the min cost of moving all containers in comination to left or all containers in combination to right
+
 
     // moving all containers in combination to right
     let leftToRightCost = 0
@@ -942,7 +952,6 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             rightToLeftCost += container.moveCost * 2
     })
     
-    
     if (isBalanced) { // add cost of moving all containers not in combination to other side        
         let i = 0
         originalContainers.forEach(container => {
@@ -1022,7 +1031,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
 // ***************************************************************************************************************************************************************
 
 
-// SIFT starting below
+// SIFT starts below
 // This is for when balancing is IMPOSSIBLE
 
 

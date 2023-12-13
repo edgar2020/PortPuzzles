@@ -31,7 +31,13 @@ function getFormatedDate(date)
 }
 
 export function saveEvent(m = "")
-{   
+{
+    console.log(m);
+    if(m === "")
+    {
+        console.log("No message to create event");
+        return;
+    }
     try {
         console.log("saveEvent");
         db.collection(getCurrentLogFile()).add({

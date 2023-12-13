@@ -7,7 +7,7 @@ function SignedOut() {
         <div id="signedOutPageContent">
             <h1>Software Signed Out</h1>
             <h2>Happy Holidys!</h2>
-            <p>Sign back in: <button id='return' className="signedOutButton" onClick={(e)=> this.endOfYearSignOut(e)}>Sign-In</button></p>
+            <p>Sign back in: <button id='return' className="signedOutButton" /*onClick={}*/>Sign-In</button></p>
             <iframe
             width="860"
             height="484"

@@ -27,21 +27,62 @@ function getFormatedDate(date)
 
 export function saveEvent(m)
 {   
-    db.collection(getCurrentLogFile()).add({
-        time_stamp:  Timestamp.fromDate(new Date()),
-        message: m,
-    });
+    try {
+        console.log("saveEvent");
+        db.collection(getCurrentLogFile()).add({
+            time_stamp:  Timestamp.fromDate(new Date()),
+            message: m,
+        });
+        
+    } catch (error) {
+        console.log(error);
+    }
 }
+export async function signOut()
+{  
 
+    try {
+        
+        console.log("signOut");
+        //     const querySnapshot = await db.collection(getCurrentLogFile()).get()
+        //     if (!querySnapshot.empty) {
+            
+            let out = (await db.collection('curUser').doc('1').get()).data().name
+            //if no user currently signed in
+        saveEvent(out + " logged out");
+        db.collection('curUser').doc('1').update({
+            name: "No One Logged in to loggout",
+        });
+        // saveEvent(name + " logged in");
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
 export async function signIn(name)
-{   let out = (await db.collection('curUser').doc('1').get()).data().name
-    saveEvent(out + " logged out");
-    db.collection('curUser').doc('1').update({
-        name: name,
-    });
-    saveEvent(name + " logged in");
-    // console.log("Name "+ name );
-
+{
+    try {
+        
+        console.log("signIn");   
+        let out = (await db.collection('curUser').doc('1').get()).data().name
+        //if no user currently signed in
+        if(out === "No One Logged in to loggout")
+        {
+            saveEvent(out);
+        }
+        else
+        {
+            saveEvent(out + " logged out");
+        }
+        db.collection('curUser').doc('1').update({
+            name: name,
+        });
+        saveEvent(name + " logged in");
+        // console.log("Name "+ name );
+        
+    } catch (error) {
+        console.log(error); 
+    }
 }
 
 const LogPage = () =>
@@ -50,23 +91,28 @@ const LogPage = () =>
     const [entries, setEntries] = useState([]);
  
     useEffect(() => {
-        const getEntriesFromFirebase = [];
-        const subscriber = db
-          .collection(getCurrentLogFile()).orderBy("time_stamp")
-          .onSnapshot((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                getEntriesFromFirebase.push({
-                ...doc.data(), //spread operator
-                key: doc.id, // `id` given to us by Firebase
-              });
+        try {
+            const getEntriesFromFirebase = [];
+            const subscriber = db
+            .collection(getCurrentLogFile()).orderBy("time_stamp")
+            .onSnapshot((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    getEntriesFromFirebase.push({
+                    ...doc.data(), //spread operator
+                    key: doc.id, // `id` given to us by Firebase
+                });
+                });
+                setEntries(getEntriesFromFirebase);
+                setLoading(false);
             });
-            setEntries(getEntriesFromFirebase);
-            setLoading(false);
-          });
-        //   console.log(getEntriesFromFirebase);
-        // return cleanup function
-        return () => subscriber();
-      }, [loading]); // empty dependencies array => useEffect only called once
+            //   console.log(getEntriesFromFirebase);
+            // return cleanup function
+            return () => subscriber();
+        
+        } catch (error) {
+            console.log(error); 
+        }
+    }, [loading]); // empty dependencies array => useEffect only called once
  
       const downloadTxtFile = () => {
         const element = document.createElement("a");

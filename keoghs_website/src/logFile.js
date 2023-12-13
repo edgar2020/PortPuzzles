@@ -9,6 +9,11 @@ function getCurrentLogFile()
     let year = new Date().getFullYear();
     return "Keoghs_Port_"+ year;
 }
+function getCurrentUserFile()
+{
+    let year = new Date().getFullYear();
+    return "curUser"+ year;
+}
 
 function getFormatedDate(date)
 {
@@ -38,47 +43,45 @@ export function saveEvent(m)
         console.log(error);
     }
 }
-export async function signOut()
-{  
-
-    try {
-        console.log("signOut");
-        //     const querySnapshot = await db.collection(getCurrentLogFile()).get()
-        //     if (!querySnapshot.empty) {
-            
-            let out = (/*await*/ db.collection('curUser').doc('1').get()).data().name
-            //if no user currently signed in
-        saveEvent(out + " logged out");
-        db.collection('curUser').doc('1').update({
-            name: "No One Logged in to loggout",
-        });
-        // saveEvent(name + " logged in");
-    } catch (error) {
-        console.log(error);
-        
-    }
-}
 
 export async function signIn(name)
 {
     try {
-        // const querySnapshot = await db.collection(getCurrentLogFile()).get()
-        // if (querySnapshot.empty) { 
-            console.log("signIn");   
-            let out = (/*await*/ db.collection('curUser').doc('1').get()).data().name
-            //if no user currently signed in
-            // if(out === "No One Logged in to loggout")
-            // {
-            //     saveEvent(out);
-            // }
-            // else
-            // {
-                saveEvent(out + " logged out");
-            // }
-            db.collection('curUser').doc('1').update({
+        const querySnapshot = (await db.collection(getCurrentUserFile()).doc('1').get()).data()
+        console.log(querySnapshot);
+        if (querySnapshot === undefined) {
+            console.log("!existis")
+            db.collection(getCurrentUserFile()).doc('1').set({
                 name: name,
             });
             saveEvent(name + " logged in");
+            console.log(name + " logged in");
+        } 
+        else
+        {
+            let old = querySnapshot.name
+            saveEvent(old + " logged out");
+            console.log(old + " logged out");
+            // console.log(" sf exists");
+            db.collection(getCurrentUserFile()).doc('1').update({
+                name: name,
+            });
+            
+            saveEvent(name + " logged in");
+            console.log(name + " logged in");
+        }
+        //     console.log("signIn");   
+        //     let out = (/*await*/ db.collection('curUser').doc('1').get()).data().name
+        //     //if no user currently signed in
+        //     // if(out === "No One Logged in to loggout")
+        //     // {
+        //     //     saveEvent(out);
+        //     // }
+        //     // else
+        //     // {
+        //         saveEvent(out + " logged out");
+        //     // }
+        //     saveEvent(name + " logged in");
             // console.log("Name "+ name );
         // }
     } catch (error) {

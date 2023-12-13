@@ -454,6 +454,7 @@ function getPathCost(state, cranePos, move) {
 }
 
 let everyBalancingCombination = [] // stores all the minimal balancing combinations in the ship (i.e. if {5,4} and {5,4,1} both balance, then only keep {5,4})
+// This is so that recursion is only run the first time the heuristic is called
 
 function getHeuristicCost(state, cranePos, stateMap) { // returns true if possible to balance, false if impossible
     if (isBalanced(state)) // heuristic cost is 0 if already balanced
@@ -536,20 +537,19 @@ function getHeuristicCost(state, cranePos, stateMap) { // returns true if possib
     // console.log("Upper bound: " + upperBound)
 
     let cost = Number.POSITIVE_INFINITY
-    if (everyBalancingCombination.length == 0) {
+    if (everyBalancingCombination.length == 0) { // This is only run the first time the heuristic is called (Only runs recursion once)
         let combination = []
         let balancedCombinations = []
         
         cost = getHeuristicCostHelper(lowerBound, upperBound, 0, containers, combination, balancedCombinations, Number.POSITIVE_INFINITY, containers, sum)
         //console.log(balancedCombinations)
-        
-        // UNCOMMENT COMMENT TO COMMENT
 
         // need combinations to only have the minimum number of containers needed to balance
         // NEED TO TEST IF MINIMUM MATTERS
         let balancedCombinationsCopy = structuredClone(balancedCombinations)
         //console.log(balancedCombinationsCopy)
 
+        // minimizes the balancing combinations in the ship (i.e. if {5,4} and {5,4,1} both balance, then only keep {5,4})
         for (let small = 0; small < balancedCombinations.length; small++) {
             for (let big = 0; big < balancedCombinations.length; big++) {
                 if (balancedCombinations[big].length > balancedCombinations[small].length) {
@@ -574,17 +574,14 @@ function getHeuristicCost(state, cranePos, stateMap) { // returns true if possib
             }
         }
 
-        // let newBalancedCombinations = []
+        // stores the minimum balancing combinations
         balancedCombinations.forEach(combination => {
             if (combination.length > 0)
                 everyBalancingCombination.push(combination)
         }) 
         console.log("Minimizing number of combinations: " + balancedCombinations.length + " -> " + everyBalancingCombination.length)
-
-        //*/
-    } else {
-        // IMPLEMENT NEW LOGIC HERE
-        //console.log("OOF")
+    } 
+    else { // This is run every other time
         let balancedCombinations = structuredClone(everyBalancingCombination)
         
         // need to first update combination to correct values
@@ -742,11 +739,11 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
     let leftContainers = []
     let rightContainers = []
 
-    
     let sum = 0
     
     let minCraneCost = Number.POSITIVE_INFINITY
     let firstContainerID = -1
+
     combination.forEach(container => {
         if (container.craneCost < minCraneCost) {
             minCraneCost = container.craneCost // first add min craneCost to cost
@@ -815,7 +812,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
                             cost += container.moveCost * 2
                     }
                 } else {
-                    // check that container is not part of combination
+                    // check that container is not part of combination and is on top of combination
                     let notInCombination = true
                     let isOnTopOfCombination = false
                     let i = 0
@@ -911,7 +908,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
                         leftToRightCost += container.moveCost * 2
                 }
             } else {
-                // check that container is not part of combination
+                // check that container is not part of combination and is on top of combination
                 let notInCombination = true
                 let isOnTopOfCombination = false
                 let i = 0
@@ -991,7 +988,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
                         rightToLeftCost += container.moveCost * 2
                 }
             } else {
-                // check that container is not part of combination
+                // check that container is not part of combination and is on top of combination
                 let notInCombination = true
                 let isOnTopOfCombination = false
                 let i = 0
@@ -1017,10 +1014,6 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
 
     return cost
 }
-
-
-// GOD SPEED HEURISTIC
-
 
 
 

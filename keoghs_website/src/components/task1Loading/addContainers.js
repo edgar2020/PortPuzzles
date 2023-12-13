@@ -70,7 +70,7 @@ class AddContainers extends Component {
     render() {
         return (
             <div id="inputContainerNamesContainer" className="inputSection">
-                <h3 id="containerToAddHeader">Add Containers</h3>
+                <h3 id="containerToAddHeader">Add Containers to Load</h3>
                 <div id="inputContainersUserInput">
                     {/* <label id="textBoxLabel">Container's Label:  */}
                         <input minLength={1} maxLength={255} id="inputContainerName" type="text" name="name" />
@@ -79,7 +79,7 @@ class AddContainers extends Component {
                 </div>
                 <div id="userContainerShowContainers">
                     {/* <ul className="listContainers"> */}
-                    <div id="containerCount">Adding {this.state.listitems.length} Containers</div>
+                    <div id="containerCount">Loading {this.state.listitems.length} Containers</div>
                     {this.state.listitems.map((listitem, index) => 
                         <div key={index} className="individualContainers">
                             <div className="individualContainerName">{listitem.name}<button className="removeContainerButton" onClick={() => {this.removeContainerToAdd(index)}}>X</button></div>

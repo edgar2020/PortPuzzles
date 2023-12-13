@@ -15,7 +15,6 @@ class SiteHeader extends Component
       input.value = ""
       if(currentEmployee != "") 
       {
-        // console.log("esf");
         signIn(currentEmployee);
       }
 
@@ -31,7 +30,6 @@ class SiteHeader extends Component
       let response = prompt("Initiate END OF YEAR SIGN OUT PROTOCOL?\nType \"YES\" if you want to initialte protocol");
       if(response === "YES")
       {
-        // signOut();
         saveEvent("Signed out for the year");
         window.location.href="/Signed-out";
       }

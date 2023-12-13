@@ -6,7 +6,7 @@ import SiteFooter from './components/footer'
 function homePage() {
   return (
     <div className="homePage">
-        <SiteHeader value={"Move Generator"}/>
+        <SiteHeader value={"Move Generator"} signOut={true}/>
         <HomeOptions/>
         <SiteFooter/>
     </div>

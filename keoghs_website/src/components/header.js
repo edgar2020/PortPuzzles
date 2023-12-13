@@ -1,6 +1,6 @@
 import React,{ Component } from 'react';
 import '../css/header.css';
-import { signIn } from '../logFile';
+import { saveEvent, signIn, signOut } from '../logFile';
 import keoghLogo from '../other/Logo_3.png'
   
 
@@ -18,6 +18,24 @@ class SiteHeader extends Component
         // console.log("esf");
         signIn(currentEmployee);
       }
+
+    } catch (error) {
+      
+    }
+
+  }
+  endOfYearSignOut(e)
+  {
+    try {
+      e.preventDefault();
+      let response = prompt("Initiate END OF YEAR SIGN OUT PROTOCOL?\nType \"YES\" if you want to initialte protocol");
+      if(response === "YES")
+      {
+        // signOut();
+        saveEvent("Signed out for the year");
+        window.location.href="/Signed-out";
+      }
+
 
     } catch (error) {
       
@@ -45,6 +63,9 @@ class SiteHeader extends Component
             </form>
           </div>
         </div>
+        { this.props.signOut &&
+            <button id='endOfYearSignOut' onClick={(e)=> this.endOfYearSignOut(e)}>End of Year</button>
+        }
 
 
       </div>

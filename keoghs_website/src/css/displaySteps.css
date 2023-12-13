@@ -2,19 +2,20 @@
 *{
     --transition: all 0.3s linear;
     --displayButtonDimension: 35px;
-    --initial-color: rgb(255, 164, 60);
+    --initial-color: rgb(255, 0, 0);
     --final-color: #00ca14;
 }
     
 
 .start
 {
+  background-color: rgb(94, 132, 189);
+  /* color: black; */
   /* background-color: rgb(152, 251, 152); */
   animation: animateInitial 3.5s ease 0s infinite normal forwards;
 }
 .end
 {
-    /* background-color: rgb(255, 82, 82); */
     animation: animateFinal 3.5s ease 0s infinite normal forwards;
 }
   .next {

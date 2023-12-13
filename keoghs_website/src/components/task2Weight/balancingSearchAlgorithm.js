@@ -464,7 +464,7 @@ function getHeuristicCost(state, cranePos, stateMap) { // returns estimated cost
     let leftAvailableEmptyCells = []
     let rightAvailableEmptyCells = []
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) { // adds all containers into array in order starting from middle and going outwards, top to down
         let topLeftEmptyRow = 9 // initially out of bounds
         let topRightEmptyRow = 9 // initially out of bounds
         for (let row = 8; row >= 0; row--) {
@@ -730,7 +730,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
     return cost
 }*/
 
- //(Super fast now!, except 6 one's breaks it)
+// a lot more accurate
 // returns the cost to move all the containers in the combination to the same side (other side if already on the same side)
 function totalMovingCost(combination, lower, upper, originalContainers) {
     //console.log('GETTING TOTAL COST')
@@ -848,10 +848,8 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
 
 
 
-
-
-
     // else return the min cost of moving all containers in comination to left or all containers in combination to right
+
 
     // moving all containers in combination to right
     let leftToRightCost = 0
@@ -941,7 +939,6 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
         else
             rightToLeftCost += container.moveCost * 2
     })
-    
     
     if (isBalanced) { // add cost of moving all containers not in combination to other side        
         let i = 0

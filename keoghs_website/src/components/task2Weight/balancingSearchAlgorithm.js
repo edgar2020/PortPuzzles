@@ -46,6 +46,16 @@ function consolePrintStateMap(stateMap) {
     console.log(a.join('\t'))
 }
 
+
+
+
+// ***************************************************************************************************************************************************************
+// ***************************************************************************************************************************************************************
+
+
+// Algorithm's code starts below
+
+
 class Node {
 	constructor(ship) {
 		this.state = structuredClone(ship) // should make a copy of "ship" grid array
@@ -170,7 +180,7 @@ function balanceIsPossibleHelper(lower, upper, sum, weightRemaining, weights) { 
 // ***************************************************************************************************************************************************************
 
 
-// Balance search starting below
+// Balance search starts below
 // This is for when balancing is POSSIBLE
 
 
@@ -1021,7 +1031,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
 // ***************************************************************************************************************************************************************
 
 
-// SIFT starting below
+// SIFT starts below
 // This is for when balancing is IMPOSSIBLE
 
 

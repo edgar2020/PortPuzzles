@@ -1,6 +1,8 @@
 import React, { useEffect, useState, Component } from 'react';
 import '../../css/tasks.css'
 
+// EDGAR'S CODE ABOVE
+
 // This function is strictly for debugging
 function consolePrintState(state) {
     for (let row = 8; row >= 0; row--) {

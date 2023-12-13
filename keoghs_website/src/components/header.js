@@ -11,12 +11,22 @@ class SiteHeader extends Component
     try {
       e.preventDefault();
       let input = document.getElementById("signIn")
-      let currentEmployee = input.value;
+      let currentEmployee = input.value.trim();
       input.value = ""
-      if(currentEmployee != "") 
+      if(currentEmployee != "" && currentEmployee.length <= 256) 
       {
         signIn(currentEmployee);
+        return;
       }
+      else if(currentEmployee.length > 256) 
+      {
+        alert("Username too long");
+      }
+      else
+      {
+        alert("No value entered, please type your name to sign in");
+      }
+      
 
     } catch (error) {
       
@@ -38,7 +48,6 @@ class SiteHeader extends Component
     } catch (error) {
       
     }
-
   }
 
   render () 
@@ -53,7 +62,7 @@ class SiteHeader extends Component
           <h1 className='headerTitle'>{this.props.value}</h1>
           <div className="signInContainer">
             <form id="signInForm">
-              <input id="signIn" className='signInInput' type="text" placeholder="Username" name="username" onChange={this.updateInput}/>
+              <input id="signIn" className='signInInput' type="text" placeholder="Username" name="username" max="256" onChange={this.updateInput}/>
               <button className='signInButton' type="submit" onClick={(e)=> this.submitSignIn(e)}>Sign-in</button>
             </form>
           </div>

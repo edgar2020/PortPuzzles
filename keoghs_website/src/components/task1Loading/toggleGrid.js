@@ -72,7 +72,7 @@ class ToggleGrid extends Component
         return (
          <div id="selectUnload" className='inputSection'>
             <h3 id="containersToUnloadInput_header">Select Containers to Unload</h3>
-            <div id="OffloadCounter">Offloading {this.props.numberToOffload} containers</div>
+            <div id="OffloadCounter">Unloading {this.props.numberToOffload} containers</div>
             <div id="containersToUnloadInput">
                 <div id="cargoGridDisplayContainer">
                     <div id='gridRow_8' className="gridRow">

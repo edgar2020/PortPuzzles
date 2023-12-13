@@ -46,7 +46,7 @@ export async function signOut()
         //     const querySnapshot = await db.collection(getCurrentLogFile()).get()
         //     if (!querySnapshot.empty) {
             
-            let out = (await db.collection('curUser').doc('1').get()).data().name
+            let out = (/*await*/ db.collection('curUser').doc('1').get()).data().name
             //if no user currently signed in
         saveEvent(out + " logged out");
         db.collection('curUser').doc('1').update({
@@ -65,7 +65,7 @@ export async function signIn(name)
         // const querySnapshot = await db.collection(getCurrentLogFile()).get()
         // if (querySnapshot.empty) { 
             console.log("signIn");   
-            let out = (await db.collection('curUser').doc('1').get()).data().name
+            let out = (/*await*/ db.collection('curUser').doc('1').get()).data().name
             //if no user currently signed in
             // if(out === "No One Logged in to loggout")
             // {

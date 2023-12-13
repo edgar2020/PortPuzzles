@@ -47,12 +47,9 @@ class SiteHeader extends Component
   {
     return (  
       <div className='siteHeader'>
-        {/* left */}
         <div className='keoghLogoContainer'>
           <img src={keoghLogo} className='headerLogo' alt='Keoghs Logo'/>
         </div>
-
-        {/* right */}
 
         <div className='rightSideOfHeader'>
           <h1 className='headerTitle'>{this.props.value}</h1>

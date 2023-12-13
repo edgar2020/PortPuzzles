@@ -739,18 +739,19 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
 function totalMovingCost(combination, lower, upper, originalContainers) {
     //console.log('GETTING TOTAL COST')
     let cost = 0
-    let minCraneCost = Number.POSITIVE_INFINITY
-
+    
     let leftContainers = []
     let rightContainers = []
-    let firstMovePos = []
 
+    
     let sum = 0
-
+    
+    let minCraneCost = Number.POSITIVE_INFINITY
+    let firstContainerID = -1
     combination.forEach(container => {
         if (container.craneCost < minCraneCost) {
             minCraneCost = container.craneCost // first add min craneCost to cost
-            firstMovePos = container.pos // min craneCost is also the first move position
+            firstContainerID = container.id // min craneCost is also the first move position
         }
 
         // separates each container in combination into left and right side
@@ -775,12 +776,12 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             let i = 0
             originalContainers.forEach(container => {
                 // check if container is part of combination
-                if (i < combination.length && (container.pos[ROW] == combination[i].pos[ROW]) && (container.pos[COLUMN] == combination[i].pos[COLUMN])) {
+                if (i < combination.length && container.id == combination[i].id) {
                     i++
                 } else if ((balancedOnlyMovingLeft && container.pos[COLUMN] < 6) || (balancedOnlyMovingRight && container.pos[COLUMN] > 5)) {
                     if (container.craneCost < minCraneCost) {
                         minCraneCost = container.craneCost
-                        firstMovePos = container.pos // min craneCost is also the first move position
+                        firstContainerID = container.id // min craneCost is also the first move position
                     }
                 }
             })
@@ -788,10 +789,10 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             i = 0
             originalContainers.forEach(container => {
                 // check if container is part of combination
-                if (i < combination.length && (container.pos[ROW] == combination[i].pos[ROW]) && (container.pos[COLUMN] == combination[i].pos[COLUMN])) {
+                if (i < combination.length && container.id == combination[i].id) {
                     i++
                 } else if ((balancedOnlyMovingLeft && container.pos[COLUMN] < 6) || (balancedOnlyMovingRight && container.pos[COLUMN] > 5)) {
-                    if ((container.pos[ROW] == firstMovePos[ROW]) && (container.pos[COLUMN] == firstMovePos[COLUMN]))
+                    if (container.id == firstContainerID)
                         cost += container.moveCost
                     else
                         cost += container.moveCost * 2
@@ -802,7 +803,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
         cost += minCraneCost
 
         combination.forEach(container => { // return cost to move all containers to other side
-            if ((container.pos[ROW] == firstMovePos[ROW]) && (container.pos[COLUMN] == firstMovePos[COLUMN])) 
+            if (container.id == firstContainerID)
                 cost += container.moveCost
             else
                 cost += container.moveCost * 2
@@ -822,7 +823,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
     // moving all containers in combination to right
     let leftToRightCost = 0
     leftContainers.forEach(container => {
-        if ((container.pos[ROW] == firstMovePos[ROW]) && (container.pos[COLUMN] == firstMovePos[COLUMN]))
+        if (container.id == firstContainerID)
             leftToRightCost += container.moveCost
         else
             leftToRightCost += container.moveCost * 2
@@ -833,12 +834,12 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
         let i = 0
         originalContainers.forEach(container => {
             // check if container is part of combination
-            if (i < combination.length && (container.pos[ROW] == combination[i].pos[ROW]) && (container.pos[COLUMN] == combination[i].pos[COLUMN])) {
+            if (i < combination.length && container.id == combination[i].id) {
                 i++
             } else if (container.pos[COLUMN] > 5) { // if container is not in combination
                 if (container.craneCost < minCraneCost) {
                     minCraneCost = container.craneCost
-                    firstMovePos = container.pos // min craneCost is also the first move position
+                    firstContainerID = container.id // min craneCost is also the first move position
                 }
             }
         })
@@ -846,10 +847,10 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
         i = 0
         originalContainers.forEach(container => {
             // check if container is part of combination
-            if (i < combination.length && (container.pos[ROW] == combination[i].pos[ROW]) && (container.pos[COLUMN] == combination[i].pos[COLUMN])) {
+            if (i < combination.length && container.id == combination[i].id) {
                 i++
             } else if (container.pos[COLUMN] > 5) { // if container is not in combination
-                if ((container.pos[ROW] == firstMovePos[ROW]) && (container.pos[COLUMN] == firstMovePos[COLUMN]))
+                if (container.id == firstContainerID)
                     leftToRightCost += container.moveCost
                 else
                     leftToRightCost += container.moveCost * 2
@@ -864,7 +865,7 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
     // moving all containers in combination to left
     let rightToLeftCost = 0
     rightContainers.forEach(container => {
-        if ((container.pos[ROW] == firstMovePos[ROW]) && (container.pos[COLUMN] == firstMovePos[COLUMN]))
+        if (container.id == firstContainerID)
             rightToLeftCost += container.moveCost
         else
             rightToLeftCost += container.moveCost * 2
@@ -875,12 +876,12 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
         let i = 0
         originalContainers.forEach(container => {
             // check if container is part of combination
-            if (i < combination.length && (container.pos[ROW] == combination[i].pos[ROW]) && (container.pos[COLUMN] == combination[i].pos[COLUMN])) {
+            if (i < combination.length && container.id == combination[i].id) {
                 i++
             } else if (container.pos[COLUMN] < 6) { // if container is not in combination
                 if (container.craneCost < minCraneCost) {
                     minCraneCost = container.craneCost
-                    firstMovePos = container.pos // min craneCost is also the first move position
+                    firstContainerID = container.id // min craneCost is also the first move position
                 }
             }
         })
@@ -888,10 +889,10 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
         i = 0
         originalContainers.forEach(container => {
             // check if container is part of combination
-            if (i < combination.length && (container.pos[ROW] == combination[i].pos[ROW]) && (container.pos[COLUMN] == combination[i].pos[COLUMN])) {
+            if (i < combination.length && container.id == combination[i].id) {
                 i++
             } else if (container.pos[COLUMN] < 6) { // if container is not in combination
-                if ((container.pos[ROW] == firstMovePos[ROW]) && (container.pos[COLUMN] == firstMovePos[COLUMN]))
+                if (container.id == firstContainerID)
                     rightToLeftCost += container.moveCost
                 else
                     rightToLeftCost += container.moveCost * 2

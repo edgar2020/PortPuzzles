@@ -581,18 +581,6 @@ function DisplaySteps(props)
     // const [showButton, setShowButton] = useState(false);
     const [index, setIndex] = useState(0);
 
-    useEffect(() => {
-        // if(index === steps.length-1)
-        // {
-        //    setShowButton(false);
-        // }
-        // else
-        // {
-            
-        //     setShowButton(true);
-        // }
-      }, );
-
     const allowNext = () =>
     {
         setIndex(index + 1)

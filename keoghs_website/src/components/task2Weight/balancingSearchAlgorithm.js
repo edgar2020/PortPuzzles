@@ -567,7 +567,6 @@ function getHeuristicCost(state, cranePos, stateMap) { // returns true if possib
                     }
 
                     if (shareAllContainers) { // If they share all the containers (in smaller combination), then the bigger combination is the exact same comination as the smaller with just added containers
-                        //balancedCombinations.splice(big, 1) // remove the bigger combination from balanced combinations
                         //console.log(balancedCombinations[big])
                         balancedCombinations[big] = []
                     }
@@ -580,7 +579,7 @@ function getHeuristicCost(state, cranePos, stateMap) { // returns true if possib
             if (combination.length > 0)
                 everyBalancingCombination.push(combination)
         }) 
-        console.log(balancedCombinations.length + " => " + everyBalancingCombination.length)
+        console.log("Minimizing number of combinations: " + balancedCombinations.length + " -> " + everyBalancingCombination.length)
 
         //*/
     } else {
@@ -775,11 +774,19 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
 
             let i = 0
             originalContainers.forEach(container => {
-                // check if container is part of combination
-                if (i < combination.length && container.id == combination[i].id) {
-                    i++
-                } else if ((balancedOnlyMovingLeft && container.pos[COLUMN] < 6) || (balancedOnlyMovingRight && container.pos[COLUMN] > 5)) {
-                    if (container.craneCost < minCraneCost) {
+                if ((balancedOnlyMovingLeft && container.pos[COLUMN] < 6) || (balancedOnlyMovingRight && container.pos[COLUMN] > 5)) {
+                    // check if container is part of combination
+                    let notInCombination = true
+                    let i = 0
+                    while (i < combination.length) {
+                        if (container.id == combination[i].id) {
+                            notInCombination = false
+                            break
+                        }
+                        i++
+                    }
+
+                    if (notInCombination && container.craneCost < minCraneCost) {
                         minCraneCost = container.craneCost
                         firstContainerID = container.id // min craneCost is also the first move position
                     }
@@ -789,13 +796,42 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
             i = 0
             originalContainers.forEach(container => {
                 // check if container is part of combination
-                if (i < combination.length && container.id == combination[i].id) {
-                    i++
-                } else if ((balancedOnlyMovingLeft && container.pos[COLUMN] < 6) || (balancedOnlyMovingRight && container.pos[COLUMN] > 5)) {
-                    if (container.id == firstContainerID)
-                        cost += container.moveCost
-                    else
-                        cost += container.moveCost * 2
+                if ((balancedOnlyMovingLeft && container.pos[COLUMN] < 6) || (balancedOnlyMovingRight && container.pos[COLUMN] > 5)) {
+                    // check if container is part of combination
+                    let notInCombination = true
+                    let i = 0
+                    while (i < combination.length) {
+                        if (container.id == combination[i].id) {
+                            notInCombination = false
+                            break
+                        }
+                        i++
+                    }
+
+                    if (notInCombination) {
+                        if (container.id == firstContainerID)
+                            cost += container.moveCost
+                        else
+                            cost += container.moveCost * 2
+                    }
+                } else {
+                    // check that container is not part of combination
+                    let notInCombination = true
+                    let isOnTopOfCombination = false
+                    let i = 0
+                    while (i < combination.length) {
+                        if (container.id == combination[i].id) {
+                            notInCombination = false
+                            break
+                        } else if (container.pos[COLUMN] == combination[i].pos[COLUMN] && container.pos[ROW] > combination[i].pos[ROW]) {
+                            isOnTopOfCombination = true
+                        }
+                        i++
+                    }
+
+                    if (notInCombination && isOnTopOfCombination) {
+                        cost += 2
+                    }
                 }
             })
         }
@@ -834,10 +870,19 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
         let i = 0
         originalContainers.forEach(container => {
             // check if container is part of combination
-            if (i < combination.length && container.id == combination[i].id) {
-                i++
-            } else if (container.pos[COLUMN] > 5) { // if container is not in combination
-                if (container.craneCost < minCraneCost) {
+            if (container.pos[COLUMN] > 5) {
+                // check if container is part of combination
+                let notInCombination = true
+                let i = 0
+                while (i < combination.length) {
+                    if (container.id == combination[i].id) {
+                        notInCombination = false
+                        break
+                    }
+                    i++
+                }
+
+                if (notInCombination && container.craneCost < minCraneCost) {
                     minCraneCost = container.craneCost
                     firstContainerID = container.id // min craneCost is also the first move position
                 }
@@ -847,13 +892,42 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
         i = 0
         originalContainers.forEach(container => {
             // check if container is part of combination
-            if (i < combination.length && container.id == combination[i].id) {
-                i++
-            } else if (container.pos[COLUMN] > 5) { // if container is not in combination
-                if (container.id == firstContainerID)
-                    leftToRightCost += container.moveCost
-                else
-                    leftToRightCost += container.moveCost * 2
+            if (container.pos[COLUMN] > 5) {
+                // check if container is part of combination
+                let notInCombination = true
+                let i = 0
+                while (i < combination.length) {
+                    if (container.id == combination[i].id) {
+                        notInCombination = false
+                        break
+                    }
+                    i++
+                }
+
+                if (notInCombination) {
+                    if (container.id == firstContainerID)
+                        leftToRightCost += container.moveCost
+                    else
+                        leftToRightCost += container.moveCost * 2
+                }
+            } else {
+                // check that container is not part of combination
+                let notInCombination = true
+                let isOnTopOfCombination = false
+                let i = 0
+                while (i < combination.length) {
+                    if (container.id == combination[i].id) {
+                        notInCombination = false
+                        break
+                    } else if (container.pos[COLUMN] == combination[i].pos[COLUMN] && container.pos[ROW] > combination[i].pos[ROW]) {
+                        isOnTopOfCombination = true
+                    }
+                    i++
+                }
+
+                if (notInCombination && isOnTopOfCombination) {
+                    cost += 2
+                }
             }
         })
     }
@@ -876,10 +950,19 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
         let i = 0
         originalContainers.forEach(container => {
             // check if container is part of combination
-            if (i < combination.length && container.id == combination[i].id) {
-                i++
-            } else if (container.pos[COLUMN] < 6) { // if container is not in combination
-                if (container.craneCost < minCraneCost) {
+            if (container.pos[COLUMN] < 6) {
+                // check if container is part of combination
+                let notInCombination = true
+                let i = 0
+                while (i < combination.length) {
+                    if (container.id == combination[i].id) {
+                        notInCombination = false
+                        break
+                    }
+                    i++
+                }
+
+                if (notInCombination && container.craneCost < minCraneCost) {
                     minCraneCost = container.craneCost
                     firstContainerID = container.id // min craneCost is also the first move position
                 }
@@ -889,13 +972,42 @@ function totalMovingCost(combination, lower, upper, originalContainers) {
         i = 0
         originalContainers.forEach(container => {
             // check if container is part of combination
-            if (i < combination.length && container.id == combination[i].id) {
-                i++
-            } else if (container.pos[COLUMN] < 6) { // if container is not in combination
-                if (container.id == firstContainerID)
-                    rightToLeftCost += container.moveCost
-                else
-                    rightToLeftCost += container.moveCost * 2
+            if (container.pos[COLUMN] < 6) {
+                // check if container is part of combination
+                let notInCombination = true
+                let i = 0
+                while (i < combination.length) {
+                    if (container.id == combination[i].id) {
+                        notInCombination = false
+                        break
+                    }
+                    i++
+                }
+
+                if (notInCombination) {
+                    if (container.id == firstContainerID)
+                        rightToLeftCost += container.moveCost
+                    else
+                        rightToLeftCost += container.moveCost * 2
+                }
+            } else {
+                // check that container is not part of combination
+                let notInCombination = true
+                let isOnTopOfCombination = false
+                let i = 0
+                while (i < combination.length) {
+                    if (container.id == combination[i].id) {
+                        notInCombination = false
+                        break
+                    } else if (container.pos[COLUMN] == combination[i].pos[COLUMN] && container.pos[ROW] > combination[i].pos[ROW]) {
+                        isOnTopOfCombination = true
+                    }
+                    i++
+                }
+
+                if (notInCombination && isOnTopOfCombination) {
+                    cost += 2
+                }
             }
         })
     }

@@ -6,7 +6,7 @@ import {saveEvent } from '../logFile'
 
 let arrayOfNullWeightsGlobal = [];
 
-const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, fileName, ParentRecieveButtonInput}) => {
+const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, fileName, ParentRecieveButtonInput, task}) => {
     const [weightInput, setWeightInput] = useState('');
     const [arrayOfNullWeights, updateArray] = useState([]);
 {/* {cost: 14, state:{ship: grid, buffer: buffer},initialPos:{position: [1, 1], location: 1}, finalPos: {position: [1, 1], location: 12} },  */}
@@ -87,7 +87,7 @@ const Step = ({index, cost, initialPos, finalPos, state, stepIndex, length, file
             return (
                 <>
                 <button id={'toggleCell_['+row+','+col+']'} className={`displayCell gridToggleButton containerPresent ${start ? " start " : ""}`}>
-                    {displayCell.container.name}
+                    {task === 1 ? displayCell.container.name : displayCell.container.weight}
                 </button>
                 </>
             );
@@ -602,7 +602,7 @@ function DisplaySteps(props)
         <div id="displayStepsContainer">
                 
                     {steps.map((step, stepIndex) => {
-                return <Step ParentRecieveButtonInput={allowNext} key={stepIndex} {...step} stepIndex={stepIndex} index={index} length={steps.length} fileName={props.fileName} />
+                return <Step ParentRecieveButtonInput={allowNext} key={stepIndex} {...step} stepIndex={stepIndex} index={index} length={steps.length} fileName={props.fileName} task={props.task} />
             })}
             
         </div>

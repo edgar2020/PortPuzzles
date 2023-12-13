@@ -195,7 +195,7 @@ import AddContainers from './addContainers';
     renderShowSteps() {
       return (
        <>
-          <DisplaySteps fileName={this.state.loadedFileName} steps={steps} />
+          <DisplaySteps fileName={this.state.loadedFileName} steps={steps} task={1}/>
         </>
       );
     }

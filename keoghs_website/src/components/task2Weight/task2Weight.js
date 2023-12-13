@@ -190,7 +190,7 @@ class task2Loading extends Component {
         {/* {console.log("fs")}
         {console.log(this.state.stepsFound)} */}
         <div className='loadedFileName'>Current File: {this.state.loadedFileName}</div>
-        <DisplaySteps fileName={this.state.loadedFileName} steps={steps} />
+        <DisplaySteps fileName={this.state.loadedFileName} steps={steps} task={2} />
       {/* <button onClick={() => this.transition(Task2_States.INIT)}>
         No Logic Yetd
       </button> */}

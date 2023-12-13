@@ -80,7 +80,7 @@ export async function signIn(name)
             });
             saveEvent(name + " logged in");
             // console.log("Name "+ name );
-        }
+        // }
     } catch (error) {
         console.log(error); 
     }

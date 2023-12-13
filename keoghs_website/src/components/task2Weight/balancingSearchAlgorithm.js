@@ -411,7 +411,7 @@ function getNewStateMap(oldStateMap, move) { // only used to speed up balancing 
     return newStateMap
 }
 
-function getPathCost(state, cranePos, move) {
+function getPathCost(state, cranePos, move) { // returns the path cost (minutes) to get to the state
     let cost = 0
 
     // first initializes values to calculate cost moving crane to position

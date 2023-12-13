@@ -27,12 +27,12 @@ function SignedOut() {
             <h2>Happy Holidys!</h2>
             {/* <p><button id='return' className="signedOutButton" onClick={() => sendMessage}>Finish Signing Out</button></p> */}
             <p>You May Now Close the Website</p>
-            {/* <iframe
+            <iframe
             width="860"
             title=""
             height="484"
             src="/logFiles"
-            ></iframe>; */}
+            ></iframe>;
 
         </div>
         {/* Code below is from: https://codepen.io/codeconvey/pen/xRzQay

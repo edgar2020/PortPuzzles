@@ -2,6 +2,8 @@ import React,{ Component } from 'react';
 import '../css/homeOptions.css';
 import '../css/tasks.css'
 
+import PDF1 from '../other/Instructionional_guide.pdf'
+
 class SiteHeader extends Component
 {
   render () 
@@ -12,7 +14,8 @@ class SiteHeader extends Component
         
         <a href="/LoadUnload"><button id="load-unload">Load and Unload</button></a>
         <a href="/Weight"><button id="weight-balancing">Weight Balancing</button></a>
-        <a href="https://docs.google.com/document/d/e/2PACX-1vRmRrrMe055YkEswPame8ZT-4YIx_xd6bC1mpo9w1WWHLa1KvF8mhN14XMwginI7a0q6pOowSDsliuP/pub" target="_blank"><button id="helpButton">Help</button></a>
+        <a href={PDF1} target="_blank"
+                    rel="noreferrer"><button id="helpButton">Help</button></a>
       </div>
     )
   }

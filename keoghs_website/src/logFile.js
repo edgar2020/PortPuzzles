@@ -30,8 +30,14 @@ function getFormatedDate(date)
         return "["+curDate+"]";
 }
 
-export function saveEvent(m)
-{   
+export function saveEvent(m = "")
+{
+    console.log(m);
+    if(m === "")
+    {
+        console.log("No message to create event");
+        return;
+    }
     try {
         console.log("saveEvent");
         db.collection(getCurrentLogFile()).add({
@@ -62,7 +68,6 @@ export async function signIn(name)
             let old = querySnapshot.name
             saveEvent(old + " logged out");
             console.log(old + " logged out");
-            // console.log(" sf exists");
             db.collection(getCurrentUserFile()).doc('1').update({
                 name: name,
             });
@@ -70,20 +75,6 @@ export async function signIn(name)
             saveEvent(name + " logged in");
             console.log(name + " logged in");
         }
-        //     console.log("signIn");   
-        //     let out = (/*await*/ db.collection('curUser').doc('1').get()).data().name
-        //     //if no user currently signed in
-        //     // if(out === "No One Logged in to loggout")
-        //     // {
-        //     //     saveEvent(out);
-        //     // }
-        //     // else
-        //     // {
-        //         saveEvent(out + " logged out");
-        //     // }
-        //     saveEvent(name + " logged in");
-            // console.log("Name "+ name );
-        // }
     } catch (error) {
         console.log(error); 
     }

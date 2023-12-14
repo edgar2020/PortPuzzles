@@ -23,6 +23,11 @@ export default function siteFooter ()
     e.preventDefault();
     try {
       let note = document.getElementById('noteInput').value.trim();
+      if(note.length === 0)
+      {
+        alert("Must enter a note to submit a note");
+        return;
+      }
       saveEvent("Note by Operator: "+note);
     } catch (error) {
       alert( error);

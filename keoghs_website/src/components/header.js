@@ -11,13 +11,22 @@ class SiteHeader extends Component
     try {
       e.preventDefault();
       let input = document.getElementById("signIn")
-      let currentEmployee = input.value;
+      let currentEmployee = input.value.trim();
       input.value = ""
-      if(currentEmployee != "") 
+      if(currentEmployee != "" && currentEmployee.length <= 256) 
       {
-        // console.log("esf");
         signIn(currentEmployee);
+        return;
       }
+      else if(currentEmployee.length > 256) 
+      {
+        alert("Username too long");
+      }
+      else
+      {
+        alert("No value entered, please type your name to sign in");
+      }
+      
 
     } catch (error) {
       
@@ -31,7 +40,6 @@ class SiteHeader extends Component
       let response = prompt("Initiate END OF YEAR SIGN OUT PROTOCOL?\nType \"YES\" if you want to initialte protocol");
       if(response === "YES")
       {
-        // signOut();
         saveEvent("Signed out for the year");
         window.location.href="/Signed-out";
       }
@@ -40,25 +48,21 @@ class SiteHeader extends Component
     } catch (error) {
       
     }
-
   }
 
   render () 
   {
     return (  
       <div className='siteHeader'>
-        {/* left */}
         <div className='keoghLogoContainer'>
           <img src={keoghLogo} className='headerLogo' alt='Keoghs Logo'/>
         </div>
-
-        {/* right */}
 
         <div className='rightSideOfHeader'>
           <h1 className='headerTitle'>{this.props.value}</h1>
           <div className="signInContainer">
             <form id="signInForm">
-              <input id="signIn" className='signInInput' type="text" placeholder="Username" name="username" onChange={this.updateInput}/>
+              <input id="signIn" className='signInInput' type="text" placeholder="Username" name="username" max="256" onChange={this.updateInput}/>
               <button className='signInButton' type="submit" onClick={(e)=> this.submitSignIn(e)}>Sign-in</button>
             </form>
           </div>

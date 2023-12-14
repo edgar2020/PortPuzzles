@@ -17,7 +17,6 @@ class FileUploader extends Component
     sendDataUp = (event) => {
         // Call the parent callback function 
         this.props.parentCallback( {name: this.fileName, text: this.textFromFile.trim()});
-        // event.preventDefault();
     }
 
     // On file select
@@ -68,14 +67,6 @@ class FileUploader extends Component
     };
     // On file upload (click the upload button)
     onFileUpload = () => {
-        // Create an object of formData
-        // const formData = new FormData();
-        // // Update the formData object
-        // formData.append(
-        //     //     "myFile",
-        //     this.state.selectedFile,
-        //     this.state.selectedFile.name
-        //     );
 
         // sendDataUp);
         let fr = new FileReader()

@@ -596,13 +596,14 @@ function expand(frontier, node) { // branching function, max 12x11 branches
     // remove duplicates columns
     columns_With_ContainersToMove = [...new Set(columns_With_ContainersToMove)]
 
+    console.log(node.unloads_left);
     // got to the columns with a container that need to be offloaded
     for(let i = 0; i < columns_With_ContainersToMove.length; i++)
     {
         let origCol = columns_With_ContainersToMove[i]
         let rowNum = 0;
         // find container at the top of the column
-        while(rowNum < 8 && node.shipState[rowNum+1][origCol].container != null)
+        while(rowNum < 8 && (node.shipState[rowNum+1][origCol].deadSpace === true || node.shipState[rowNum+1][origCol].container != null) )
         {
             rowNum++;
         }
@@ -611,6 +612,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
         let startOfMove = {loc: 1, col: origCol}
     
         // create a node for where a blocking container can move too
+        console.log(rowNum)
         if(curContainer.offload !== true) //container does not need to be removed
         {
             // if not moving container just moved OR doing first move 
@@ -676,6 +678,7 @@ function expand(frontier, node) { // branching function, max 12x11 branches
                     tempNode.heuristicCost = getHeuristicCost(tempState, unloads, loads)        
                     tempNode.loads_left = loads
                     tempNode.unloads_left = unloads
+                    console.log(unloads);
                     tempNode.pathCost = node.pathCost + getPathCost(node, move)
                     tempNode.initial_loc = move[OLD]
                     tempNode.final_loc = move[NEW]
@@ -740,6 +743,8 @@ function expand(frontier, node) { // branching function, max 12x11 branches
 
 function taskComplete(node) // returns true if no unloading/loading to be done
 {
+    printShip(node.shipState);
+    console.log(node.unloads_left);
     if(node.loads_left.length <= 0 && node.unloads_left.length <= 0)
     {
         // checls that no containers in the 9th row

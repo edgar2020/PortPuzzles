@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/WebPortPuzzles/static/css/main.1fbadb14.css",
+    "main.js": "/WebPortPuzzles/static/js/main.2e20089c.js",
+    "static/js/787.b5dccad1.chunk.js": "/WebPortPuzzles/static/js/787.b5dccad1.chunk.js",
+    "static/media/Instructionional_guide.pdf": "/WebPortPuzzles/static/media/Instructionional_guide.9072e503292334514986.pdf",
+    "static/media/Logo_3.png": "/WebPortPuzzles/static/media/Logo_3.1fdf4cd0eca4775ea2e4.png",
+    "index.html": "/WebPortPuzzles/index.html",
+    "main.1fbadb14.css.map": "/WebPortPuzzles/static/css/main.1fbadb14.css.map",
+    "main.2e20089c.js.map": "/WebPortPuzzles/static/js/main.2e20089c.js.map",
+    "787.b5dccad1.chunk.js.map": "/WebPortPuzzles/static/js/787.b5dccad1.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1fbadb14.css",
+    "static/js/main.2e20089c.js"
+  ]
+}

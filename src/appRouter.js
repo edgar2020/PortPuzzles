@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route, BrowserRouter } from 'react-router-dom'
 
 import Home from './homePage'
 import Weight from './weightBalancing'
@@ -11,8 +11,9 @@ function AppRouter() {
 
     const basename = process.env.NODE_ENV === 'production' ? '/WebPortPuzzles/#/' : '';
     return (
-        // <HashRouter basename= {basename} >
-        <HashRouter>
+        <HashRouter basename= {basename} >
+        {/* <HashRouter> */}
+        {/* // <BrowserRouter> */}
             <Routes>
                 <Route path="/" element={<Home/>} />
                 <Route path="/LoadUnload" element={<LoadUnload/>} />
@@ -25,6 +26,7 @@ function AppRouter() {
                 />
             </Routes>
         </HashRouter>
+        // </BrowserRouter>
     )
 }
 export default AppRouter
